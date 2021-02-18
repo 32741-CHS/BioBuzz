@@ -1,31 +1,23 @@
+
 repositories {
     mavenCentral()
     google() // Needed for androidx
-    maven { url = 'https://mymaven.bylazar.com/releases' }
-    maven { url = 'https://repo.dairy.foundation/releases' }
+    jcenter()  // Needed for tensorflow-lite
+    flatDir {
+        dirs rootProject.file('libs')
+    }
 }
 
 dependencies {
-
-    implementation 'org.firstinspires.ftc:Inspection:12.0.0'
-    implementation 'org.firstinspires.ftc:Blocks:12.0.0'
-    implementation 'org.firstinspires.ftc:RobotCore:12.0.0'
-    implementation 'org.firstinspires.ftc:RobotServer:12.0.0'
-    implementation 'org.firstinspires.ftc:OnBotJava:12.0.0'
-    implementation 'org.firstinspires.ftc:Hardware:12.0.0'
-    implementation 'org.firstinspires.ftc:FtcCommon:12.0.0'
-    implementation 'org.firstinspires.ftc:Vision:12.0.0'
+    implementation 'org.firstinspires.ftc:Inspection:6.2.1'
+    implementation 'org.firstinspires.ftc:Blocks:6.2.1'
+    implementation 'org.firstinspires.ftc:RobotCore:6.2.1'
+    implementation 'org.firstinspires.ftc:RobotServer:6.2.1'
+    implementation 'org.firstinspires.ftc:OnBotJava:6.2.1'
+    implementation 'org.firstinspires.ftc:Hardware:6.2.1'
+    implementation 'org.firstinspires.ftc:FtcCommon:6.2.1'
+    implementation 'org.firstinspires.ftc:tfod:1.0.2'
+    implementation 'org.tensorflow:tensorflow-lite:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-
-    // Stuff For Panels -- Eric
-    // Don't update fullpanels yet as we use legacy code that needs to be updated.
-    // I no want to handle that...
-    implementation 'com.bylazar:fullpanels:1.0.0'
-    implementation 'com.bylazar:camerastream:1.0.2'
-
-    // Stuff for pedro pathing
-    implementation 'com.pedropathing:tuning:1.0.0'
-    implementation 'com.pedropathing:revhub:3.0.2'
-    implementation 'com.pedropathing.ivy:pedro:1.1.1'
 }
 
