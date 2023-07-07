@@ -32,20 +32,17 @@ package org.firstinspires.ftc.robotcontroller.external.samples;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionPortal.CameraState;
-import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
-import java.util.List;
-
-/*
- * This OpMode illustrates the basics of AprilTag recognition and pose estimation, using
+/**
+ * This 2023-2024 OpMode illustrates the basics of AprilTag recognition and pose estimation, using
  * two webcams.
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
@@ -55,7 +52,7 @@ import java.util.List;
 @Disabled
 public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
 
-    /*
+    /**
      * Variables used for switching cameras.
      */
     private WebcamName webcam1, webcam2;
@@ -63,12 +60,12 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
     private boolean oldRightBumper;
 
     /**
-     * The variable to store our instance of the AprilTag processor.
+     * {@link #aprilTag} is the variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
 
     /**
-     * The variable to store our instance of the vision portal.
+     * {@link #visionPortal} is the variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
 
@@ -79,29 +76,31 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch START to start OpMode");
+        telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
         waitForStart();
 
-        while (opModeIsActive()) {
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
 
-            telemetryCameraSwitching();
-            telemetryAprilTag();
+                telemetryCameraSwitching();
+                telemetryAprilTag();
 
-            // Push telemetry to the Driver Station.
-            telemetry.update();
+                // Push telemetry to the Driver Station.
+                telemetry.update();
 
-            // Save CPU resources; can resume streaming when needed.
-            if (gamepad1.dpad_down) {
-                visionPortal.stopStreaming();
-            } else if (gamepad1.dpad_up) {
-                visionPortal.resumeStreaming();
+                // Save CPU resources; can resume streaming when needed.
+                if (gamepad1.dpad_down) {
+                    visionPortal.stopStreaming();
+                } else if (gamepad1.dpad_up) {
+                    visionPortal.resumeStreaming();
+                }
+
+                doCameraSwitching();
+
+                // Share the CPU.
+                sleep(20);
             }
-
-            doCameraSwitching();
-
-            // Share the CPU.
-            sleep(20);
         }
 
         // Save more CPU resources when camera is no longer needed.
@@ -131,7 +130,7 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
     }   // end method initAprilTag()
 
     /**
-     * Add telemetry about camera switching.
+     * Function to add telemetry about camera switching.
      */
     private void telemetryCameraSwitching() {
 
@@ -146,7 +145,7 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
     }   // end method telemetryCameraSwitching()
 
     /**
-     * Add telemetry about AprilTag detections.
+     * Function to add telemetry about AprilTag detections.
      */
     private void telemetryAprilTag() {
 
@@ -155,25 +154,14 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if (detection instanceof AprilTagSingleDetection) {
-                AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
-
-                if (singleDet.metadata != null) {
-                    telemetry.addLine(String.format("\n==== (ID %d) %s", singleDet.id, singleDet.metadata.name));
-                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                    telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-                } else {
-                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", singleDet.id));
-                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", singleDet.center.x, singleDet.center.y));
-                }
-            }  else {
-                AprilTagClusterDetection clusterDet = (AprilTagClusterDetection) detection;
-                telemetry.addLine(String.format("\n==== Tag Cluster (%s)", clusterDet.metadata.name));
-                telemetry.addLine(String.format("Percent tags found: %d", clusterDet.percentClusterFound));
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
 
@@ -185,7 +173,7 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
     }   // end method telemetryAprilTag()
 
     /**
-     * Set the active camera according to input from the gamepad.
+     * Function to set the active camera according to input from the gamepad.
      */
     private void doCameraSwitching() {
         if (visionPortal.getCameraState() == CameraState.STREAMING) {
