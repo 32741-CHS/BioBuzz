@@ -50,7 +50,7 @@ public class Vision {
         ExposureControl exp = portal.getCameraControl(ExposureControl.class);
         if (exp != null) {
             exp.setMode(ExposureControl.Mode.Manual);
-            exp.setExposure(5, TimeUnit.MILLISECONDS);
+            exp.setExposure(2, TimeUnit.MILLISECONDS);
         }
 
         GainControl gain = portal.getCameraControl(GainControl.class);
