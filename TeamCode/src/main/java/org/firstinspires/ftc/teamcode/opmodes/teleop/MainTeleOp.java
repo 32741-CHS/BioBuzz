@@ -37,11 +37,11 @@ public class MainTeleOp extends OpMode {
 
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    private final GamepadEx gp1 = new GamepadEx();
-    private final GamepadEx gp2 = new GamepadEx();
+    private final GamepadEx driverButtons = new GamepadEx();
+    private final GamepadEx operatorButtons = new GamepadEx();
 
-    private final GamepadManager pgp1 = PanelsGamepad.INSTANCE.getFirstManager();
-    private final GamepadManager pgp2 = PanelsGamepad.INSTANCE.getSecondManager();
+    private final GamepadManager driverPanelsGamepad = PanelsGamepad.INSTANCE.getFirstManager();
+    private final GamepadManager operatorPanelsGamepad = PanelsGamepad.INSTANCE.getSecondManager();
 
     private boolean isFieldDriving = false;
     public static boolean isRed = false;
@@ -68,7 +68,7 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init_loop() {
-        Gamepad driverGamepad = pgp1.asCombinedFTCGamepad(gamepad1);
+        Gamepad driverGamepad = getDriverGamepad();
 
         if (driverGamepad.x) {
             isRed = true;
@@ -84,14 +84,14 @@ public class MainTeleOp extends OpMode {
     public void start() {}
     @Override
     public void loop() {
-        Gamepad driverGamepad = pgp1.asCombinedFTCGamepad(gamepad1);
-        Gamepad operatorGamepad = pgp2.asCombinedFTCGamepad(gamepad2);
+        Gamepad driverGamepad = getDriverGamepad();
+        Gamepad operatorGamepad = getOperatorGamepad();
 
-        gp1.update(driverGamepad);
-        gp2.update(operatorGamepad);
+        driverButtons.update(driverGamepad);
+        operatorButtons.update(operatorGamepad);
 
         // gamepad 1
-        drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
+        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld(), driverButtons.rb.isHeld());
         // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
                 -driverGamepad.left_stick_y,
@@ -100,26 +100,26 @@ public class MainTeleOp extends OpMode {
                 isFieldDriving
         );
 
-        if (gp1.y.wasPressed()) {
+        if (driverButtons.y.wasPressed()) {
             isFieldDriving = !isFieldDriving;
         }
 
         // gamepad 2
-        if (gp2.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
-        if (gp2.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
+        if (operatorButtons.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
+        if (operatorButtons.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
 
-        if (gp2.y.wasPressed()) {drivetrain.resetIMU();}
-        if (gp2.b.wasPressed()) {turret.resetTurretEncoder();}
+        if (operatorButtons.y.wasPressed()) {drivetrain.resetIMU();}
+        if (operatorButtons.b.wasPressed()) {turret.resetTurretEncoder();}
 
-        if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
-        if (gp2.a.isHeld()) { intake.invert();}
+        if (operatorButtons.lt >= TRIGGER_THRESHOLD) {intake.eat();}
+        if (operatorButtons.a.isHeld()) { intake.invert();}
 
         if (operatorGamepad.a && operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
             shooter.reverseFeed();
         } else if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
             shooter.feed();
         }
-        if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
+        if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
 
         // turret: right stick x for manual override, or auto-track the goal tag
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
@@ -172,5 +172,13 @@ public class MainTeleOp extends OpMode {
 
         panelsGraph.update();
         panelsTelemetry.update(telemetry);
+    }
+
+    private Gamepad getDriverGamepad() {
+        return driverPanelsGamepad.asCombinedFTCGamepad(gamepad1);
+    }
+
+    private Gamepad getOperatorGamepad() {
+        return operatorPanelsGamepad.asCombinedFTCGamepad(gamepad2);
     }
 }
