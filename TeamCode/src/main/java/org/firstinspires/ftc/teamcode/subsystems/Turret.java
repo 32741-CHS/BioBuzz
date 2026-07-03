@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312R
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
@@ -23,8 +22,8 @@ public class Turret {
     public static double MAX_POWER = 0.6;
     public static double MAX_ACCEL = 0.02;
     public static double ANGLE_TOLERANCE = 1.5;
-    public static double MIN_ANGLE = -44;
-    public static double MAX_ANGLE = 20;
+    public static double MIN_ANGLE = -85;
+    public static double MAX_ANGLE = 61;
     public static double SOFT_ZONE_DEG = 5.0;
 
     private double lastPower = 0;
