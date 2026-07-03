@@ -57,7 +57,10 @@ public class Shooter {
 
     public void toggleFlywheel() {
         canSpinFlywheel = !canSpinFlywheel;
-        if (canSpinFlywheel) desiredFlywheelRPS = 13;
+    }
+
+    public static void setDesiredFlywheelRPS(double rps) {
+        desiredFlywheelRPS = rps;
     }
 
     public void feed() {

@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import org.firstinspires.ftc.teamcode.utils.MathEx;
 
 public class Ballistics {
-    private static double[] DISTANCE_LOOKUP = {0.71, 1.86, 3.27};
-    private static double[] SPEED_LOOKUP =    {37.0, 52.0, 70.0};
+    private static double[] DISTANCE_LOOKUP = {0.71, 1.86, 3.27}; // metres
+    private static double[] SPEED_LOOKUP =    {37.0, 52.0, 70.0}; // rps
 
     public static double calculateTurretAngle(double tagBearingDeg, double currentAngleDeg) {
         return currentAngleDeg + tagBearingDeg;
