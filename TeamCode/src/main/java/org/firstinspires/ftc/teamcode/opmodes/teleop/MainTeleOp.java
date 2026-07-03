@@ -12,6 +12,7 @@ import com.bylazar.graph.GraphManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
@@ -67,9 +68,11 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init_loop() {
-        if (gamepad1.x) {
+        Gamepad driverGamepad = pgp1.asCombinedFTCGamepad(gamepad1);
+
+        if (driverGamepad.x) {
             isRed = true;
-        } else if (gamepad1.a) {
+        } else if (driverGamepad.a) {
             isRed = false;
         }
         telemetry.addData("Team", isRed ? "RED" : "BLUE");
@@ -81,16 +84,19 @@ public class MainTeleOp extends OpMode {
     public void start() {}
     @Override
     public void loop() {
-        gp1.update(pgp1.asCombinedFTCGamepad(gamepad1));
-        gp2.update(pgp2.asCombinedFTCGamepad(gamepad2));
+        Gamepad driverGamepad = pgp1.asCombinedFTCGamepad(gamepad1);
+        Gamepad operatorGamepad = pgp2.asCombinedFTCGamepad(gamepad2);
+
+        gp1.update(driverGamepad);
+        gp2.update(operatorGamepad);
 
         // gamepad 1
         drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
         // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
-            -gamepad1.left_stick_y,
-            gamepad1.left_stick_x,
-            gamepad1.right_stick_x,
+                -driverGamepad.left_stick_y,
+                driverGamepad.left_stick_x,
+                driverGamepad.right_stick_x,
                 isFieldDriving
         );
 
@@ -108,9 +114,9 @@ public class MainTeleOp extends OpMode {
         if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
         if (gp2.a.isHeld()) { intake.invert();}
 
-        if (gamepad2.a && gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+        if (operatorGamepad.a && operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
             shooter.reverseFeed();
-        } else if (gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+        } else if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
             shooter.feed();
         }
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
@@ -118,7 +124,7 @@ public class MainTeleOp extends OpMode {
         // turret: right stick x for manual override, or auto-track the goal tag
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
 
-        double stickX = gamepad2.right_stick_x;
+        double stickX = operatorGamepad.right_stick_x;
         if (Math.abs(stickX) > STICK_DEADBAND) {
             if (!turretManualMode) {
                 turretManualMode = true;
