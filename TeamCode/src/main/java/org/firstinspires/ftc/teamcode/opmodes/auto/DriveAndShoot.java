@@ -21,7 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Configurable
 @Autonomous(name="Drive and shoot", group="Robot")
 public class DriveAndShoot extends LinearOpMode {
-    public static double DRIVE_TIME = 1.5;
+    public static double DRIVE_TIME = 1.2;
     public static double DRIVE_POWER = 0.4;
 
     public static double SHOOT_TIME = 5;
