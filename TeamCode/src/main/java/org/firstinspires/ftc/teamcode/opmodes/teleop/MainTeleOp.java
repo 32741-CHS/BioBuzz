@@ -114,11 +114,14 @@ public class MainTeleOp extends OpMode {
         if (operatorButtons.lt >= TRIGGER_THRESHOLD) {intake.eat();}
         if (operatorButtons.a.isHeld()) { intake.invert();}
 
-        if (operatorGamepad.a && operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
-            shooter.reverseFeed();
-        } else if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
-            shooter.feed();
+        if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD){
+            if (operatorButtons.a.isHeld()) {
+                shooter.reverseFeed();
+            } else {
+                shooter.feed();
+            }
         }
+
         if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
 
         // turret: right stick x for manual override, or auto-track the goal tag
