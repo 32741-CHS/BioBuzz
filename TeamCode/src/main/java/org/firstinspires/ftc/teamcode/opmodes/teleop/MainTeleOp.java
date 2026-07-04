@@ -95,7 +95,7 @@ public class MainTeleOp extends OpMode {
         operatorButtons.update(operatorGamepad);
 
         // gamepad 1
-        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld(), driverButtons.rb.isHeld());
+        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld());
         // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
                 -driverGamepad.left_stick_y,

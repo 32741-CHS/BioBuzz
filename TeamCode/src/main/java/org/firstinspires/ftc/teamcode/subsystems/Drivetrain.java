@@ -17,9 +17,8 @@ public class Drivetrain {
     static final double WHEEL_DIAMETER = 10.4;
     static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI);
 
-    private static final double SPEED_SLOW   = 0.25;
-    private static final double SPEED_NORMAL = 0.75;
-    private static final double SPEED_TURBO  = 1.00;
+    private static final double SPEED_SLOW   = 0.4;
+    private static final double SPEED_NORMAL = 1;
 
     private static final double STICK_DEADBAND = 0.05;
 
@@ -77,16 +76,12 @@ public class Drivetrain {
         brDrive.setPower((br / max) * speedMultiplier);
     }
 
-    public void setSpeedMultiplier(boolean slow, boolean turbo) {
-        if (slow) speedMultiplier = SPEED_SLOW;
-        else if (turbo) speedMultiplier = SPEED_TURBO;
-        else speedMultiplier = SPEED_NORMAL;
+    public void setSpeedMultiplier(boolean slow) {
+        speedMultiplier = (slow ? SPEED_SLOW : SPEED_NORMAL);
     }
 
-    public String getSpeedMultiplier() {
-        if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (%.0f%%)", speedMultiplier * 100);
-        if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (%.0f%%)", speedMultiplier * 100);
-       return String.format("Normal (%.0f%%)", speedMultiplier * 100);
+    public double getSpeedMultiplier() {
+        return speedMultiplier;
     }
 
     public void resetIMU() {
