@@ -121,11 +121,11 @@ public class MainTeleOp extends OpMode {
                 shooter.feed();
             }
         }
-        if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
-        if (gp2.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
+        if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
+        if (operatorButtons.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
 
         // turret: right stick x for manual override, or auto-track the goal tag
-        double stickX = gamepad2.right_stick_x;
+        double stickX = operatorGamepad.right_stick_x;
         if (Math.abs(stickX) > STICK_DEADBAND) {
             if (!turretManualMode) {
                 turretManualMode = true;
