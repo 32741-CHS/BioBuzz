@@ -19,15 +19,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
-@Autonomous(name="Drive and shoot", group="Robot")
-public class DriveAndShoot extends LinearOpMode {
+@Autonomous(name="Drive and shoot far", group="Robot")
+public class DriveAndShootFar extends LinearOpMode {
     public static double DRIVE_TIME = 1.2;
     public static double DRIVE_POWER = 0.4;
 
-    public static double SHOOT_TIME = 5;
-    public static double MAX_SPINUP_TIME = 4;
+    public static double SHOOT_TIME = 10;
+    public static double MAX_SPINUP_TIME = 5;
 
-    public static double FLYWHEEL_ERROR_TOL = 1;
+    public static double FLYWHEEL_ERROR_TOL = 0.5;
 
 
     private final RobotHardware hw = new RobotHardware();
@@ -65,19 +65,18 @@ public class DriveAndShoot extends LinearOpMode {
         waitForStart();
 
         Shooter.canSpinFlywheel = true;
-        Shooter.desiredFlywheelRPS = 16.5;
         lastGoalTagTime = getRuntime();
 
         timer.reset();
         while (opModeIsActive() && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL && timer.seconds() <= MAX_SPINUP_TIME) {
-            trackTag();
+            runBallistics();
             turret.update();
             shooter.update();
         }
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= SHOOT_TIME) {
-            trackTag();
+            runBallistics();
             shooter.feed();
             intake.eat();
             turret.update();
@@ -92,13 +91,16 @@ public class DriveAndShoot extends LinearOpMode {
         }
     }
 
-    private void trackTag() {
+    private void runBallistics() {
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
         if (goalTag != null) {
             lastGoalTagTime = getRuntime();
             double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
             double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
             turret.goTo(angle);
+
+            double distance = goalTag.ftcPose.range;
+            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
             turret.returnHome();
         }
