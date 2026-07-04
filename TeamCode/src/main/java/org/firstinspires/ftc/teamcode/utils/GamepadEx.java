@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-// wraps the gamepad
-// call update() once per loop, then check wasPressed() or wasToggled()
 public class GamepadEx {
 
     public final Button a      = new Button();
@@ -22,14 +20,14 @@ public class GamepadEx {
     public float lt, rt;
 
     public void update(Gamepad gamepad) {
-        a.update(gamepad.a);
-        b.update(gamepad.b);
-        x.update(gamepad.x);
-        y.update(gamepad.y);
+        a.update(gamepad.a || gamepad.cross);
+        b.update(gamepad.b || gamepad.circle);
+        x.update(gamepad.x || gamepad.square);
+        y.update(gamepad.y || gamepad.triangle);
         lb.update(gamepad.left_bumper);
         rb.update(gamepad.right_bumper);
-        back.update(gamepad.back);
-        start.update(gamepad.start);
+        back.update(gamepad.back || gamepad.share);
+        start.update(gamepad.start || gamepad.options);
         dpadUp.update(gamepad.dpad_up);
         dpadDown.update(gamepad.dpad_down);
         dpadLeft.update(gamepad.dpad_left);

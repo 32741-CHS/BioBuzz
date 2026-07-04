@@ -11,6 +11,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
@@ -35,11 +36,11 @@ public class MainTeleOp extends OpMode {
 
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    private final GamepadEx gp1 = new GamepadEx();
-    private final GamepadEx gp2 = new GamepadEx();
+    private final GamepadEx driverButtons = new GamepadEx();
+    private final GamepadEx operatorButtons = new GamepadEx();
 
-    private final GamepadManager pgp1 = PanelsGamepad.INSTANCE.getFirstManager();
-    private final GamepadManager pgp2 = PanelsGamepad.INSTANCE.getSecondManager();
+    private final GamepadManager driverPanelsGamepad = PanelsGamepad.INSTANCE.getFirstManager();
+    private final GamepadManager operatorPanelsGamepad = PanelsGamepad.INSTANCE.getSecondManager();
 
     private boolean isFieldDriving = false;
     public static boolean isRed = false;
@@ -67,9 +68,11 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init_loop() {
-        if (gamepad1.x) {
+        Gamepad driverGamepad = getDriverGamepad();
+
+        if (driverGamepad.x) {
             isRed = true;
-        } else if (gamepad1.a) {
+        } else if (driverGamepad.a) {
             isRed = false;
         }
         telemetry.addData("Team", isRed ? "RED" : "BLUE");
@@ -81,37 +84,42 @@ public class MainTeleOp extends OpMode {
     public void start() {}
     @Override
     public void loop() {
-        gp1.update(pgp1.asCombinedFTCGamepad(gamepad1));
-        gp2.update(pgp2.asCombinedFTCGamepad(gamepad2));
+        Gamepad driverGamepad = getDriverGamepad();
+        Gamepad operatorGamepad = getOperatorGamepad();
+
+        driverButtons.update(driverGamepad);
+        operatorButtons.update(operatorGamepad);
 
         // gamepad 1
-        drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
+        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld(), driverButtons.rb.isHeld());
         // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
-            -gamepad1.left_stick_y,
-            gamepad1.left_stick_x,
-            gamepad1.right_stick_x,
+                -driverGamepad.left_stick_y,
+                driverGamepad.left_stick_x,
+                driverGamepad.right_stick_x,
                 isFieldDriving
         );
 
-        if (gp1.y.wasPressed()) {
+        if (driverButtons.y.wasPressed()) {
             isFieldDriving = !isFieldDriving;
         }
 
         // gamepad 2
-        if (gp2.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
-        if (gp2.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
+        if (operatorButtons.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
+        if (operatorButtons.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
 
-        if (gp2.y.wasPressed()) {drivetrain.resetIMU();}
-        if (gp2.b.wasPressed()) {turret.resetTurretEncoder();}
+        if (operatorButtons.y.wasPressed()) {drivetrain.resetIMU();}
+        if (operatorButtons.b.wasPressed()) {turret.resetTurretEncoder();}
 
-        if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
-        if (gp2.a.isHeld()) { intake.invert();}
+        if (operatorButtons.lt >= TRIGGER_THRESHOLD) {intake.eat();}
+        if (operatorButtons.a.isHeld()) { intake.invert();}
 
-        if (gamepad2.a && gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
-            shooter.reverseFeed();
-        } else if (gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
-            shooter.feed();
+        if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD){
+            if (operatorButtons.a.isHeld()) {
+                shooter.reverseFeed();
+            } else {
+                shooter.feed();
+            }
         }
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
         if (gp2.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
@@ -178,5 +186,13 @@ public class MainTeleOp extends OpMode {
 
         panelsGraph.update();
         panelsTelemetry.update(telemetry);
+    }
+
+    private Gamepad getDriverGamepad() {
+        return driverPanelsGamepad.asCombinedFTCGamepad(gamepad1);
+    }
+
+    private Gamepad getOperatorGamepad() {
+        return operatorPanelsGamepad.asCombinedFTCGamepad(gamepad2);
     }
 }
