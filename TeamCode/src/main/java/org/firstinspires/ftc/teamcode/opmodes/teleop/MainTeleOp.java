@@ -160,6 +160,7 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Turret error", turret.getErrorAngle());
         panelsTelemetry.addData("Turret mode", turretManualMode ? "MANUAL" : "AUTO");
         panelsTelemetry.addData("Field Centric", isFieldDriving);
+        panelsTelemetry.addData("Use lookups", useFlywheelLookups);
 
         if (goalTag != null) {
             panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));
