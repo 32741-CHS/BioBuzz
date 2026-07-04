@@ -49,6 +49,7 @@ public class MainTeleOp extends OpMode {
     private static final double STICK_DEADBAND = 0.15;
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
+    private double lastGoalTagTime = 0;
     public static boolean useFlywheelLookups = true;
 
     @Override
@@ -81,7 +82,10 @@ public class MainTeleOp extends OpMode {
     }
 
     @Override
-    public void start() {}
+    public void start() {
+        lastGoalTagTime = getRuntime();
+    }
+
     @Override
     public void loop() {
         Gamepad driverGamepad = getDriverGamepad();
@@ -137,14 +141,18 @@ public class MainTeleOp extends OpMode {
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
 
         if (turretManualMode) {
+            lastGoalTagTime = getRuntime();
             manualTurretAngle = turret.getCurrentAngle();
             manualTurretAngle += stickX * 3;
             turret.goTo(manualTurretAngle);
         } else {
             if (goalTag != null) {
+                lastGoalTagTime = getRuntime();
                 double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
                 double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
                 turret.goTo(angle);
+            } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
+                turret.returnHome();
             }
         }
 

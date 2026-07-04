@@ -25,6 +25,7 @@ public class Turret {
     public static double MIN_ANGLE = -80;
     public static double MAX_ANGLE = 80;
     public static double SOFT_ZONE_DEG = 5.0;
+    public static double LOST_TAG_RETURN_DELAY = 2.0;
 
     private double lastPower = 0;
 
@@ -46,6 +47,10 @@ public class Turret {
 
     public void goTo(double angle) {
         desiredAngle = Range.clip(angle, MIN_ANGLE, MAX_ANGLE);
+    }
+
+    public void returnHome() {
+        goTo(0);
     }
 
     public void resetTurretEncoder() {

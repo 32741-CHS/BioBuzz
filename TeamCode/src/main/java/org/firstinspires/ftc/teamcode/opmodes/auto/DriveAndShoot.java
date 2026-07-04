@@ -39,6 +39,7 @@ public class DriveAndShoot extends LinearOpMode {
     private Turret turret;
 
     private final ElapsedTime timer = new ElapsedTime();
+    private double lastGoalTagTime = 0;
 
     @Override
     public void runOpMode() {
@@ -65,6 +66,7 @@ public class DriveAndShoot extends LinearOpMode {
 
         Shooter.canSpinFlywheel = true;
         Shooter.desiredFlywheelRPS = 16.5;
+        lastGoalTagTime = getRuntime();
 
         timer.reset();
         while (opModeIsActive() && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL && timer.seconds() <= MAX_SPINUP_TIME) {
@@ -93,9 +95,12 @@ public class DriveAndShoot extends LinearOpMode {
     private void trackTag() {
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
         if (goalTag != null) {
+            lastGoalTagTime = getRuntime();
             double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
             double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
             turret.goTo(angle);
+        } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
+            turret.returnHome();
         }
     }
 }
