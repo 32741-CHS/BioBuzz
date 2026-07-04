@@ -14,6 +14,8 @@ public class DriveForTime extends LinearOpMode {
     public static double DRIVE_TIME = 0.55;
     public static double DRIVE_POWER = 0.4;
 
+    public static double WAIT_TIME = 20;
+
     private final RobotHardware hw = new RobotHardware();
 
     private Drivetrain drivetrain;
@@ -25,6 +27,9 @@ public class DriveForTime extends LinearOpMode {
         drivetrain = new Drivetrain(hw);
 
         waitForStart();
+        timer.reset();
+
+        while (opModeIsActive() && timer.seconds() < WAIT_TIME) {}
         timer.reset();
 
         while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
