@@ -5,11 +5,10 @@ import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
 
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
+import com.bylazar.graph.GraphManager;
+import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.bylazar.graph.PanelsGraph;
-import com.bylazar.graph.GraphManager;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -50,6 +49,7 @@ public class MainTeleOp extends OpMode {
     private static final double STICK_DEADBAND = 0.15;
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
+    public static boolean useFlywheelLookups = true;
 
     @Override
     public void init() {
@@ -121,27 +121,37 @@ public class MainTeleOp extends OpMode {
                 shooter.feed();
             }
         }
-
         if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
+        if (operatorButtons.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
 
         // turret: right stick x for manual override, or auto-track the goal tag
-        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
-
         double stickX = operatorGamepad.right_stick_x;
         if (Math.abs(stickX) > STICK_DEADBAND) {
             if (!turretManualMode) {
                 turretManualMode = true;
-                manualTurretAngle = turret.getCurrentAngle();
             }
+        } else {
+            turretManualMode = false;
+        }
+
+        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+
+        if (turretManualMode) {
+            manualTurretAngle = turret.getCurrentAngle();
             manualTurretAngle += stickX * 3;
             turret.goTo(manualTurretAngle);
         } else {
-            turretManualMode = false;
             if (goalTag != null) {
                 double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
                 double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
                 turret.goTo(angle);
             }
+        }
+
+        if (useFlywheelLookups && goalTag != null) {
+            double distance = goalTag.ftcPose.range;
+            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+
         }
 
         intake.update();
@@ -158,6 +168,7 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Turret error", turret.getErrorAngle());
         panelsTelemetry.addData("Turret mode", turretManualMode ? "MANUAL" : "AUTO");
         panelsTelemetry.addData("Field Centric", isFieldDriving);
+        panelsTelemetry.addData("Use lookups", useFlywheelLookups);
 
         if (goalTag != null) {
             panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));

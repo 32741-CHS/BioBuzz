@@ -17,8 +17,10 @@ public class Shooter {
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;
 
-    public static double flywheelKP = 15;
-    public static double flywheelKF = 11.5;
+    public static double flywheelKP = 16.5;
+    public static double flywheelKF = 13.5;
+
+    public static double FLYWHEEL_ERROR_TOL = 1.0;
 
     public static boolean canSpinFlywheel = false;
 
@@ -57,7 +59,10 @@ public class Shooter {
 
     public void toggleFlywheel() {
         canSpinFlywheel = !canSpinFlywheel;
-        if (canSpinFlywheel) desiredFlywheelRPS = 13;
+    }
+
+    public static void setDesiredFlywheelRPS(double rps) {
+        desiredFlywheelRPS = rps;
     }
 
     public void feed() {
@@ -76,7 +81,7 @@ public class Shooter {
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
-        if (requestedFeed) {
+        if (requestedFeed && Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL) {
             feeder.setPower(requestedReverseFeed ? -desiredFeederPower : desiredFeederPower);
         } else {
             feeder.setPower(0);
