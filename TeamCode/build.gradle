@@ -33,4 +33,10 @@ dependencies {
     implementation project(':FtcRobotController')
     implementation 'com.bylazar:fullpanels:1.0.0'
     implementation 'com.bylazar:camerastream:1.0.0'
+
+		// pedro
+		// pedro MAY need fullpanels:1.0.12 as thats the version it pinned in the documentation
+		// though the build works currently so :shrug:
+		implementation 'com.pedropathing:ftc:2.1.2'
+		implementation 'com.pedropathing:telemetry:1.0.0'
 }
