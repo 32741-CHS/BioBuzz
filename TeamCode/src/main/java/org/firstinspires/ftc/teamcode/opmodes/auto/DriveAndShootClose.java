@@ -27,7 +27,7 @@ public class DriveAndShootClose extends LinearOpMode {
     public static double SHOOT_TIME = 10;
     public static double MAX_SPINUP_TIME = 5;
 
-    public static double FLYWHEEL_ERROR_TOL = 0.5;
+    public static double FLYWHEEL_ERROR_TOL = 100;
 
 
     private final RobotHardware hw = new RobotHardware();
