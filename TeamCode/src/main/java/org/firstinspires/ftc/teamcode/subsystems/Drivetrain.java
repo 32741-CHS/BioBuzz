@@ -24,6 +24,10 @@ public class Drivetrain {
 
     public static double AUTO_DRIVE_SPEED = 0.4;
 
+		public double Expected_X = 0;
+		public double Expected_Y = 0;
+		public double Expected_Z = 0;
+
     private final DcMotor flDrive, frDrive, blDrive, brDrive;
     private final IMU imu;
 
