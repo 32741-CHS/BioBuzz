@@ -1,89 +1,75 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode;
 
-import com.pedropathing.drivetrain.DrivePowers;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.ManualDrive;
-import com.pedropathing.math.Pose;
-import com.qualcomm.robotcore.hardware.Gamepad;
+import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.teamcode.configs.RobotHardware;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.pedro.Constants;
-import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
+public class Drivetrain {
 
-public class Drivetrain implements SubsystemBase {
+    static final double WHEEL_DIAMETER = 10.4;
+    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI);
 
-    private final Gamepad gamepad;
-    private final Pose startPose;
-    private Follower follower;
+    private static final double SPEED_SLOW   = 0.4;
+    private static final double SPEED_NORMAL = 1;
 
-    public Drivetrain(Gamepad gamepad, Pose startPose) {
-        this.startPose = startPose;
-        this.gamepad = gamepad;
+    private static final double STICK_DEADBAND = 0.05;
+
+    public static double AUTO_DRIVE_SPEED = 0.4;
+
+    private final DcMotor flDrive, frDrive, blDrive, brDrive;
+    private final IMU imu;
+
+    private double speedMultiplier = SPEED_NORMAL;
+
+    public Drivetrain(RobotHardware hw) {
+        (flDrive = hw.flDrive).setDirection(DcMotorSimple.Direction.REVERSE);
+        (blDrive = hw.blDrive).setDirection(DcMotorSimple.Direction.REVERSE);
+        (frDrive = hw.frDrive).setDirection(DcMotorSimple.Direction.FORWARD);
+        (brDrive = hw.brDrive).setDirection(DcMotorSimple.Direction.FORWARD);
+        imu = hw.imu;
+
+        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
+            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+
+        resetIMU();
     }
 
-    public static Pose createPose(double x, double y, double heading) {
-        return new Pose(x, y, heading);
-    }
+		// normalizes speed (meters per second) to a value from 0 - 1
+		// makes it viable to use for DcMotor.setPower()
+		public float NormalizeSpeed(float speed) {
+			float WHEEL_RADIUS = (float)WHEEL_DIAMETER / 2;
+			float RPM = 312;
+			return 2 * (float)Math.PI * WHEEL_RADIUS / 60 * RPM;
+		}
+		
+		// updates the speed of a motor
+		// uses normalizespeed func to normalize it to be 0 - 1
+		public void UpdateSpeed(DcMotor drive, float speed) {
+			drive.setPower(NormalizeSpeed(speed));
+			return;
+		}
 
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        follower = Constants.create(robotHardware.hardwareMap);
-        this.setPosition(startPose);
-        follower.update();
-    }
+		// updates the direction of a motor
+		public void UpdateDirection(DcMotor drive, DcMotorSimple.Direction direction) {
+			drive.setDirection(direction);
+			return;
+		}
 
-    @Override
-    public void update() {
-        double forward = -gamepad.left_stick_y;
-        double strafe = gamepad.left_stick_x;
-        double turn = gamepad.right_stick_x;
+		public void resetIMU() {
+			imu.initialize(new IMU.Parameters(
+					new RevHubOrientationOnRobot(
+						RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+						RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+				)
+			));
+		}
 
-        forward = deadband(forward);
-        strafe = deadband(strafe);
-        turn = deadband(turn);
-
-        DrivePowers powers = ManualDrive.fieldCentric(
-                forward,
-                strafe,
-                turn,
-                follower.pose().heading()
-        );
-
-        follower.manual(powers);
-        follower.update();
-    }
-
-    public Pose getPosition() {
-        return follower.pose();
-    }
-
-    public void setPosition(Pose pose) {
-        follower.setPose(pose);
-    }
-
-    public void setPosition(double x, double y, double heading) {
-        follower.setPose(createPose(x, y, heading));
-    }
-
-
-    public double getX() {
-        return follower.pose().x();
-    }
-
-    public double getY() {
-        return follower.pose().y();
-    }
-
-    public double getHeading() {
-        return follower.pose().heading();
-    }
-
-    public Follower getFollower() {
-        return follower;
-    }
-
-    private double deadband(double value) {
-        return Math.abs(value) < Globals.STICK_DEADBAND ? 0 : value;
-    }
 }
