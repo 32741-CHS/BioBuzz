@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Drivetrain {
 
@@ -57,9 +54,37 @@ public class Drivetrain {
 			return;
 		}
 
-		// updates the direction of a motor
-		public void UpdateDirection(DcMotor drive, DcMotorSimple.Direction direction) {
-			drive.setDirection(direction);
+		// shifts the robot forward / in reverse based off direction
+		// default is forward
+		public void Shift(float speed, DcMotorSimple.Direction dir = DcMotorSimple.Direction.FORWARD) {
+			flDrive.setDirection(dir);
+			frDrive.setDirection(dir);
+
+			float power = NormalizeSpeed(speed);
+			flDrive.setPower(power);
+			frDrive.setPower(power);
+			return;
+		}
+
+		// updates the movement of the robot to be to their right
+		public void ShiftRight(float speed) {
+			frDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+			brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+
+			float power = NormalizeSpeed(speed);
+			frDrive.setPower(power);
+			brDrive.setPower(power);
+			return;
+		}
+
+		// updates the movement of the robot to be their left
+		public void ShiftLeft(float speed) {
+			flDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+			blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+
+			float power = NormalizeSpeed(speed);
+			flDrive.setPower(power);
+			blDrive.setPower(power);
 			return;
 		}
 
