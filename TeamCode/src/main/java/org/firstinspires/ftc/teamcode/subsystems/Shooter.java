@@ -8,35 +8,31 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.configs.TunableConstants;
-import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
+import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 @Configurable
-public class Shooter implements SubsystemBase {
-    public static final double desiredFeederPower = 0.7;
+public class Shooter {
+    private final DcMotorEx flywheel;
+    private final DcMotor feeder;
+
     public static double desiredFlywheelRPS = 13;
+    public static double desiredFeederPower = 0.7;
+
+    public static double flywheelKP = 16.5;
+    public static double flywheelKF = 13.5;
+
+
     public static boolean canSpinFlywheel = false;
-    private DcMotorEx flywheel;
-    private DcMotor feeder;
-    private boolean requestedFeed = false, requestedReverseFeed = false;
+    private boolean requestedFeed = false;
+    private boolean requestedReverseFeed = false;
 
-    public Shooter() {
-    }
-
-    public static void setDesiredFlywheelRPS(double rps) {
-        desiredFlywheelRPS = rps;
-    }
-
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        flywheel = robotHardware.flywheel;
+    public Shooter(RobotHardware hw) {
+        flywheel = hw.flywheel;
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        feeder = robotHardware.feeder;
+        feeder = hw.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
@@ -65,6 +61,10 @@ public class Shooter implements SubsystemBase {
         canSpinFlywheel = !canSpinFlywheel;
     }
 
+    public static void setDesiredFlywheelRPS(double rps) {
+        desiredFlywheelRPS = rps;
+    }
+
     public void feed() {
         requestedFeed = true;
     }
@@ -74,12 +74,11 @@ public class Shooter implements SubsystemBase {
         requestedReverseFeed = true;
     }
 
-    @Override
     public void update() {
-        // apply PIDF every frame so @Configurable changes work
+        // apply pidf every frame so @Configurable changes work
         flywheel.setPIDFCoefficients(
                 DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(TunableConstants.flywheelKP, 0, 0, TunableConstants.flywheelKF));
+                new PIDFCoefficients(flywheelKP, 0, 0, flywheelKF));
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 

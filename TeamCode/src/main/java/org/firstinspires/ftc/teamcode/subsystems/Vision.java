@@ -1,96 +1,104 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
+import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
+
+import android.util.Size;
+
+import com.bylazar.camerastream.PanelsCameraStream;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class Vision implements SubsystemBase {
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-    private AprilTagProcessor aprilTag;
+// 20 = blue goal, 24 = red goal
+public class Vision {
+    private AprilTagProcessor processor;
+    private VisionPortal portal;
 
-    private boolean isRed = true;
+    public Vision(RobotHardware hw) {
+        processor =
+                new AprilTagProcessor.Builder()
+                        .setDrawTagID(true)
+                        .setDrawTagOutline(true)
+                        .setDrawAxes(true)
+                        .setDrawCubeProjection(true)
+                        .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
+                        .build();
 
-    private double distanceToGoal = Double.NaN;
-    private double xRadians = Double.NaN;
-    private double zRadians = Double.NaN;
+        portal =
+                new VisionPortal.Builder()
+                        .setCamera(hw.vision)
+                        .setCameraResolution(new Size(640, 480))
+                        .addProcessor(processor)
+                        .build();
 
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
+        processor.setDecimation(3);
 
-        aprilTag = new AprilTagProcessor.Builder()
-                .build();
-
-        VisionPortal visionPortal = new VisionPortal.Builder()
-                .setCamera(robotHardware.vision)
-                .addProcessor(aprilTag)
-                .build();
-    }
-
-    public void setTeam(boolean isRed) {
-        this.isRed = isRed;
-    }
-
-    public void update() {
-
-        distanceToGoal = Double.NaN;
-        xRadians = Double.NaN;
-        zRadians = Double.NaN;
-
-        AprilTagClusterDetection best = null;
-
-        for (AprilTagDetection detection : aprilTag.getDetections()) {
-
-            if (!(detection instanceof AprilTagClusterDetection))
-                continue;
-
-            AprilTagClusterDetection cluster =
-                    (AprilTagClusterDetection) detection;
-
-            if (cluster.metadata == null || cluster.ftcPose == null)
-                continue;
-
-            // Alliance filtering
-            String name = cluster.metadata.name;
-
-            if (isRed && !name.startsWith("RED"))
-                continue;
-
-            if (!isRed && !name.startsWith("BLUE"))
-                continue;
-
-            // Reject upside-down cells
-            if (Math.abs(cluster.ftcPose.roll) >= 90)
-                continue;
-
-            // Choose closest valid cluster
-            if (best == null ||
-                    cluster.ftcPose.range < best.ftcPose.range) {
-                best = cluster;
-            }
+        while (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            // wait for camera to be ready
         }
 
-        if (best == null)
-            return;
+        ExposureControl exp = portal.getCameraControl(ExposureControl.class);
+        if (exp != null) {
+            exp.setMode(ExposureControl.Mode.Manual);
+            exp.setExposure(2, TimeUnit.MILLISECONDS);
+        }
 
-        distanceToGoal = best.ftcPose.range;
+        GainControl gain = portal.getCameraControl(GainControl.class);
+        if (gain != null) gain.setGain(80);
 
-        xRadians = Math.toRadians(best.ftcPose.bearing);
-
-        zRadians = Math.toRadians(best.ftcPose.elevation);
+        PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);
     }
 
-    public double getDistance() {
-        return distanceToGoal;
+    public List<AprilTagDetection> getDetections() {
+        return processor.getDetections();
     }
 
-    public double getXRadians() {
-        return xRadians;
+    // check if a specific goal tag is visible
+    public boolean isTagVisible(int tagId) {
+        return getTagById(tagId) != null;
     }
 
-    public double getZRadians() {
-        return zRadians;
+    // returns 0 if tag not visible.
+    public double getTagBearing(int tagId) {
+        AprilTagDetection tag = getTagById(tagId);
+        if (tag == null) return 0;
+        return Math.toDegrees(tag.ftcPose.bearing);
+    }
+
+    public double getTagRange(int tagId) {
+        AprilTagDetection tag = getTagById(tagId);
+        if (tag == null) return -1;
+        return tag.ftcPose.range;
+    }
+
+    public double getTagYaw(int tagId) {
+        AprilTagDetection tag = getTagById(tagId);
+        if (tag == null) return 0;
+        return Math.toDegrees(tag.ftcPose.yaw);
+    }
+
+    public AprilTagDetection getTagById(int tagId) {
+        List<AprilTagDetection> detections = getDetections();
+        for (AprilTagDetection detection : detections) {
+            if (detection.id == tagId) {
+                return detection;
+            }
+        }
+        return null;
+    }
+
+    public void stop() {
+        if (portal != null) {
+            portal.close();
+        }
     }
 }

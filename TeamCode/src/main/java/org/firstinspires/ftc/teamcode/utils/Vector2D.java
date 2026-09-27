@@ -1,62 +1,46 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 public class Vector2D {
-	public final double x;
-	public final double y;
-	public final double mag;
-	public final double angleRad;
+    public final double x;
+    public final double y;
+    public final double mag;
+    public final double angleRad;
+    public final double angleDeg;
 
-	/**
-	 * An immutable 2D Vector.
-	 * 
-	 * @param componentX The adjacent side of triangle
-	 * @param componentY The opposite side of triangle
-	 *                   Can take in any "number" type (doubles, floats, ints)
-	 */
-	public <T> Vector2D(T componentX, T componentY) {
-		x = (double) componentX;
-		y = (double) componentY;
-		mag = Math.sqrt(x * x + y * y);
-		angleRad = Math.atan2(y, x);
-	}
+    /** An immutable 2D Vector. */
+    public Vector2D(double vX, double vY) {
+        x = vX;
+        y = vY;
+        mag = Math.sqrt(x * x + y * y);
+        angleRad = Math.atan2(y, x);
+        angleDeg = Math.toDegrees(angleRad);
+    }
 
-	/**
-	 * @param mag      the magnitude
-	 * @param angleRad between x and y
-	 * @return Vector2D
-	 */
-	public static <T> Vector2D fromMag(T mag, double angleRad) {
-		double d_mag = (double) mag;
-		double x = Math.cos(angleRad) * d_mag;
-		double y = Math.sin(angleRad) * d_mag;
+    /**
+     * @param mag the magnitude
+     * @param deg the horizontal angle on the flat plane
+     * @return Vector2D
+     */
+    public static Vector2D fromMag(double mag, double deg) {
+        double rad = Math.toRadians(deg);
 
-		return new Vector2D(x, y);
-	}
+        double x = Math.cos(rad) * mag;
+        double y = Math.sin(rad) * mag;
 
-	/**
-	 * Add this vector to the other vector to give a new vector
-	 * 
-	 * @param v2 The other vector
-	 * @return Vector2D
-	 */
-	public Vector2D plus(Vector2D v2) {
-		return new Vector2D(x + v2.x, y + v2.y);
-	}
+        return new Vector2D(x, y);
+    }
 
-	/**
-	 * Subtract this vector from the other vector (IN THIS ORDER) and return a new
-	 * vector
-	 * 
-	 * @param v2 other vector
-	 * @return Vector2D
-	 */
-	public Vector2D minus(Vector2D v2) {
-		return new Vector2D(x - v2.x, y - v2.y);
-	}
+    public Vector2D plus(Vector2D v2) {
+        return new Vector2D(x + v2.x, y + v2.y);
+    }
 
-	public Vector2D normalise() {
-		double newX = x == 0 || mag == 0 ? 0 : x / mag;
-		double newY = y == 0 || mag == 0 ? 0 : y / mag;
-		return new Vector2D(newX, newY);
-	}
+    public Vector2D minus(Vector2D v2) {
+        return new Vector2D(x - v2.x, y - v2.y);
+    }
+
+    public Vector2D normalise() {
+        double newX = x == 0 || mag == 0 ? 0 : x / mag;
+        double newY = y == 0 || mag == 0 ? 0 : y / mag;
+        return new Vector2D(newX, newY);
+    }
 }

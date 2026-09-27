@@ -1,56 +1,54 @@
-package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
-import static org.firstinspires.ftc.teamcode.opmodes.OldMainTeleOp.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
+
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.RobotHardware;
+import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.old.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.old.Turret;
-import org.firstinspires.ftc.teamcode.utils.Ballistics;
-import org.firstinspires.ftc.teamcode.utils.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.old.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-@Disabled
 @Configurable
 @Autonomous(name = "Drive and shoot close", group = "Robot")
 public class DriveAndShootClose extends LinearOpMode {
-    public static final double DRIVE_TIME = 2;
-    public static final double DRIVE_POWER = 0.4;
+    public static double DRIVE_TIME = 2;
+    public static double DRIVE_POWER = 0.4;
 
-    public static final double SHOOT_TIME = 10;
-    public static final double MAX_SPINUP_TIME = 5;
+    public static double SHOOT_TIME = 10;
+    public static double MAX_SPINUP_TIME = 5;
 
-    public static final double FLYWHEEL_ERROR_TOL = 100;
-    private final ElapsedTime timer = new ElapsedTime();
+    public static double FLYWHEEL_ERROR_TOL = 100;
+
+    private final RobotHardware hw = new RobotHardware();
+
     private Drivetrain drivetrain;
     private Shooter shooter;
     private Intake intake;
     private Vision vision;
     private Turret turret;
+
+    private final ElapsedTime timer = new ElapsedTime();
     private double lastGoalTagTime = 0;
 
     @Override
     public void runOpMode() {
-        // New robotHardware To make force fresh init and reduce risk of improper motor
-        // config.
-        robotHardwareGroup = new RobotHardwareGroup();
-        robotHardwareGroup.init(hardwareMap);
-        drivetrain = new Drivetrain();
-        shooter = new Shooter();
-        intake = new Intake();
-        turret = new Turret();
-        vision = new Vision();
+        hw.init(hardwareMap);
+        drivetrain = new Drivetrain(hw);
+        shooter = new Shooter(hw);
+        intake = new Intake(hw);
+        turret = new Turret(hw);
+        vision = new Vision(hw);
 
         while (opModeInInit()) {
             if (gamepad1.x) {
@@ -71,7 +69,7 @@ public class DriveAndShootClose extends LinearOpMode {
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-            drivetrain.drive(new Vector2D(-DRIVE_POWER, 0), 0, false);
+            drivetrain.drive(-DRIVE_POWER, 0, 0, false);
         }
 
         timer.reset();
@@ -97,7 +95,7 @@ public class DriveAndShootClose extends LinearOpMode {
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-            drivetrain.drive(new Vector2D(0, DRIVE_POWER), 0, false);
+            drivetrain.drive(0, DRIVE_POWER, 0, false);
         }
 
         drivetrain.stop();
@@ -114,7 +112,7 @@ public class DriveAndShootClose extends LinearOpMode {
             turret.goTo(angle);
 
             double distance = goalTag.ftcPose.range;
-            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
             turret.returnHome();
         }
