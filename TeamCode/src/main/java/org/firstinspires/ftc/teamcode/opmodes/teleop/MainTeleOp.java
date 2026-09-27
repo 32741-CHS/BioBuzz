@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
 
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -22,6 +23,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.Locale;
 
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
@@ -46,7 +49,7 @@ public class MainTeleOp extends OpMode {
     public static boolean isRed = false;
 
     private static final double TRIGGER_THRESHOLD = 0.5;
-    private static final double STICK_DEADBAND = 0.15;
+
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
     private double lastGoalTagTime = 0;
@@ -95,38 +98,53 @@ public class MainTeleOp extends OpMode {
         operatorButtons.update(operatorGamepad);
 
         // gamepad 1
-        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld());
+        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld() ? 1 : 0);
         // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
                 -driverGamepad.left_stick_y,
                 driverGamepad.left_stick_x,
                 driverGamepad.right_stick_x,
-                isFieldDriving
-        );
+                isFieldDriving);
 
         if (driverButtons.y.wasPressed()) {
             isFieldDriving = !isFieldDriving;
         }
 
         // gamepad 2
-        if (operatorButtons.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
-        if (operatorButtons.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
+        if (operatorButtons.dpadUp.wasPressed()) {
+            shooter.speedUpFlywheel();
+        }
+        if (operatorButtons.dpadDown.wasPressed()) {
+            shooter.slowDownFlywheel();
+        }
 
-        if (operatorButtons.y.wasPressed()) {drivetrain.resetIMU();}
-        if (operatorButtons.b.wasPressed()) {turret.resetTurretEncoder();}
+        if (operatorButtons.y.wasPressed()) {
+            drivetrain.resetIMU();
+        }
+        if (operatorButtons.b.wasPressed()) {
+            turret.resetTurretEncoder();
+        }
 
-        if (operatorButtons.lt >= TRIGGER_THRESHOLD) {intake.eat();}
-        if (operatorButtons.a.isHeld()) { intake.invert();}
+        if (operatorButtons.lt >= TRIGGER_THRESHOLD) {
+            intake.eat();
+        }
+        if (operatorButtons.a.isHeld()) {
+            intake.invert();
+        }
 
-        if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD){
+        if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD) {
             if (operatorButtons.a.isHeld()) {
                 shooter.reverseFeed();
             } else {
                 shooter.feed();
             }
         }
-        if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
-        if (operatorButtons.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
+        if (operatorButtons.x.wasPressed()) {
+            shooter.toggleFlywheel();
+        }
+        if (operatorButtons.lb.wasPressed()) {
+            useFlywheelLookups = !useFlywheelLookups;
+        }
 
         // turret: right stick x for manual override, or auto-track the goal tag
         double stickX = operatorGamepad.right_stick_x;
@@ -159,7 +177,6 @@ public class MainTeleOp extends OpMode {
         if (useFlywheelLookups && goalTag != null) {
             double distance = goalTag.ftcPose.range;
             shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
-
         }
 
         intake.update();
@@ -167,7 +184,7 @@ public class MainTeleOp extends OpMode {
         turret.update();
 
         // Telemetry
-        panelsTelemetry.addData("Intake power",  intake.getPower());
+        panelsTelemetry.addData("Intake power", intake.getPower());
         panelsTelemetry.addData("Feeder power", shooter.getFeederPower());
         panelsTelemetry.addData("Flywheel rps", shooter.getFlywheelRPS());
         panelsTelemetry.addData("Flywheel error", shooter.getFlywheelErrorRPS());
@@ -179,8 +196,13 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Use lookups", useFlywheelLookups);
 
         if (goalTag != null) {
-            panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));
-            panelsTelemetry.addData("Tag bearing", String.format("%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
+            // Locale.US means use the 12.22 every time instead of 12,22 because some countries use
+            // the "," instead of the "." why I do not know.
+            panelsTelemetry.addData(
+                    "Tag distance", String.format(Locale.US, "%.2f m", goalTag.ftcPose.range));
+            panelsTelemetry.addData(
+                    "Tag bearing",
+                    String.format(Locale.US, "%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
         } else {
             panelsTelemetry.addData("Tag distance", "no tag");
         }

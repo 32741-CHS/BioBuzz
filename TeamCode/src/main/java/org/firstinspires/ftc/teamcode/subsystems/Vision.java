@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
+
 import android.util.Size;
 
 import com.bylazar.camerastream.PanelsCameraStream;
@@ -16,30 +18,27 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 // 20 = blue goal, 24 = red goal
 public class Vision {
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
-    public static final int BLUE_GOAL_TAG = 20;
-    public static final int RED_GOAL_TAG = 24;
-
-    public static int MAX_FPS = 15;
     public Vision(RobotHardware hw) {
-        processor = new AprilTagProcessor.Builder()
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
-                .build();
+        processor =
+                new AprilTagProcessor.Builder()
+                        .setDrawTagID(true)
+                        .setDrawTagOutline(true)
+                        .setDrawAxes(true)
+                        .setDrawCubeProjection(true)
+                        .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
+                        .build();
 
-        portal = new VisionPortal.Builder()
-                .setCamera(hw.vision)
-                .setCameraResolution(new Size(640, 480))
-                .addProcessor(processor)
-                .build();
+        portal =
+                new VisionPortal.Builder()
+                        .setCamera(hw.vision)
+                        .setCameraResolution(new Size(640, 480))
+                        .addProcessor(processor)
+                        .build();
 
         processor.setDecimation(3);
 
@@ -95,12 +94,6 @@ public class Vision {
             }
         }
         return null;
-    }
-
-    // get the goal tag ID based on alliance color
-    // TODO: we need to have a way to set alliance (manual for now via controller)
-    public int getGoalTagId(boolean isRedAlliance) {
-        return isRedAlliance ? RED_GOAL_TAG : BLUE_GOAL_TAG;
     }
 
     public void stop() {

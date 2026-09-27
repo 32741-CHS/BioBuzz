@@ -29,10 +29,14 @@ public class Intake {
     public double getPower() {
         return intake.getPower();
     }
-    public void invert() { isInverted = true; }
+
+    public void invert() {
+        isInverted = true;
+    }
 
     public void update() {
         intake.setPower(!isInverted ? targetPower : -targetPower);
-        targetPower = 0; isInverted = false;
+        targetPower = 0;
+        isInverted = false;
     }
 }

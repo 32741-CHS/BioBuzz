@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
+
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,7 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
-@Autonomous(name="Drive and shoot close", group="Robot")
+@Autonomous(name = "Drive and shoot close", group = "Robot")
 public class DriveAndShootClose extends LinearOpMode {
     public static double DRIVE_TIME = 2;
     public static double DRIVE_POWER = 0.4;
@@ -28,7 +29,6 @@ public class DriveAndShootClose extends LinearOpMode {
     public static double MAX_SPINUP_TIME = 5;
 
     public static double FLYWHEEL_ERROR_TOL = 100;
-
 
     private final RobotHardware hw = new RobotHardware();
 
@@ -67,7 +67,6 @@ public class DriveAndShootClose extends LinearOpMode {
         Shooter.canSpinFlywheel = true;
         lastGoalTagTime = getRuntime();
 
-
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
             drivetrain.drive(-DRIVE_POWER, 0, 0, false);
@@ -76,7 +75,9 @@ public class DriveAndShootClose extends LinearOpMode {
         timer.reset();
         drivetrain.stop();
 
-        while (opModeIsActive() && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL && timer.seconds() <= MAX_SPINUP_TIME) {
+        while (opModeIsActive()
+                && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
+                && timer.seconds() <= MAX_SPINUP_TIME) {
             runBallistics();
             turret.update();
             shooter.update();
@@ -100,8 +101,6 @@ public class DriveAndShootClose extends LinearOpMode {
         drivetrain.stop();
 
         timer.reset();
-
-
     }
 
     private void runBallistics() {

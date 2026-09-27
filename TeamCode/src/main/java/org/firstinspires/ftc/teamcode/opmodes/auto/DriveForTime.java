@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 @Configurable
-@Autonomous(name="Drive for time", group="Robot")
+@Autonomous(name = "Drive for time", group = "Robot")
 public class DriveForTime extends LinearOpMode {
     public static double DRIVE_TIME = 0.55;
     public static double DRIVE_POWER = 0.4;

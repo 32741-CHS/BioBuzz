@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,7 +14,7 @@ public class Turret {
 
     private final DcMotorEx turret;
     // TODO: measure wheel diameter / lazy susan diameter
-    private final static double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
+    private static final double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
 
     public static double desiredAngle;
     public static double kP = 0.03;

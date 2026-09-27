@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_6000RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,10 +21,8 @@ public class Shooter {
     public static double flywheelKP = 16.5;
     public static double flywheelKF = 13.5;
 
-    public static double FLYWHEEL_ERROR_TOL = 1.0;
 
     public static boolean canSpinFlywheel = false;
-
     private boolean requestedFeed = false;
     private boolean requestedReverseFeed = false;
 
@@ -49,6 +48,7 @@ public class Shooter {
     public void speedUpFlywheel() {
         desiredFlywheelRPS = Math.min(desiredFlywheelRPS + 1, 100);
     }
+
     public void slowDownFlywheel() {
         desiredFlywheelRPS = Math.max(desiredFlywheelRPS - 1, 0);
     }
@@ -76,7 +76,8 @@ public class Shooter {
 
     public void update() {
         // apply pidf every frame so @Configurable changes work
-        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+        flywheel.setPIDFCoefficients(
+                DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(flywheelKP, 0, 0, flywheelKF));
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);

@@ -4,17 +4,17 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class GamepadEx {
 
-    public final Button a      = new Button();
-    public final Button b      = new Button();
-    public final Button x      = new Button();
-    public final Button y      = new Button();
-    public final Button lb     = new Button();
-    public final Button rb     = new Button();
-    public final Button back   = new Button();
-    public final Button start  = new Button();
-    public final Button dpadUp    = new Button();
-    public final Button dpadDown  = new Button();
-    public final Button dpadLeft  = new Button();
+    public final Button a = new Button();
+    public final Button b = new Button();
+    public final Button x = new Button();
+    public final Button y = new Button();
+    public final Button lb = new Button();
+    public final Button rb = new Button();
+    public final Button back = new Button();
+    public final Button start = new Button();
+    public final Button dpadUp = new Button();
+    public final Button dpadDown = new Button();
+    public final Button dpadLeft = new Button();
     public final Button dpadRight = new Button();
 
     public float lt, rt;
@@ -35,8 +35,6 @@ public class GamepadEx {
 
         lt = gamepad.left_trigger;
         rt = gamepad.right_trigger;
-
-
     }
 
     public static class Button {
@@ -63,7 +61,7 @@ public class GamepadEx {
         }
 
         // flips each time you press, returns current state
-        public boolean wasToggled() {
+        public boolean isToggled() {
             return toggleState;
         }
 

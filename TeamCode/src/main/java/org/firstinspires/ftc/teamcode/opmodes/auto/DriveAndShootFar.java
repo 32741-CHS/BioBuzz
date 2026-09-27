@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
-@Autonomous(name="Drive and shoot far", group="Robot")
+@Autonomous(name = "Drive and shoot far", group = "Robot")
 public class DriveAndShootFar extends LinearOpMode {
     public static double DRIVE_TIME = 1.2;
     public static double DRIVE_POWER = 0.4;
@@ -28,7 +28,6 @@ public class DriveAndShootFar extends LinearOpMode {
     public static double MAX_SPINUP_TIME = 5;
 
     public static double FLYWHEEL_ERROR_TOL = 100;
-
 
     private final RobotHardware hw = new RobotHardware();
 
@@ -68,7 +67,9 @@ public class DriveAndShootFar extends LinearOpMode {
         lastGoalTagTime = getRuntime();
 
         timer.reset();
-        while (opModeIsActive() && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL && timer.seconds() <= MAX_SPINUP_TIME) {
+        while (opModeIsActive()
+                && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
+                && timer.seconds() <= MAX_SPINUP_TIME) {
             runBallistics();
             turret.update();
             shooter.update();
@@ -92,7 +93,7 @@ public class DriveAndShootFar extends LinearOpMode {
     }
 
     private void runBallistics() {
-        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+        AprilTagDetection goalTag = vision.getTagById(!isRed ? BLUE_GOAL : RED_GOAL);
         if (goalTag != null) {
             lastGoalTagTime = getRuntime();
             double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
