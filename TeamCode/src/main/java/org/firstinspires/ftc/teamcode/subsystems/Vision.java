@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
 
 import android.util.Size;
 
@@ -10,7 +11,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 // 20 = blue goal, 24 = red goal
 public class Vision {
-    private AprilTagProcessor processor;
-    private VisionPortal portal;
+    private final AprilTagProcessor processor;
+    private final VisionPortal portal;
 
-    public Vision(RobotHardware hw) {
+    public Vision() {
         processor =
                 new AprilTagProcessor.Builder()
                         .setDrawTagID(true)
@@ -35,7 +35,7 @@ public class Vision {
 
         portal =
                 new VisionPortal.Builder()
-                        .setCamera(hw.vision)
+                        .setCamera(robotHardware.vision)
                         .setCameraResolution(new Size(640, 480))
                         .addProcessor(processor)
                         .build();

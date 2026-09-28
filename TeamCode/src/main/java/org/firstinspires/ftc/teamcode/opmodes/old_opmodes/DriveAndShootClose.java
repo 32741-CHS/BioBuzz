@@ -2,15 +2,14 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
 import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
-
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -29,26 +28,22 @@ public class DriveAndShootClose extends LinearOpMode {
     public static double MAX_SPINUP_TIME = 5;
 
     public static double FLYWHEEL_ERROR_TOL = 100;
-
-    private final RobotHardware hw = new RobotHardware();
-
+    private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
     private Shooter shooter;
     private Intake intake;
     private Vision vision;
     private Turret turret;
-
-    private final ElapsedTime timer = new ElapsedTime();
     private double lastGoalTagTime = 0;
 
     @Override
     public void runOpMode() {
-        hw.init(hardwareMap);
-        drivetrain = new Drivetrain(hw);
-        shooter = new Shooter(hw);
-        intake = new Intake(hw);
-        turret = new Turret(hw);
-        vision = new Vision(hw);
+        robotHardware.init(hardwareMap);
+        drivetrain = new Drivetrain();
+        shooter = new Shooter();
+        intake = new Intake();
+        turret = new Turret();
+        vision = new Vision();
 
         while (opModeInInit()) {
             if (gamepad1.x) {
@@ -112,7 +107,7 @@ public class DriveAndShootClose extends LinearOpMode {
             turret.goTo(angle);
 
             double distance = goalTag.ftcPose.range;
-            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
             turret.returnHome();
         }

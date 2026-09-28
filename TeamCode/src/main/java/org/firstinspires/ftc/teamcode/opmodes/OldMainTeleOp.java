@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
 
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -14,7 +15,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -29,41 +29,34 @@ import java.util.Locale;
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
 
-    private final RobotHardware hw = new RobotHardware();
-
+    private static final double TRIGGER_THRESHOLD = 0.5;
+    public static boolean isRed = false;
+    public static boolean useFlywheelLookups = true;
+    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
+    private final GamepadEx driverButtons = new GamepadEx();
+    private final GamepadEx operatorButtons = new GamepadEx();
+    private final GamepadManager driverPanelsGamepad = PanelsGamepad.INSTANCE.getFirstManager();
+    private final GamepadManager operatorPanelsGamepad = PanelsGamepad.INSTANCE.getSecondManager();
     private Drivetrain drivetrain;
     private Intake intake;
     private Shooter shooter;
     private Turret turret;
     private Vision vision;
-
-    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    private final GamepadEx driverButtons = new GamepadEx();
-    private final GamepadEx operatorButtons = new GamepadEx();
-
-    private final GamepadManager driverPanelsGamepad = PanelsGamepad.INSTANCE.getFirstManager();
-    private final GamepadManager operatorPanelsGamepad = PanelsGamepad.INSTANCE.getSecondManager();
-
     private boolean isFieldDriving = false;
-    public static boolean isRed = false;
-
-    private static final double TRIGGER_THRESHOLD = 0.5;
-
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
     private double lastGoalTagTime = 0;
-    public static boolean useFlywheelLookups = true;
 
     @Override
     public void init() {
-        hw.init(hardwareMap);
+        robotHardware.init(hardwareMap);
 
-        drivetrain = new Drivetrain(hw);
-        intake = new Intake(hw);
-        shooter = new Shooter(hw);
-        vision = new Vision(hw);
-        turret = new Turret(hw);
+        drivetrain = new Drivetrain();
+        intake = new Intake();
+        shooter = new Shooter();
+        vision = new Vision();
+        turret = new Turret();
 
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Alliance", "Square = Red, X = Blue");
@@ -176,7 +169,7 @@ public class MainTeleOp extends OpMode {
 
         if (useFlywheelLookups && goalTag != null) {
             double distance = goalTag.ftcPose.range;
-            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         }
 
         intake.update();

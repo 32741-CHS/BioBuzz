@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
 import static org.firstinspires.ftc.teamcode.configs.Globals.WHEEL_DIAMETER;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,41 +11,34 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 /** Handles movement of the 4 mecanum wheels */
 public class Drivetrain {
 
-//    /** How many encoder ticks equal one centimeter of physical travel */
-//    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI); //
+    //    /** How many encoder ticks equal one centimeter of physical travel */
+    //    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI); //
 
     private static final double SPEED_SLOW = 0.4;
     private static final double SPEED_NORMAL = 1;
-
+    public static double AUTO_DRIVE_SPEED = 0.4;
+    private final DcMotor flDrive, frDrive, blDrive, brDrive;
+    private final IMU imu;
     public double Expected_X = 0;
     public double Expected_Y = 0;
-
     /**
      * Tracks the elapsed time since the drive() function has been called gets set to 0 when using
      * Shift functions so beware
      */
     public double PrevLastMoved = 0;
-
     public double LastMoved = 0;
-
-    public static double AUTO_DRIVE_SPEED = 0.4;
-
-    private final DcMotor flDrive, frDrive, blDrive, brDrive;
-    private final IMU imu;
-
     private double speedMultiplier = SPEED_NORMAL;
 
-    public Drivetrain(RobotHardware hw) {
-        (flDrive = hw.flDrive).setDirection(Direction.REVERSE);
-        (blDrive = hw.blDrive).setDirection(Direction.REVERSE);
-        (frDrive = hw.frDrive).setDirection(Direction.FORWARD);
-        (brDrive = hw.brDrive).setDirection(Direction.FORWARD);
-        imu = hw.imu;
+    public Drivetrain() {
+        (flDrive = robotHardware.flDrive).setDirection(Direction.REVERSE);
+        (blDrive = robotHardware.blDrive).setDirection(Direction.REVERSE);
+        (frDrive = robotHardware.frDrive).setDirection(Direction.FORWARD);
+        (brDrive = robotHardware.brDrive).setDirection(Direction.FORWARD);
+        imu = robotHardware.imu;
 
         for (DcMotor m : new DcMotor[] {flDrive, frDrive, blDrive, brDrive}) {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -145,7 +139,6 @@ public class Drivetrain {
         float power = NormalizeSpeed(speed);
         flDrive.setPower(power);
         frDrive.setPower(power);
-        return;
     }
 
     public void Shift(float speed) {
@@ -164,7 +157,6 @@ public class Drivetrain {
         float power = NormalizeSpeed(speed);
         frDrive.setPower(power);
         brDrive.setPower(power);
-        return;
     }
 
     /**
@@ -193,16 +185,15 @@ public class Drivetrain {
                                 RevHubOrientationOnRobot.UsbFacingDirection.DOWN)));
     }
 
-    public void setSpeedMultiplier(double newSpeed) {
-        speedMultiplier = newSpeed;
-    }
-
     public double getSpeedMultiplier() {
         return speedMultiplier;
     }
 
-    public void stop(){
-        speedMultiplier = 0;
+    public void setSpeedMultiplier(double newSpeed) {
+        speedMultiplier = newSpeed;
+    }
 
+    public void stop() {
+        speedMultiplier = 0;
     }
 }

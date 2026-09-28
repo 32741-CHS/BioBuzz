@@ -2,39 +2,39 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 @Configurable
 public class Shooter {
-    private final DcMotorEx flywheel;
-    private final DcMotor feeder;
-
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;
-
     public static double flywheelKP = 16.5;
     public static double flywheelKF = 13.5;
-
-
     public static boolean canSpinFlywheel = false;
+    private final DcMotorEx flywheel;
+    private final DcMotor feeder;
     private boolean requestedFeed = false;
     private boolean requestedReverseFeed = false;
 
-    public Shooter(RobotHardware hw) {
-        flywheel = hw.flywheel;
+    public Shooter() {
+        flywheel = robotHardware.flywheel;
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        feeder = hw.feeder;
+        feeder = robotHardware.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    public static void setDesiredFlywheelRPS(double rps) {
+        desiredFlywheelRPS = rps;
     }
 
     public double getFlywheelRPS() {
@@ -59,10 +59,6 @@ public class Shooter {
 
     public void toggleFlywheel() {
         canSpinFlywheel = !canSpinFlywheel;
-    }
-
-    public static void setDesiredFlywheelRPS(double rps) {
-        desiredFlywheelRPS = rps;
     }
 
     public void feed() {
