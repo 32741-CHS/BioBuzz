@@ -10,37 +10,21 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
 public class RobotHardware {
 
-    public DcMotor flDrive, frDrive, blDrive, brDrive;
-
-    public DcMotorEx turret;
-    public DcMotorEx flywheel;
-    public DcMotor feeder;
-    public DcMotor intake;
-
-    public IMU imu;
-
-    public WebcamName vision;
+    public static DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
+    public static DcMotorEx turret, flywheel;
+    public static IMU imu;
+    public static WebcamName vision;
 
     public void init(HardwareMap hardwareMap) {
-        // drive motors
         flDrive = hardwareMap.get(DcMotor.class, "flDrive");
         frDrive = hardwareMap.get(DcMotor.class, "frDrive");
         blDrive = hardwareMap.get(DcMotor.class, "blDrive");
         brDrive = hardwareMap.get(DcMotor.class, "brDrive");
-
-        // turret
         turret = hardwareMap.get(DcMotorEx.class, "turret");
-
-        // shooter
-        flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
-
+        flywheel = hardwareMap.get(DcMotorEx.class, "flywheel"); // Shooter
         feeder = hardwareMap.get(DcMotor.class, "feeder");
-
-        // intake
         intake = hardwareMap.get(DcMotor.class, "intake");
-
         imu = hardwareMap.get(IMU.class, "imu");
-
         vision = hardwareMap.get(WebcamName.class, "webcam");
     }
 }

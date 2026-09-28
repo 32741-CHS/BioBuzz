@@ -2,6 +2,13 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import java.lang.Math;
 
+/** Vector3D is for 3d vectors, with operations such as
+ * - plus,
+ * - minus
+ * - and normalise.
+ * A vector can be created by x y z or a special constructor method
+ * - fromMag
+ */
 public class Vector3D {
     public final double x;
     public final double y;
