@@ -195,5 +195,10 @@ public class Drivetrain {
 
     public void stop() {
         speedMultiplier = 0;
+
+        flDrive.setPower(0);
+        frDrive.setPower(0);
+        blDrive.setPower(0);
+        brDrive.setPower(0);
     }
 }

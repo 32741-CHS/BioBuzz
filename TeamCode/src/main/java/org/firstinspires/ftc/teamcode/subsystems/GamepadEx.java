@@ -32,6 +32,7 @@ public class GamepadEx {
     public GamepadEx(GamepadManager panelsGamepadManager, Gamepad hardwareGamepad) {
         this.panelsGamepadManager = panelsGamepadManager;
         this.hardwareGamepad = hardwareGamepad;
+        raw = panelsGamepadManager.asCombinedFTCGamepad(hardwareGamepad);
     }
 
     public static GamepadEx newDriverGamepad(Gamepad gamepad1) {
