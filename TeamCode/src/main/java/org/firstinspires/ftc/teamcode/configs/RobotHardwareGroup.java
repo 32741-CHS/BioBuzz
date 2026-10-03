@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
-public class RobotHardware {
+public class RobotHardwareGroup {
 
     public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
     public DcMotorEx turret, flywheel;

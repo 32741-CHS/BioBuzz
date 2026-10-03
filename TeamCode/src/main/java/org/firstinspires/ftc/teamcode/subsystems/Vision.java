@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import android.util.Size;
 
@@ -35,7 +35,7 @@ public class Vision {
 
         portal =
                 new VisionPortal.Builder()
-                        .setCamera(robotHardware.vision)
+                        .setCamera(robotHardwareGroup.vision)
                         .setCameraResolution(new Size(640, 480))
                         .addProcessor(processor)
                         .build();
@@ -62,29 +62,29 @@ public class Vision {
         return processor.getDetections();
     }
 
-    // check if a specific goal tag is visible
-    public boolean isTagVisible(int tagId) {
-        return getTagById(tagId) != null;
-    }
-
-    // returns 0 if tag not visible.
-    public double getTagBearing(int tagId) {
-        AprilTagDetection tag = getTagById(tagId);
-        if (tag == null) return 0;
-        return Math.toDegrees(tag.ftcPose.bearing);
-    }
-
-    public double getTagRange(int tagId) {
-        AprilTagDetection tag = getTagById(tagId);
-        if (tag == null) return -1;
-        return tag.ftcPose.range;
-    }
-
-    public double getTagYaw(int tagId) {
-        AprilTagDetection tag = getTagById(tagId);
-        if (tag == null) return 0;
-        return Math.toDegrees(tag.ftcPose.yaw);
-    }
+    //    // check if a specific goal tag is visible
+    //    public boolean isTagVisible(int tagId) {
+    //        return getTagById(tagId) != null;
+    //    }
+    //
+    //    // returns 0 if tag not visible.
+    //    public double getTagBearing(int tagId) {
+    //        AprilTagDetection tag = getTagById(tagId);
+    //        if (tag == null) return 0;
+    //        return Math.toDegrees(tag.ftcPose.bearing);
+    //    }
+    //
+    //    public double getTagRange(int tagId) {
+    //        AprilTagDetection tag = getTagById(tagId);
+    //        if (tag == null) return -1;
+    //        return tag.ftcPose.range;
+    //    }
+    //
+    //    public double getTagYaw(int tagId) {
+    //        AprilTagDetection tag = getTagById(tagId);
+    //        if (tag == null) return 0;
+    //        return Math.toDegrees(tag.ftcPose.yaw);
+    //    }
 
     public AprilTagDetection getTagById(int tagId) {
         List<AprilTagDetection> detections = getDetections();
@@ -95,10 +95,9 @@ public class Vision {
         }
         return null;
     }
-
-    public void stop() {
-        if (portal != null) {
-            portal.close();
-        }
-    }
+    //    public void stop() {
+    //        if (portal != null) {
+    //            portal.close();
+    //        }
+    //    }
 }

@@ -10,17 +10,8 @@ public class Globals {
     public static final double K_DERIVATIVE = 0; // Anti oscillations
 
     //    The Robot Hardware object thing
-    public static final RobotHardware robotHardware =
-            new RobotHardware(); // Not Init yet, just exists.
-
-    // Current Position
-    public static double distanceToCamera;
-    public static double cameraPositionX;
-    public static double expectedRobotPositionX;
-    public static double cameraPositionY;
-    public static double expectedRobotPositionY;
-    public static double realRobotPositionX;
-    public static double realRobotPositionY;
+    public static final RobotHardwareGroup robotHardwareGroup =
+            new RobotHardwareGroup(); // Not Init yet, just exists.
 
     // Motor Tick Rates
     public static final double GOBILDA_5203_6000RPM = 28;
@@ -29,14 +20,21 @@ public class Globals {
     // Drive Train
     public static final double WHEEL_DIAMETER = 10.4;
     public static final double STICK_DEADBAND = 0.05;
-
-    // Vision
-
     public static final int BLUE_GOAL = 20;
     public static final int RED_GOAL = 24;
     public static final int MAX_FPS = 15;
-    public static int currentGoal;
 
     // Shooter
     public static final double FLYWHEEL_ERROR_TOL = 1.0;
+    public static final double TRIGGER_THRESHOLD = 0.5;
+    // Current Position
+    public static double distanceToCamera;
+    public static double cameraPositionX;
+    public static double expectedRobotPositionX;
+    // Vision
+    public static double cameraPositionY;
+    public static double expectedRobotPositionY;
+    public static double realRobotPositionX;
+    public static double realRobotPositionY;
+    public static int currentGoal;
 }

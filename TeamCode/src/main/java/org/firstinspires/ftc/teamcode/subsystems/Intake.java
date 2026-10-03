@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +15,7 @@ public class Intake {
     private final DcMotor intake;
 
     public Intake() {
-        intake = robotHardware.intake;
+        intake = robotHardwareGroup.intake;
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
