@@ -50,7 +50,7 @@ public class Drivetrain {
     }
 
     //    /**
-    //     * Normalizes speed (meters per second) to a value from 0 to 1 makes it viable to use for
+    //     * Normalises speed (meters per second) to a value from 0 to 1 makes it viable to use for
     //     * DcMotor.setPower()
     //     */
     //    private float NormalizeSpeed(float speed) {
@@ -60,19 +60,19 @@ public class Drivetrain {
     //        return power > 1 ? 1 : power;
     //    }
     //
-    //    /** converts power to speed (meters poer second) */
+    //    /** converts power to speed (meters per second) */
     //    private float PowerToSpeed(float power) {
     //        float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
     //        return (float) Math.PI * WHEEL_RADIUS / 60 * (float) GOBILDA_5203_312RPM * power;
     //    }
 
     /**
-     * takes in joystick input and applies to all motors thanks omar and kiaan
+     * takes in joystick input and applies to all motors thanks Omar and Kiaan
      *
      * @param y The Joystick Y
      * @param x The Joystick X
-     * @param rx
-     * @param fieldRelative
+     * @param rx TODO investigate and find out
+     * @param fieldRelative TODO investigate and find out
      */
     public void drive(double y, double x, double rx, boolean fieldRelative) {
         PrevLastMoved = LastMoved;

@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @Configurable
 public class Shooter {
+    public static final double desiredFeederPower = 0.7;
+    public static final double flywheelKP = 16.5;
+    public static final double flywheelKF = 13.5;
     public static double desiredFlywheelRPS = 13;
-    public static double desiredFeederPower = 0.7;
-    public static double flywheelKP = 16.5;
-    public static double flywheelKF = 13.5;
     public static boolean canSpinFlywheel = false;
     private final DcMotorEx flywheel;
     private final DcMotor feeder;
@@ -71,7 +71,7 @@ public class Shooter {
     }
 
     public void update() {
-        // apply pidf every frame so @Configurable changes work
+        // apply PIDF every frame so @Configurable changes work
         flywheel.setPIDFCoefficients(
                 DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(flywheelKP, 0, 0, flywheelKF));

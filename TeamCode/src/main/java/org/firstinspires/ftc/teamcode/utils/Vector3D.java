@@ -49,7 +49,7 @@ public class Vector3D {
     }
 
     /**
-     * Create a new vector by adding the inputed vector to this vector
+     * Create a new vector by adding the inputted vector to this vector
      *
      * @param v2 the other vector to add
      * @return Vector3D

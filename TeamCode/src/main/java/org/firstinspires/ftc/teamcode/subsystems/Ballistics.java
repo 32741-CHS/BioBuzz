@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.utils.DataInterpolation;
 
 @Configurable
 public class Ballistics {
-    public static DataInterpolation speedToDistanceLookUp =
+    public static final DataInterpolation speedToDistanceLookUp =
             new DataInterpolation(
                     new double[][] {
                         {0.71, 37.0},

@@ -12,10 +12,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 @Configurable
 @Autonomous(name = "Drive for time", group = "Robot")
 public class DriveForTime extends LinearOpMode {
-    public static double DRIVE_TIME = 0.55;
-    public static double DRIVE_POWER = 0.4;
+    public static final double DRIVE_TIME = 0.55;
+    public static final double DRIVE_POWER = 0.4;
 
-    public static double WAIT_TIME = 20;
+    public static final double WAIT_TIME = 20;
     private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
 
