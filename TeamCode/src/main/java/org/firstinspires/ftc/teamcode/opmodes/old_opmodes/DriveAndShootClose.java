@@ -21,13 +21,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Configurable
 @Autonomous(name = "Drive and shoot close", group = "Robot")
 public class DriveAndShootClose extends LinearOpMode {
-    public static double DRIVE_TIME = 2;
-    public static double DRIVE_POWER = 0.4;
+    public static final double DRIVE_TIME = 2;
+    public static final double DRIVE_POWER = 0.4;
 
-    public static double SHOOT_TIME = 10;
-    public static double MAX_SPINUP_TIME = 5;
+    public static final double SHOOT_TIME = 10;
+    public static final double MAX_SPINUP_TIME = 5;
 
-    public static double FLYWHEEL_ERROR_TOL = 100;
+    public static final double FLYWHEEL_ERROR_TOL = 100;
     private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
     private Shooter shooter;

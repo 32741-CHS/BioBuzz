@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 @Configurable
 public class Intake {
 
-    public static double desiredPower = 1;
+    public static final double desiredPower = 1;
     public static boolean isInverted = false;
     private static double targetPower;
     private final DcMotor intake;

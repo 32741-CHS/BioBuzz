@@ -11,18 +11,18 @@ import com.qualcomm.robotcore.util.Range;
 @Configurable
 public class Turret {
 
-    // TODO: measure wheel diameter / lazy susan diameter
+    public static final double kP = 0.03;
+    public static final double kF = 0.04;
+    public static final double MAX_POWER = 0.6;
+    public static final double MAX_ACCEL = 0.02;
+    public static final double ANGLE_TOLERANCE = 1.5;
+    public static final double MIN_ANGLE = -80;
+    public static final double MAX_ANGLE = 80;
+    public static final double SOFT_ZONE_DEG = 5.0;
+    public static final double LOST_TAG_RETURN_DELAY = 2.0;
+    // TODO: measure wheel diameter / Lazy Susan diameter
     private static final double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
     public static double desiredAngle;
-    public static double kP = 0.03;
-    public static double kF = 0.04;
-    public static double MAX_POWER = 0.6;
-    public static double MAX_ACCEL = 0.02;
-    public static double ANGLE_TOLERANCE = 1.5;
-    public static double MIN_ANGLE = -80;
-    public static double MAX_ANGLE = 80;
-    public static double SOFT_ZONE_DEG = 5.0;
-    public static double LOST_TAG_RETURN_DELAY = 2.0;
     private final DcMotorEx turret;
     private double lastPower = 0;
 

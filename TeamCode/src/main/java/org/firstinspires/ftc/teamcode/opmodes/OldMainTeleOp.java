@@ -100,7 +100,7 @@ public class MainTeleOp extends OpMode {
         driverGamepad.update();
         operatorGamepad.update();
 
-        // TODO: replace with follower.setTeleOpDrive() once pedro is added
+        // TODO: replace with follower.setTeleOpDrive() once Pedro Pathing is added
         drivetrain.drive(
                 -driverGamepad.raw.left_stick_y,
                 driverGamepad.raw.left_stick_x,
