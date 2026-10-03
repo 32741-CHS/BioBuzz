@@ -1,13 +1,8 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-import java.lang.Math;
-
-/** Vector3D is for 3d vectors, with operations such as
- * - plus,
- * - minus
- * - and normalise.
- * A vector can be created by x y z or a special constructor method
- * - fromMag
+/**
+ * Vector3D is for 3d vectors, with operations such as - plus, - minus - and normalise. A vector can
+ * be created by x y z or a special constructor method - fromMag
  */
 public class Vector3D {
     public final double x;
@@ -20,7 +15,6 @@ public class Vector3D {
 
     /** The vertical angle in radians relative to the XY flat plane */
     public final double angleRadV;
-
 
     /**
      * An immutable 3D Vector.
@@ -56,6 +50,7 @@ public class Vector3D {
 
     /**
      * Create a new vector by adding the inputed vector to this vector
+     *
      * @param v2 the other vector to add
      * @return Vector3D
      */
@@ -65,6 +60,7 @@ public class Vector3D {
 
     /**
      * Subtract the other vector from this vector
+     *
      * @param v2 the other vector
      * @return Vector3D
      */
@@ -73,7 +69,9 @@ public class Vector3D {
     }
 
     /**
-     * Return a new vector based on this vector where the vector components (x, y and z) are between 0 and 1
+     * Return a new vector based on this vector where the vector components (x, y and z) are between
+     * 0 and 1
+     *
      * @return Vector3D
      */
     public Vector3D normalise() {
@@ -83,4 +81,3 @@ public class Vector3D {
         return new Vector3D(newX, newY, newZ);
     }
 }
-

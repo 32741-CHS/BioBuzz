@@ -62,9 +62,9 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init_loop() {
-        // The .raw.x instead of btnX.isHeld() and not requiring that we go driverGamepad.update()
-        if (driverGamepad.raw.x) isRed = true;
-        if (driverGamepad.raw.a) isRed = false;
+        driverGamepad.update();
+        if (driverGamepad.btnX.isHeld()) isRed = true;
+        if (driverGamepad.btnA.isHeld()) isRed = false;
 
         telemetry.addData("Team", isRed ? "RED" : "BLUE");
         telemetry.addData("Switch", "Square = Red, X = Blue");
@@ -81,7 +81,7 @@ public class MainTeleOp extends OpMode {
         // - OnPress when the key goes down, fire the function ONCE
         // - The "::" means don't call this function, just pass it forward as a parameter
         driverGamepad.leftBumper.whenHeld(() -> drivetrain.setSpeedMultiplier(1));
-        driverGamepad.leftBumper.whenNotHeld(() -> drivetrain.setSpeedMultiplier(0));
+        driverGamepad.leftBumper.whenNotHeld(() -> drivetrain.setSpeedMultiplier(0.1));
         operatorGamepad.dpadUp.onPress(shooter::speedUpFlywheel);
         operatorGamepad.dpadDown.onPress(shooter::slowDownFlywheel);
         operatorGamepad.btnY.onPress(drivetrain::resetIMU);
