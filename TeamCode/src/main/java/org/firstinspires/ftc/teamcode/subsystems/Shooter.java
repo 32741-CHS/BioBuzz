@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,12 +23,12 @@ public class Shooter {
     private boolean requestedReverseFeed = false;
 
     public Shooter() {
-        flywheel = robotHardware.flywheel;
+        flywheel = robotHardwareGroup.flywheel;
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        feeder = robotHardware.feeder;
+        feeder = robotHardwareGroup.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }

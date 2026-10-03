@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,7 +21,7 @@ public class DriveForTime extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robotHardware.init(hardwareMap);
+        robotHardwareGroup.init(hardwareMap);
         drivetrain = new Drivetrain();
 
         waitForStart();

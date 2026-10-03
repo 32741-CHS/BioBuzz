@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardware;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -38,7 +38,7 @@ public class DriveAndShootFar extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robotHardware.init(hardwareMap);
+        robotHardwareGroup.init(hardwareMap);
         drivetrain = new Drivetrain();
         shooter = new Shooter();
         intake = new Intake();
