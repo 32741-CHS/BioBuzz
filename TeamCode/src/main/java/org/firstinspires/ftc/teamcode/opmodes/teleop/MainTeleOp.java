@@ -1,66 +1,59 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
-import com.bylazar.gamepad.GamepadManager;
-import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.graph.GraphManager;
 import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
-import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.Locale;
 
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
-
-    private final RobotHardware hw = new RobotHardware();
-
+    public static boolean isRed = false;
+    public static boolean useFlywheelLookups = true;
+    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
+    private GamepadEx driverGamepad;
+    private GamepadEx operatorGamepad;
     private Drivetrain drivetrain;
     private Intake intake;
     private Shooter shooter;
     private Turret turret;
     private Vision vision;
-
-    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    private final GamepadEx driverButtons = new GamepadEx();
-    private final GamepadEx operatorButtons = new GamepadEx();
-
-    private final GamepadManager driverPanelsGamepad = PanelsGamepad.INSTANCE.getFirstManager();
-    private final GamepadManager operatorPanelsGamepad = PanelsGamepad.INSTANCE.getSecondManager();
-
     private boolean isFieldDriving = false;
-    public static boolean isRed = false;
-
-    private static final double TRIGGER_THRESHOLD = 0.5;
-    private static final double STICK_DEADBAND = 0.15;
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
     private double lastGoalTagTime = 0;
-    public static boolean useFlywheelLookups = true;
 
     @Override
     public void init() {
-        hw.init(hardwareMap);
+        // hardwareMap, gamepad1, and gamepad2 are magically injected here
+        // by ftc for us to use. We wrap them so simple functions for us.
+        robotHardwareGroup.init(hardwareMap);
+        driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
+        operatorGamepad = GamepadEx.newOperatorGamepad(gamepad2);
 
-        drivetrain = new Drivetrain(hw);
-        intake = new Intake(hw);
-        shooter = new Shooter(hw);
-        vision = new Vision(hw);
-        turret = new Turret(hw);
+        drivetrain = new Drivetrain();
+        intake = new Intake();
+        shooter = new Shooter();
+        vision = new Vision();
+        turret = new Turret();
 
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Alliance", "Square = Red, X = Blue");
@@ -69,13 +62,10 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init_loop() {
-        Gamepad driverGamepad = getDriverGamepad();
+        driverGamepad.update();
+        if (driverGamepad.btnX.isHeld()) isRed = true;
+        if (driverGamepad.btnA.isHeld()) isRed = false;
 
-        if (driverGamepad.x) {
-            isRed = true;
-        } else if (driverGamepad.a) {
-            isRed = false;
-        }
         telemetry.addData("Team", isRed ? "RED" : "BLUE");
         telemetry.addData("Switch", "Square = Red, X = Blue");
         telemetry.update();
@@ -84,52 +74,41 @@ public class MainTeleOp extends OpMode {
     @Override
     public void start() {
         lastGoalTagTime = getRuntime();
+
+        // KEY BINDS
+        // Notes:
+        // - whenHeld means run EVERY frame
+        // - OnPress when the key goes down, fire the function ONCE
+        // - The "::" means don't call this function, just pass it forward as a parameter
+        driverGamepad.leftBumper.whenHeld(() -> drivetrain.setSpeedMultiplier(1));
+        driverGamepad.leftBumper.whenNotHeld(() -> drivetrain.setSpeedMultiplier(0.1));
+        operatorGamepad.dpadUp.onPress(shooter::speedUpFlywheel);
+        operatorGamepad.dpadDown.onPress(shooter::slowDownFlywheel);
+        operatorGamepad.btnY.onPress(drivetrain::resetIMU);
+        operatorGamepad.btnB.onPress(turret::resetTurretEncoder);
+        operatorGamepad.leftBumper.whenHeld(intake::eat);
+        operatorGamepad.btnA.whenHeld(intake::invert);
+        operatorGamepad.rightTrigger.whenHeld(shooter::feed);
+        operatorGamepad.btnA.whenHeld(shooter::reverseFeed);
+        operatorGamepad.btnX.onPress(shooter::toggleFlywheel);
+        driverGamepad.btnY.onPress(() -> isFieldDriving = !isFieldDriving);
+        operatorGamepad.leftBumper.onPress(() -> useFlywheelLookups = !useFlywheelLookups);
     }
 
     @Override
     public void loop() {
-        Gamepad driverGamepad = getDriverGamepad();
-        Gamepad operatorGamepad = getOperatorGamepad();
+        driverGamepad.update();
+        operatorGamepad.update();
 
-        driverButtons.update(driverGamepad);
-        operatorButtons.update(operatorGamepad);
-
-        // gamepad 1
-        drivetrain.setSpeedMultiplier(driverButtons.lb.isHeld());
-        // TODO: replace with follower.setTeleOpDrive() once pedro is added
+        // TODO: replace with follower.setTeleOpDrive() once Pedro Pathing is added
         drivetrain.drive(
-                -driverGamepad.left_stick_y,
-                driverGamepad.left_stick_x,
-                driverGamepad.right_stick_x,
-                isFieldDriving
-        );
-
-        if (driverButtons.y.wasPressed()) {
-            isFieldDriving = !isFieldDriving;
-        }
-
-        // gamepad 2
-        if (operatorButtons.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
-        if (operatorButtons.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
-
-        if (operatorButtons.y.wasPressed()) {drivetrain.resetIMU();}
-        if (operatorButtons.b.wasPressed()) {turret.resetTurretEncoder();}
-
-        if (operatorButtons.lt >= TRIGGER_THRESHOLD) {intake.eat();}
-        if (operatorButtons.a.isHeld()) { intake.invert();}
-
-        if (operatorGamepad.right_trigger >= TRIGGER_THRESHOLD){
-            if (operatorButtons.a.isHeld()) {
-                shooter.reverseFeed();
-            } else {
-                shooter.feed();
-            }
-        }
-        if (operatorButtons.x.wasPressed()) { shooter.toggleFlywheel();}
-        if (operatorButtons.lb.wasPressed()) { useFlywheelLookups = !useFlywheelLookups; }
+                -driverGamepad.raw.left_stick_y,
+                driverGamepad.raw.left_stick_x,
+                driverGamepad.raw.right_stick_x,
+                isFieldDriving);
 
         // turret: right stick x for manual override, or auto-track the goal tag
-        double stickX = operatorGamepad.right_stick_x;
+        double stickX = operatorGamepad.raw.right_stick_x;
         if (Math.abs(stickX) > STICK_DEADBAND) {
             if (!turretManualMode) {
                 turretManualMode = true;
@@ -158,8 +137,7 @@ public class MainTeleOp extends OpMode {
 
         if (useFlywheelLookups && goalTag != null) {
             double distance = goalTag.ftcPose.range;
-            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
-
+            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         }
 
         intake.update();
@@ -167,7 +145,7 @@ public class MainTeleOp extends OpMode {
         turret.update();
 
         // Telemetry
-        panelsTelemetry.addData("Intake power",  intake.getPower());
+        panelsTelemetry.addData("Intake power", intake.getPower());
         panelsTelemetry.addData("Feeder power", shooter.getFeederPower());
         panelsTelemetry.addData("Flywheel rps", shooter.getFlywheelRPS());
         panelsTelemetry.addData("Flywheel error", shooter.getFlywheelErrorRPS());
@@ -179,8 +157,13 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Use lookups", useFlywheelLookups);
 
         if (goalTag != null) {
-            panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));
-            panelsTelemetry.addData("Tag bearing", String.format("%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
+            // Locale.US means use the 12.22 every time instead of 12,22 because some countries use
+            // the "," instead of the "." why I do not know.
+            panelsTelemetry.addData(
+                    "Tag distance", String.format(Locale.US, "%.2f m", goalTag.ftcPose.range));
+            panelsTelemetry.addData(
+                    "Tag bearing",
+                    String.format(Locale.US, "%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
         } else {
             panelsTelemetry.addData("Tag distance", "no tag");
         }
@@ -194,13 +177,5 @@ public class MainTeleOp extends OpMode {
 
         panelsGraph.update();
         panelsTelemetry.update(telemetry);
-    }
-
-    private Gamepad getDriverGamepad() {
-        return driverPanelsGamepad.asCombinedFTCGamepad(gamepad1);
-    }
-
-    private Gamepad getOperatorGamepad() {
-        return operatorPanelsGamepad.asCombinedFTCGamepad(gamepad2);
     }
 }

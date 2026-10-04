@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -19,36 +19,31 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
-@Autonomous(name="Drive and shoot far", group="Robot")
+@Autonomous(name = "Drive and shoot far", group = "Robot")
 public class DriveAndShootFar extends LinearOpMode {
-    public static double DRIVE_TIME = 1.2;
-    public static double DRIVE_POWER = 0.4;
+    public static final double DRIVE_TIME = 1.2;
+    public static final double DRIVE_POWER = 0.4;
 
-    public static double SHOOT_TIME = 10;
-    public static double MAX_SPINUP_TIME = 5;
+    public static final double SHOOT_TIME = 10;
+    public static final double MAX_SPINUP_TIME = 5;
 
-    public static double FLYWHEEL_ERROR_TOL = 100;
-
-
-    private final RobotHardware hw = new RobotHardware();
-
+    public static final double FLYWHEEL_ERROR_TOL = 100;
+    private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
     private Shooter shooter;
     private Intake intake;
     private Vision vision;
     private Turret turret;
-
-    private final ElapsedTime timer = new ElapsedTime();
     private double lastGoalTagTime = 0;
 
     @Override
     public void runOpMode() {
-        hw.init(hardwareMap);
-        drivetrain = new Drivetrain(hw);
-        shooter = new Shooter(hw);
-        intake = new Intake(hw);
-        turret = new Turret(hw);
-        vision = new Vision(hw);
+        robotHardwareGroup.init(hardwareMap);
+        drivetrain = new Drivetrain();
+        shooter = new Shooter();
+        intake = new Intake();
+        turret = new Turret();
+        vision = new Vision();
 
         while (opModeInInit()) {
             if (gamepad1.x) {
@@ -68,7 +63,9 @@ public class DriveAndShootFar extends LinearOpMode {
         lastGoalTagTime = getRuntime();
 
         timer.reset();
-        while (opModeIsActive() && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL && timer.seconds() <= MAX_SPINUP_TIME) {
+        while (opModeIsActive()
+                && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
+                && timer.seconds() <= MAX_SPINUP_TIME) {
             runBallistics();
             turret.update();
             shooter.update();
@@ -92,7 +89,7 @@ public class DriveAndShootFar extends LinearOpMode {
     }
 
     private void runBallistics() {
-        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+        AprilTagDetection goalTag = vision.getTagById(!isRed ? BLUE_GOAL : RED_GOAL);
         if (goalTag != null) {
             lastGoalTagTime = getRuntime();
             double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
@@ -100,7 +97,7 @@ public class DriveAndShootFar extends LinearOpMode {
             turret.goTo(angle);
 
             double distance = goalTag.ftcPose.range;
-            shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
             turret.returnHome();
         }
