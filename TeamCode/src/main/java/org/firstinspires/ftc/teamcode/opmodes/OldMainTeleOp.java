@@ -12,6 +12,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
@@ -45,6 +46,9 @@ public class MainTeleOp extends OpMode {
     public void init() {
         // hardwareMap, gamepad1, and gamepad2 are magically injected here
         // by ftc for us to use. We wrap them so simple functions for us.
+
+        // New robotHardware To make force fresh init and reduce risk of improper motor config.
+        robotHardwareGroup = new RobotHardwareGroup();
         robotHardwareGroup.init(hardwareMap);
         driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
         operatorGamepad = GamepadEx.newOperatorGamepad(gamepad2);

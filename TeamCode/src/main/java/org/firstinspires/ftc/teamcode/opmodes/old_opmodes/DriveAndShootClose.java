@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -38,6 +40,8 @@ public class DriveAndShootClose extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // New robotHardware To make force fresh init and reduce risk of improper motor config.
+        robotHardwareGroup = new RobotHardwareGroup();
         robotHardwareGroup.init(hardwareMap);
         drivetrain = new Drivetrain();
         shooter = new Shooter();
