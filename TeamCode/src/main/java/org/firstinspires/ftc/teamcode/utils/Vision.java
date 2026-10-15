@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.utils;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
