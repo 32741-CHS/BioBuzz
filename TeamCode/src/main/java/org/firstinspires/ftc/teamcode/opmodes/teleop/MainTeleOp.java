@@ -12,7 +12,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.Ballistics;
+import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;

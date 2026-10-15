@@ -1,5 +1,10 @@
 # Utilities
 
+## TLDR: 
+Utils are for input/output operations that help subsystem(s) but not itself a subsystem. 
+Think of these files as abstraction libraries to make some stuff easier to do.
+
+
 (This is an AI Generated README.md file and is correct as of 4/10 3:10pm)
 This directory contains reusable helper classes that are not specific to one robot mechanism.
 

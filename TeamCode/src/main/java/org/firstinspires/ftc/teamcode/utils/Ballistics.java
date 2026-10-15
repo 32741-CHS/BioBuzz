@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.utils;
 
 import com.bylazar.configurables.annotations.Configurable;
-
-import org.firstinspires.ftc.teamcode.utils.DataInterpolation;
 
 @Configurable
 public class Ballistics {
