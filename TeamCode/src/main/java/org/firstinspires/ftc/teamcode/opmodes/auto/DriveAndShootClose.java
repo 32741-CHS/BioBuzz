@@ -59,16 +59,16 @@ public class DriveAndShootClose extends LinearOpMode {
         turret = new Turret();
         vision = new Vision();
 
-        while (opModeInInit()) {
+        while (opModeInInit()) { //while initialising opmode..
             if (gamepad1.x) {
                 isRed = true;
-            } else if (gamepad1.a) {
+            } else if (gamepad1.a) { //check what team we're on
                 isRed = false;
             }
 
-            telemetry.addData("Team", isRed ? "RED" : "BLUE");
+            telemetry.addData("Team", isRed ? "RED" : "BLUE"); //set the telemetry to match the detected team
             telemetry.addData("Switch", "Square = Red, X = Blue");
-            telemetry.update();
+            telemetry.update(); //and update the telemetry reader
         }
 
         waitForStart();
