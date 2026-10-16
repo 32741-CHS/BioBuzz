@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.utils.GamepadButton;
 import org.firstinspires.ftc.teamcode.utils.GamepadTrigger;
 
+/**
+ * initialises gamepad buttons and triggers, along with keeping the buttons in sync
+ */
 public class GamepadEx {
 
     public final GamepadButton btnA = new GamepadButton();

@@ -1,4 +1,19 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
+/*
+Drives toward the shooting position, spins up the flywheel, tracks the goal using AprilTags, shoots
+for a set period, and then drives away.
+
+The close routine uses a longer initial drive period before shooting.
+
+Key configurable values include:
+
+* Drive time
+* Drive power
+* Shooting time
+* Maximum flywheel spin-up time
+
+These values are configurable in the first few lines of DriveAndShootClose.
+ */
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
@@ -23,7 +38,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 public class DriveAndShootClose extends LinearOpMode {
     public static final double DRIVE_TIME = 2;
     public static final double DRIVE_POWER = 0.4;
-
     public static final double SHOOT_TIME = 10;
     public static final double MAX_SPINUP_TIME = 5;
 

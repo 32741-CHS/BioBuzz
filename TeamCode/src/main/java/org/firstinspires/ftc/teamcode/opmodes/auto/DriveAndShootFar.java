@@ -37,15 +37,15 @@ public class DriveAndShootFar extends LinearOpMode {
   private double lastGoalTagTime = 0;
 
   @Override
-  public void runOpMode() {
-    robotHardwareGroup.init(hardwareMap);
+  public void runOpMode() { //This function does a lot of things that should be separated.
+    robotHardwareGroup.init(hardwareMap); //**INITIALISATION** of initial instances.
     drivetrain = new Drivetrain();
     shooter = new Shooter();
     intake = new Intake();
     turret = new Turret();
     vision = new Vision();
 
-    while (opModeInInit()) {
+    while (opModeInInit()) { //Declares **TEAM STATE** via isRed.
       if (gamepad1.x) {
         isRed = true;
       } else if (gamepad1.a) {
@@ -53,7 +53,7 @@ public class DriveAndShootFar extends LinearOpMode {
       }
 
       telemetry.addData("Team", isRed ? "RED" : "BLUE");
-      telemetry.addData("Switch", "Square = Red, X = Blue");
+      telemetry.addData("Switch", "Square = Red, X = Blue"); //Adds to telemetry
       telemetry.update();
     }
 
@@ -83,12 +83,16 @@ public class DriveAndShootFar extends LinearOpMode {
 
     timer.reset();
 
-    while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
+    while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) { //Actually applies power via drivetrain subsystem.
       drivetrain.drive(DRIVE_POWER, 0, 0, false);
     }
   }
 
-  private void runBallistics() {
+  /**
+   * orients the turret to the target angle then
+   * prepares the flywheel speed for shooting.
+   */
+  private void runBallistics() { //Note that this assumes a turret rotation set up. Function may have to be rewritten for new bot design.
     AprilTagDetection goalTag = vision.getTagById(!isRed ? BLUE_GOAL : RED_GOAL);
     if (goalTag != null) {
       lastGoalTagTime = getRuntime();

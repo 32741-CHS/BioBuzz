@@ -21,6 +21,11 @@ public class Ballistics {
         return currentAngleDeg + tagBearingDeg;
     }
 
+    /**
+     * Calculates the flywheel RPS based off of preset interpolation params.
+     * @param distance
+     * @return speed The calculated flywheel RPS using the distance given.
+     */
     public static double calculateFlywheelRPS(double distance) {
         return speedToDistanceLookUp.interpolate(distance);
     }

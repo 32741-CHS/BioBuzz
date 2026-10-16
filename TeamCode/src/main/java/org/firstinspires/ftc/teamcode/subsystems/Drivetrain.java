@@ -33,13 +33,15 @@ public class Drivetrain {
     public double LastMoved = 0;
     private double speedMultiplier = SPEED_NORMAL;
 
+    //can we figure out when this is called thanks
     public Drivetrain() {
         (flDrive = robotHardwareGroup.flDrive).setDirection(Direction.REVERSE);
         (blDrive = robotHardwareGroup.blDrive).setDirection(Direction.REVERSE);
         (frDrive = robotHardwareGroup.frDrive).setDirection(Direction.FORWARD);
         (brDrive = robotHardwareGroup.brDrive).setDirection(Direction.FORWARD);
         imu = robotHardwareGroup.imu;
-
+        //inits a new motor each time it's called? but doesn't actually make the motor changes
+        //reflect onto the robotHardwareGroup? what
         for (DcMotor m : new DcMotor[] {flDrive, frDrive, blDrive, brDrive}) {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -67,7 +69,7 @@ public class Drivetrain {
     //    }
 
     /**
-     * takes in joystick input and applies to all motors thanks Omar and Kiaan
+     * translates joystick inputs into motor actions thanks Omar and Kiaan
      *
      * @param y The Joystick Y
      * @param x The Joystick X
@@ -82,7 +84,7 @@ public class Drivetrain {
         x = deadband(x) * 1.1;
         rx = deadband(rx);
 
-        if (fieldRelative) {
+        if (fieldRelative) { //corrects for field
             double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             double cos = Math.cos(-heading);
             double sin = Math.sin(-heading);
@@ -103,7 +105,7 @@ public class Drivetrain {
                         Math.max(
                                 Math.abs(fl),
                                 Math.max(Math.abs(fr), Math.max(Math.abs(bl), Math.abs(br)))));
-
+        // below actually does the setting of powers and application into the motors, though it goes through another interface first
         double flSpeed = (fl / max) * speedMultiplier;
         flDrive.setPower(flSpeed);
 
@@ -119,6 +121,11 @@ public class Drivetrain {
         // TODO find a way to update Expected_X and Expected_Y based on the movement of the drive
     }
 
+    /**
+     *
+     * @param value current stick position (probably)
+     * @return adjustedStick the stick position accounting for the deadband
+     */
     private double deadband(double value) {
         return Math.abs(value) < STICK_DEADBAND ? 0 : value;
     }
