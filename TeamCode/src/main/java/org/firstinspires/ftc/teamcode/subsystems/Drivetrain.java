@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.Vector3D;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,8 +23,7 @@ public class Drivetrain {
     public static double AUTO_DRIVE_SPEED = 0.4;
     private final DcMotor flDrive, frDrive, blDrive, brDrive;
     private final IMU imu;
-    public double Expected_X = 0;
-    public double Expected_Y = 0;
+		public Vector2D ExpectedPosition = Vector2D(0.0, 0.0);
 
     /**
      * Tracks the elapsed time since the drive() function has been called gets set to 0 when using
@@ -69,17 +70,16 @@ public class Drivetrain {
     /**
      * takes in joystick input and applies to all motors thanks Omar and Kiaan
      *
-     * @param y The Joystick Y
-     * @param x The Joystick X
+     * @param Joystick The Joystick X and Y as a Vector2D
      * @param rx TODO investigate and find out
-     * @param fieldRelative TODO investigate and find out
+     * @param fieldRelative TODO investigate and find out <-- oh my god :sob:
      */
-    public void drive(double y, double x, double rx, boolean fieldRelative) {
+    public void drive(Vector2D Joystick, double rx, boolean fieldRelative) {
         PrevLastMoved = LastMoved;
         LastMoved = System.currentTimeMillis();
 
-        y = deadband(y);
-        x = deadband(x) * 1.1;
+        double y = deadband(Joystick.y);
+        double x = deadband(Joystick.x) * 1.1;
         rx = deadband(rx);
 
         if (fieldRelative) {
@@ -116,7 +116,7 @@ public class Drivetrain {
         double brSpeed = (br / max) * speedMultiplier;
         brDrive.setPower(brSpeed);
 
-        // TODO find a way to update Expected_X and Expected_Y based on the movement of the drive
+        // TODO find a way to update ExpectedPosition based on the movement of the drive
     }
 
     private double deadband(double value) {
@@ -131,9 +131,9 @@ public class Drivetrain {
     //        frDrive.setDirection(dir);
     //
     //        if (dir == Direction.FORWARD) {
-    //            Expected_Y += speed;
+    //            ExpectedPosition.x += speed;
     //        } else {
-    //            Expected_Y -= speed;
+    //            ExpectedPosition.y -= speed;
     //        }
     //
     //        float power = NormalizeSpeed(speed);
@@ -152,7 +152,7 @@ public class Drivetrain {
     //        frDrive.setDirection(Direction.REVERSE);
     //        brDrive.setDirection(Direction.FORWARD);
     //
-    //        Expected_X += speed;
+    //        ExpectedPosition.x += speed;
     //
     //        float power = NormalizeSpeed(speed);
     //        frDrive.setPower(power);
@@ -170,7 +170,7 @@ public class Drivetrain {
     //        flDrive.setDirection(Direction.REVERSE);
     //        blDrive.setDirection(Direction.FORWARD);
     //
-    //        Expected_X -= speed;
+    //        ExpectedPosition.x -= speed;
     //
     //        float power = NormalizeSpeed(speed);
     //        flDrive.setPower(power);
