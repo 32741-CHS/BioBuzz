@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /** Handles movement of the 4 mecanum wheels */
-public class Drivetrain {
+public class Drivetrain implements SubSystemRequirements {
 
     //    /** How many encoder ticks equal one centimeter of physical travel */
     //    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI); //
