@@ -33,7 +33,6 @@ public class Drivetrain {
     public double LastMoved = 0;
     private double speedMultiplier = SPEED_NORMAL;
 
-    //can we figure out when this is called thanks
     public Drivetrain() {
         (flDrive = robotHardwareGroup.flDrive).setDirection(Direction.REVERSE);
         (blDrive = robotHardwareGroup.blDrive).setDirection(Direction.REVERSE);

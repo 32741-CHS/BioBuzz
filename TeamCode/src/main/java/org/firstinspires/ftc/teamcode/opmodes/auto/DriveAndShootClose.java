@@ -45,13 +45,16 @@ public class DriveAndShootClose extends LinearOpMode {
     private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
     private Shooter shooter;
-    private Intake intake;
+    private Intake intake;G
     private Vision vision;
     private Turret turret;
     private double lastGoalTagTime = 0;
 
+    /**
+     * this function initialises the robot + basic telemetry, and commands the subsystems throughout the game.
+     */
     @Override
-    public void runOpMode() {
+    public void runOpMode() { //This function does a lot of things that should be separated.
         robotHardwareGroup.init(hardwareMap);
         drivetrain = new Drivetrain();
         shooter = new Shooter();
@@ -71,8 +74,8 @@ public class DriveAndShootClose extends LinearOpMode {
             telemetry.update(); //and update the telemetry reader
         }
 
-        waitForStart();
-
+        waitForStart(); //Anyone knows where this function is even defined?
+        //bang!! it starts
         Shooter.canSpinFlywheel = true;
         lastGoalTagTime = getRuntime();
 
@@ -90,7 +93,7 @@ public class DriveAndShootClose extends LinearOpMode {
             runBallistics();
             turret.update();
             shooter.update();
-        }
+        } //This seems to be for the autonomous handling.
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= SHOOT_TIME) {
@@ -100,12 +103,12 @@ public class DriveAndShootClose extends LinearOpMode {
             turret.update();
             shooter.update();
             intake.update();
-        }
+        } //This may be for the TeleOp
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
             drivetrain.drive(0, DRIVE_POWER, 0, false);
-        }
+        } //Potentially for the endgame, though I don't think this would apply to biobuzz if this is the endgame.
 
         drivetrain.stop();
 
