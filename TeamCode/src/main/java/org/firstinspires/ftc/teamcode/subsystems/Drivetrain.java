@@ -11,18 +11,21 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /** Handles movement of the 4 mecanum wheels */
-public class Drivetrain {
+public class Drivetrain implements SubSystemRequirements {
 
     //    /** How many encoder ticks equal one centimeter of physical travel */
     //    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI); //
 
-    private static final double SPEED_SLOW = 0.4;
+//    private static final double SPEED_SLOW = 0.4;
+//    public static double AUTO_DRIVE_SPEED = 0.4;
+
+//    public double Expected_X = 0;
+//    public double Expected_Y = 0;
+
     private static final double SPEED_NORMAL = 1;
-    public static double AUTO_DRIVE_SPEED = 0.4;
+
     private final DcMotor flDrive, frDrive, blDrive, brDrive;
     private final IMU imu;
-    public double Expected_X = 0;
-    public double Expected_Y = 0;
 
     /**
      * Tracks the elapsed time since the drive() function has been called gets set to 0 when using
@@ -45,26 +48,8 @@ public class Drivetrain {
             m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-
         resetIMU();
     }
-
-    //    /**
-    //     * Normalises speed (meters per second) to a value from 0 to 1 makes it viable to use for
-    //     * DcMotor.setPower()
-    //     */
-    //    private float NormalizeSpeed(float speed) {
-    //        float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
-    //        float power = (60 * speed) / (WHEEL_RADIUS * (float) Math.PI * (float)
-    // GOBILDA_5203_312RPM);
-    //        return power > 1 ? 1 : power;
-    //    }
-    //
-    //    /** converts power to speed (meters per second) */
-    //    private float PowerToSpeed(float power) {
-    //        float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
-    //        return (float) Math.PI * WHEEL_RADIUS / 60 * (float) GOBILDA_5203_312RPM * power;
-    //    }
 
     /**
      * takes in joystick input and applies to all motors thanks Omar and Kiaan
@@ -123,60 +108,6 @@ public class Drivetrain {
         return Math.abs(value) < STICK_DEADBAND ? 0 : value;
     }
 
-    //    /** shifts the robot forward in reverse based off direction default is forward */
-    //    public void Shift(float speed, Direction dir) {
-    //        PrevLastMoved = LastMoved;
-    //        LastMoved = System.currentTimeMillis();
-    //        flDrive.setDirection(dir);
-    //        frDrive.setDirection(dir);
-    //
-    //        if (dir == Direction.FORWARD) {
-    //            Expected_Y += speed;
-    //        } else {
-    //            Expected_Y -= speed;
-    //        }
-    //
-    //        float power = NormalizeSpeed(speed);
-    //        flDrive.setPower(power);
-    //        frDrive.setPower(power);
-    //    }
-
-    //    public void Shift(float speed) {
-    //        Shift(speed, Direction.FORWARD);
-    //    }
-    //
-    //    /** updates the movement of the robot to be to their right */
-    //    public void ShiftRight(float speed) {
-    //        PrevLastMoved = LastMoved;
-    //        LastMoved = System.currentTimeMillis();
-    //        frDrive.setDirection(Direction.REVERSE);
-    //        brDrive.setDirection(Direction.FORWARD);
-    //
-    //        Expected_X += speed;
-    //
-    //        float power = NormalizeSpeed(speed);
-    //        frDrive.setPower(power);
-    //        brDrive.setPower(power);
-    //    }
-    //
-    //    /**
-    //     * updates the movement of the robot to be their left
-    //     *
-    //     * @param speed in ...
-    //     */
-    //    public void ShiftLeft(float speed) {
-    //        PrevLastMoved = LastMoved;
-    //        LastMoved = System.currentTimeMillis();
-    //        flDrive.setDirection(Direction.REVERSE);
-    //        blDrive.setDirection(Direction.FORWARD);
-    //
-    //        Expected_X -= speed;
-    //
-    //        float power = NormalizeSpeed(speed);
-    //        flDrive.setPower(power);
-    //        blDrive.setPower(power);
-    //    }
-
     public void resetIMU() {
         imu.initialize(
                 new IMU.Parameters(
@@ -193,12 +124,86 @@ public class Drivetrain {
         speedMultiplier = newSpeed;
     }
 
+    @Override
     public void stop() {
         speedMultiplier = 0;
-
         flDrive.setPower(0);
         frDrive.setPower(0);
         blDrive.setPower(0);
         brDrive.setPower(0);
     }
+
+    @Override
+    public void update() {}
 }
+
+//    /**
+//     * Normalises speed (meters per second) to a value from 0 to 1 makes it viable to use for
+//     * DcMotor.setPower()
+//     */
+//    private float NormalizeSpeed(float speed) {
+//        float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
+//        float power = (60 * speed) / (WHEEL_RADIUS * (float) Math.PI * (float)
+// GOBILDA_5203_312RPM);
+//        return power > 1 ? 1 : power;
+//    }
+//
+//    /** converts power to speed (meters per second) */
+//    private float PowerToSpeed(float power) {
+//        float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
+//        return (float) Math.PI * WHEEL_RADIUS / 60 * (float) GOBILDA_5203_312RPM * power;
+//    }
+
+//    /** shifts the robot forward in reverse based off direction default is forward */
+//    public void Shift(float speed, Direction dir) {
+//        PrevLastMoved = LastMoved;
+//        LastMoved = System.currentTimeMillis();
+//        flDrive.setDirection(dir);
+//        frDrive.setDirection(dir);
+//
+//        if (dir == Direction.FORWARD) {
+//            Expected_Y += speed;
+//        } else {
+//            Expected_Y -= speed;
+//        }
+//
+//        float power = NormalizeSpeed(speed);
+//        flDrive.setPower(power);
+//        frDrive.setPower(power);
+//    }
+
+//    public void Shift(float speed) {
+//        Shift(speed, Direction.FORWARD);
+//    }
+//
+//    /** updates the movement of the robot to be to their right */
+//    public void ShiftRight(float speed) {
+//        PrevLastMoved = LastMoved;
+//        LastMoved = System.currentTimeMillis();
+//        frDrive.setDirection(Direction.REVERSE);
+//        brDrive.setDirection(Direction.FORWARD);
+//
+//        Expected_X += speed;
+//
+//        float power = NormalizeSpeed(speed);
+//        frDrive.setPower(power);
+//        brDrive.setPower(power);
+//    }
+//
+//    /**
+//     * updates the movement of the robot to be their left
+//     *
+//     * @param speed in ...
+//     */
+//    public void ShiftLeft(float speed) {
+//        PrevLastMoved = LastMoved;
+//        LastMoved = System.currentTimeMillis();
+//        flDrive.setDirection(Direction.REVERSE);
+//        blDrive.setDirection(Direction.FORWARD);
+//
+//        Expected_X -= speed;
+//
+//        float power = NormalizeSpeed(speed);
+//        flDrive.setPower(power);
+//        blDrive.setPower(power);
+//    }
