@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +11,6 @@ public class BasicMotorRun extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Map the motor using the name configured in the Driver Hub / Control Hub
-        motor = hardwareMap.get(DcMotor.class, "motor");
 
         // Set the motor run mode (optional, RUN_WITHOUT_ENCODER is default for basic power)
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
