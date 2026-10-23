@@ -45,7 +45,7 @@ public class DriveAndShootClose extends LinearOpMode {
     private final ElapsedTime timer = new ElapsedTime();
     private Drivetrain drivetrain;
     private Shooter shooter;
-    private Intake intake;G
+    private Intake intake;
     private Vision vision;
     private Turret turret;
     private double lastGoalTagTime = 0;

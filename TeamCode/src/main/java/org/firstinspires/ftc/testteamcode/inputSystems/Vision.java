@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.testteamcode.inputSystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.MAX_FPS;
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 // 20 = blue goal, 24 = red goal
-public class relativeAprilTagPos {
+public class Vision {
     private final AprilTagProcessor processor;
     private final VisionPortal portal;
 
