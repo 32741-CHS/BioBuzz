@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+//This entire file should be considered for deletion. New work is in testteamcode.
+/*package org.firstinspires.ftc.teamcode.opmodes;
 //This file is meant to initialise most of the stuff in one file.
 //By the way, this entire codebase is meant to use public variables for state lol
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
@@ -24,6 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
  * This doesn't actually do anything, it just handles sending the signals to the game phases and
  * keeping track of robot state.
  */
+/*
 class primaryRobot {
     private void startBotInit()  {
         robotHardwareGroup.init(hardwareMap);
