@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.util.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 @Configurable
 @Autonomous(name = "Drive for time", group = "Robot")
@@ -37,7 +37,7 @@ public class DriveForTime extends LinearOpMode {
 		timer.reset();
 
 		while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
-			drivetrain.drive(Vector2D(DRIVE_POWER, 0), 0, false);
+			drivetrain.drive(new Vector2D(DRIVE_POWER, 0), 0, false);
 		}
 
 		drivetrain.stop();

@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.utils.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.teamcode.util.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 @Configurable
 @Autonomous(name = "Drive and shoot far", group = "Robot")
@@ -89,7 +89,7 @@ public class DriveAndShootFar extends LinearOpMode {
 		timer.reset();
 
 		while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-			drivetrain.drive(Vector2D(DRIVE_POWER, 0), 0, false);
+			drivetrain.drive(new Vector2D(DRIVE_POWER, 0), 0, false);
 		}
 	}
 

@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.teamcode.utils.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -68,7 +69,7 @@ public class DriveAndShootClose extends LinearOpMode {
 
 		timer.reset();
 		while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-			drivetrain.drive(Vector2D(-DRIVE_POWER, 0), 0, false);
+			drivetrain.drive(new Vector2D(-DRIVE_POWER, 0), 0, false);
 		}
 
 		timer.reset();
@@ -94,7 +95,7 @@ public class DriveAndShootClose extends LinearOpMode {
 
 		timer.reset();
 		while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-			drivetrain.drive(Vector2D(0, DRIVE_POWER), 0, false);
+			drivetrain.drive(new Vector2D(0, DRIVE_POWER), 0, false);
 		}
 
 		drivetrain.stop();

@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.teamcode.utils.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -184,3 +185,8 @@ public class MainTeleOp extends OpMode {
 		panelsGraph.addData("flywheelError", shooter.getFlywheelErrorRPS());
 		panelsGraph.addData("feederPower", shooter.getFeederPower());
 		panelsGraph.addData("intakePower", intake.getPower());
+
+		panelsGraph.update();
+		panelsTelemetry.update(telemetry);
+	}
+}
