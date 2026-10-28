@@ -9,34 +9,37 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.util.Vector2D;
 
 @Configurable
 @Autonomous(name = "Drive for time", group = "Robot")
 public class DriveForTime extends LinearOpMode {
-    public static final double DRIVE_TIME = 0.55;
-    public static final double DRIVE_POWER = 0.4;
+	public static final double DRIVE_TIME = 0.55;
+	public static final double DRIVE_POWER = 0.4;
 
-    public static final double WAIT_TIME = 20;
-    private final ElapsedTime timer = new ElapsedTime();
-    private Drivetrain drivetrain;
+	public static final double WAIT_TIME = 20;
+	private final ElapsedTime timer = new ElapsedTime();
+	private Drivetrain drivetrain;
 
-    @Override
-    public void runOpMode() {
-        // New robotHardware To make force fresh init and reduce risk of improper motor config.
-        robotHardwareGroup = new RobotHardwareGroup();
-        robotHardwareGroup.init(hardwareMap);
-        drivetrain = new Drivetrain();
+	@Override
+	public void runOpMode() {
+		// New robotHardware To make force fresh init and reduce risk of improper motor
+		// config.
+		robotHardwareGroup = new RobotHardwareGroup();
+		robotHardwareGroup.init(hardwareMap);
+		drivetrain = new Drivetrain();
 
-        waitForStart();
-        timer.reset();
+		waitForStart();
+		timer.reset();
 
-        while (opModeIsActive() && timer.seconds() < WAIT_TIME) {}
-        timer.reset();
+		while (opModeIsActive() && timer.seconds() < WAIT_TIME) {
+		}
+		timer.reset();
 
-        while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
-            drivetrain.drive(DRIVE_POWER, 0, 0, false);
-        }
+		while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
+			drivetrain.drive(Vector2D(DRIVE_POWER, 0), 0, false);
+		}
 
-        drivetrain.stop();
-    }
+		drivetrain.stop();
+	}
 }
