@@ -111,7 +111,7 @@ public class MainTeleOp extends OpMode {
 
 		// TODO: replace with follower.setTeleOpDrive() once Pedro Pathing is added
 		drivetrain.drive(
-				Vector2D(
+				new Vector2D(
 						-driverGamepad.raw.left_stick_y,
 						driverGamepad.raw.left_stick_x),
 				driverGamepad.raw.right_stick_x,
