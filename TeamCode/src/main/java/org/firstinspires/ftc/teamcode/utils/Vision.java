@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -89,7 +90,8 @@ public class Vision {
     public AprilTagDetection getTagById(int tagId) {
         List<AprilTagDetection> detections = getDetections();
         for (AprilTagDetection detection : detections) {
-            if (detection.id == tagId) {
+            if (detection instanceof AprilTagSingleDetection
+                    && ((AprilTagSingleDetection) detection).id == tagId) {
                 return detection;
             }
         }
