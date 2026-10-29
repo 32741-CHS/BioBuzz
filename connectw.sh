@@ -2,5 +2,6 @@
 # wrapper for connecting to the robot
 # must be connected to the network beforehand
 adb disconnect
+adb kill-server && adb start-server
 adb connect 192.168.43.1:5555
 echo "connected to robot filesystem"

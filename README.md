@@ -22,3 +22,6 @@ this wirelessly.
    *(If you're doing this via USB, skip this)*
 2. Run the `trybuild` script to test if it works *(Skip this if you're in a hurry)*
 3. Run the `build` script to install the build onto the robot.
+
+Use `adb logcat` to view the log of the robot after doing installDebug.
+`build` script runs adb logcat automatically after installing.
