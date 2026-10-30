@@ -1,141 +1,208 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.Vector3D;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
-
+/** Handles movement of the 4 mecanum wheels */
 public class Drivetrain {
 
-    static final double WHEEL_DIAMETER = 10.4;
-    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI);
+	// /** How many encoder ticks equal one centimeter of physical travel */
+	// static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER *
+	// Math.PI); //
 
-    private static final double SPEED_SLOW   = 0.4;
-    private static final double SPEED_NORMAL = 1;
+	private static final double SPEED_SLOW = 0.4;
+	private static final double SPEED_NORMAL = 1;
+	public static double AUTO_DRIVE_SPEED = 0.4;
+	private final DcMotor flDrive, frDrive, blDrive, brDrive;
+	private final IMU imu;
+	public Vector2D ExpectedPosition = new Vector2D(0.0, 0.0);
 
-    private static final double STICK_DEADBAND = 0.05;
+	/**
+	 * Tracks the elapsed time since the drive() function has been called gets set
+	 * to 0 when using
+	 * Shift functions so beware
+	 */
+	public double PrevLastMoved = 0;
 
-    public static double AUTO_DRIVE_SPEED = 0.4;
+	public double LastMoved = 0;
+	private double speedMultiplier = SPEED_NORMAL;
 
-    private final DcMotor flDrive, frDrive, blDrive, brDrive;
-    private final IMU imu;
+	public Drivetrain() {
+		(flDrive = robotHardwareGroup.flDrive).setDirection(Direction.REVERSE);
+		(blDrive = robotHardwareGroup.blDrive).setDirection(Direction.REVERSE);
+		(frDrive = robotHardwareGroup.frDrive).setDirection(Direction.FORWARD);
+		(brDrive = robotHardwareGroup.brDrive).setDirection(Direction.FORWARD);
+		imu = robotHardwareGroup.imu;
 
-    private double speedMultiplier = SPEED_NORMAL;
+		for (DcMotor m : new DcMotor[] { flDrive, frDrive, blDrive, brDrive }) {
+			m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+			m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		}
 
+		resetIMU();
+	}
 
-    public Drivetrain(RobotHardware hw) {
-        (flDrive = hw.flDrive).setDirection(DcMotorSimple.Direction.REVERSE);
-        (blDrive = hw.blDrive).setDirection(DcMotorSimple.Direction.REVERSE);
-        (frDrive = hw.frDrive).setDirection(DcMotorSimple.Direction.FORWARD);
-        (brDrive = hw.brDrive).setDirection(DcMotorSimple.Direction.FORWARD);
-        imu = hw.imu;
+	// /**
+	// * Normalises speed (meters per second) to a value from 0 to 1 makes it viable
+	// to use for
+	// * DcMotor.setPower()
+	// */
+	// private float NormalizeSpeed(float speed) {
+	// float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
+	// float power = (60 * speed) / (WHEEL_RADIUS * (float) Math.PI * (float)
+	// GOBILDA_5203_312RPM);
+	// return power > 1 ? 1 : power;
+	// }
+	//
+	// /** converts power to speed (meters per second) */
+	// private float PowerToSpeed(float power) {
+	// float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
+	// return (float) Math.PI * WHEEL_RADIUS / 60 * (float) GOBILDA_5203_312RPM *
+	// power;
+	// }
 
-        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
-            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+	/**
+	 * takes in joystick input and applies to all motors thanks Omar and Kiaan
+	 *
+	 * @param Joystick      The Joystick X and Y as a Vector2D
+	 * @param rx            TODO investigate and find out
+	 * @param fieldRelative TODO investigate and find out <-- oh my god :sob:
+	 */
+	public void drive(Vector2D Joystick, double rx, boolean fieldRelative) {
+		PrevLastMoved = LastMoved;
+		LastMoved = System.currentTimeMillis();
 
-        resetIMU();
-    }
+		double y = deadband(Joystick.y);
+		double x = deadband(Joystick.x) * 1.1;
+		rx = deadband(rx);
 
-    public void drive(double y, double x, double rx, boolean fieldRelative) {
-        y  = deadband(y);
-        x  = deadband(x) * 1.1;
-        rx = deadband(rx);
+		if (fieldRelative) {
+			double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+			double cos = Math.cos(-heading);
+			double sin = Math.sin(-heading);
+			double rotX = x * cos - y * sin;
+			double rotY = x * sin + y * cos;
+			x = rotX;
+			y = rotY;
+		}
 
-        if (fieldRelative) {
-            double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            double cos = Math.cos(-heading);
-            double sin = Math.sin(-heading);
-            double rotX = x * cos - y * sin;
-            double rotY = x * sin + y * cos;
-            x  = rotX;
-            y  = rotY;
-        }
+		double fl = (y + x + rx);
+		double fr = (y - x - rx);
+		double bl = (y - x + rx);
+		double br = (y + x - rx);
 
-        double fl = (y + x + rx);
-        double fr = (y - x - rx);
-        double bl = (y - x + rx);
-        double br = (y + x - rx);
+		double max = Math.max(
+				1.0,
+				Math.max(
+						Math.abs(fl),
+						Math.max(Math.abs(fr), Math.max(Math.abs(bl), Math.abs(br)))));
 
-        double max = Math.max(1.0, Math.max(Math.abs(fl),
-                         Math.max(Math.abs(fr),
-                         Math.max(Math.abs(bl), Math.abs(br)))));
+		double flSpeed = (fl / max) * speedMultiplier;
+		flDrive.setPower(flSpeed);
 
-        flDrive.setPower((fl / max) * speedMultiplier);
-        frDrive.setPower((fr / max) * speedMultiplier);
-        blDrive.setPower((bl / max) * speedMultiplier);
-        brDrive.setPower((br / max) * speedMultiplier);
-    }
+		double frSpeed = (fr / max) * speedMultiplier;
+		frDrive.setPower(frSpeed);
 
-    public void setSpeedMultiplier(boolean slow) {
-        speedMultiplier = (slow ? SPEED_SLOW : SPEED_NORMAL);
-    }
+		double blSpeed = (bl / max) * speedMultiplier;
+		blDrive.setPower(blSpeed);
 
-    public double getSpeedMultiplier() {
-        return speedMultiplier;
-    }
+		double brSpeed = (br / max) * speedMultiplier;
+		brDrive.setPower(brSpeed);
 
-    public void resetIMU() {
-        imu.initialize(new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.DOWN
-                )
-        ));
-    }
+		// TODO find a way to update ExpectedPosition based on the movement of the drive
+	}
 
-    private double deadband(double v) {
-        return Math.abs(v) < STICK_DEADBAND ? 0 : v;
-    }
+	private double deadband(double value) {
+		return Math.abs(value) < STICK_DEADBAND ? 0 : value;
+	}
 
-    public void stop() {
-        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
-            m.setPower(0);
-        }
-    }
+	// /** shifts the robot forward in reverse based off direction default is
+	// forward */
+	// public void Shift(float speed, Direction dir) {
+	// PrevLastMoved = LastMoved;
+	// LastMoved = System.currentTimeMillis();
+	// flDrive.setDirection(dir);
+	// frDrive.setDirection(dir);
+	//
+	// if (dir == Direction.FORWARD) {
+	// ExpectedPosition.x += speed;
+	// } else {
+	// ExpectedPosition.y -= speed;
+	// }
+	//
+	// float power = NormalizeSpeed(speed);
+	// flDrive.setPower(power);
+	// frDrive.setPower(power);
+	// }
 
-    // async + non blocking methods (iterative opmodes, state machines (need for pedro later))
-    public void setDriveTarget(double distance) {
-        int target = (int)(distance * COUNTS_PER_CM);
+	// public void Shift(float speed) {
+	// Shift(speed, Direction.FORWARD);
+	// }
+	//
+	// /** updates the movement of the robot to be to their right */
+	// public void ShiftRight(float speed) {
+	// PrevLastMoved = LastMoved;
+	// LastMoved = System.currentTimeMillis();
+	// frDrive.setDirection(Direction.REVERSE);
+	// brDrive.setDirection(Direction.FORWARD);
+	//
+	// ExpectedPosition.x += speed;
+	//
+	// float power = NormalizeSpeed(speed);
+	// frDrive.setPower(power);
+	// brDrive.setPower(power);
+	// }
+	//
+	// /**
+	// * updates the movement of the robot to be their left
+	// *
+	// * @param speed in ...
+	// */
+	// public void ShiftLeft(float speed) {
+	// PrevLastMoved = LastMoved;
+	// LastMoved = System.currentTimeMillis();
+	// flDrive.setDirection(Direction.REVERSE);
+	// blDrive.setDirection(Direction.FORWARD);
+	//
+	// ExpectedPosition.x -= speed;
+	//
+	// float power = NormalizeSpeed(speed);
+	// flDrive.setPower(power);
+	// blDrive.setPower(power);
+	// }
 
-        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
-            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            m.setTargetPosition(target);
-            m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            m.setPower(AUTO_DRIVE_SPEED);
-        }
-    }
+	public void resetIMU() {
+		imu.initialize(
+				new IMU.Parameters(
+						new RevHubOrientationOnRobot(
+								RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+								RevHubOrientationOnRobot.UsbFacingDirection.DOWN)));
+	}
 
-    public boolean isBusy() {
-        // Returns true if ANY motor is still driving to its target
-        return flDrive.isBusy() || frDrive.isBusy() || blDrive.isBusy() || brDrive.isBusy();
-    }
+	public double getSpeedMultiplier() {
+		return speedMultiplier;
+	}
 
-    public void clearDriveTarget() {
-        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
-            m.setPower(0);
-            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
-    }
+	public void setSpeedMultiplier(double newSpeed) {
+		speedMultiplier = newSpeed;
+	}
 
-    // synchronous / blocking method (best for linearopmodes)
-    public void driveDistanceBlocking(double distance, LinearOpMode opMode) {
-        setDriveTarget(distance);
-        
-        while (opMode.opModeIsActive() && isBusy()) {
-            // Yield to other processes while waiting
-            opMode.idle(); 
-        }
-        
-        clearDriveTarget();
-    }
+	public void stop() {
+		speedMultiplier = 0;
+
+		flDrive.setPower(0);
+		frDrive.setPower(0);
+		blDrive.setPower(0);
+		brDrive.setPower(0);
+	}
 }

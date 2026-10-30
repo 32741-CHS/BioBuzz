@@ -1,41 +1,45 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 @Configurable
-@Autonomous(name="Drive for time", group="Robot")
+@Autonomous(name = "Drive for time", group = "Robot")
 public class DriveForTime extends LinearOpMode {
-    public static double DRIVE_TIME = 0.55;
-    public static double DRIVE_POWER = 0.4;
+	public static final double DRIVE_TIME = 0.55;
+	public static final double DRIVE_POWER = 0.4;
 
-    public static double WAIT_TIME = 20;
+	public static final double WAIT_TIME = 20;
+	private final ElapsedTime timer = new ElapsedTime();
+	private Drivetrain drivetrain;
 
-    private final RobotHardware hw = new RobotHardware();
+	@Override
+	public void runOpMode() {
+		// New robotHardware To make force fresh init and reduce risk of improper motor
+		// config.
+		robotHardwareGroup = new RobotHardwareGroup();
+		robotHardwareGroup.init(hardwareMap);
+		drivetrain = new Drivetrain();
 
-    private Drivetrain drivetrain;
-    private final ElapsedTime timer = new ElapsedTime();
+		waitForStart();
+		timer.reset();
 
-    @Override
-    public void runOpMode() {
-        hw.init(hardwareMap);
-        drivetrain = new Drivetrain(hw);
+		while (opModeIsActive() && timer.seconds() < WAIT_TIME) {
+		}
+		timer.reset();
 
-        waitForStart();
-        timer.reset();
+		while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
+			drivetrain.drive(new Vector2D(DRIVE_POWER, 0), 0, false);
+		}
 
-        while (opModeIsActive() && timer.seconds() < WAIT_TIME) {}
-        timer.reset();
-
-        while (opModeIsActive() && timer.seconds() < DRIVE_TIME) {
-            drivetrain.drive(DRIVE_POWER, 0, 0, false);
-        }
-
-        drivetrain.stop();
-    }
+		drivetrain.stop();
+	}
 }
