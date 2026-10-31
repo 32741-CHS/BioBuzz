@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
@@ -25,8 +25,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Locale;
 
-@TeleOp(name = "Main TeleOp", group = "TeleOp")
-public class MainTeleOp extends OpMode {
+@TeleOp(name = "Old Main TeleOp", group = "TeleOp")
+public class OldMainTeleOp extends OpMode {
 	public static boolean isRed = false;
 	public static boolean useFlywheelLookups = true;
 	private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
