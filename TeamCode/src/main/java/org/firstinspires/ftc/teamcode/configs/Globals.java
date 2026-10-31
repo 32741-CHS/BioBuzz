@@ -28,14 +28,4 @@ public class Globals {
 	// Shooter
 	public static final double FLYWHEEL_ERROR_TOL = 1.0;
 	public static final double TRIGGER_THRESHOLD = 0.5;
-	// Current Position
-	public static double distanceToCamera;
-	public static double cameraPositionX;
-	public static double expectedRobotPositionX;
-	// Vision
-	public static double cameraPositionY;
-	public static double expectedRobotPositionY;
-	public static double realRobotPositionX;
-	public static double realRobotPositionY;
-	public static int currentGoal;
 }
