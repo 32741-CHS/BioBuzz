@@ -29,8 +29,6 @@ public class RobotHardwareGroup {
 
 
     public void init(HardwareMap hardwareMap) {
-
-
         flDrive = hardwareMap.get(DcMotor.class, FL_MOTOR_NAME);
         frDrive = hardwareMap.get(DcMotor.class, FR_MOTOR_NAME);
         blDrive = hardwareMap.get(DcMotor.class, BL_MOTOR_NAME);
