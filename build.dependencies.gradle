@@ -20,5 +20,12 @@ dependencies {
     // Stuff For Panels -- Eric
     implementation 'com.bylazar:fullpanels:1.0.0'
     implementation 'com.bylazar:camerastream:1.0.2'
+
+    // Stuff for pedro pathing
+//    implementation 'com.pedropathing:core:3.0.2'
+    implementation 'com.pedropathing:tuning:1.0.0'
+    implementation 'com.pedropathing:revhub:3.0.2'
+
+
 }
 
