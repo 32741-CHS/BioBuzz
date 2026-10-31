@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
-import static org.firstinspires.ftc.teamcode.opmodes.teleop.MainTeleOp.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.OldMainTeleOp.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,9 +21,9 @@ import org.firstinspires.ftc.teamcode.utils.Vision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
-@Autonomous(name = "Drive and shoot close", group = "Robot")
-public class DriveAndShootClose extends LinearOpMode {
-	public static final double DRIVE_TIME = 2;
+@Autonomous(name = "Drive and shoot far", group = "Robot")
+public class DriveAndShootFar extends LinearOpMode {
+	public static final double DRIVE_TIME = 1.2;
 	public static final double DRIVE_POWER = 0.4;
 
 	public static final double SHOOT_TIME = 10;
@@ -68,13 +68,6 @@ public class DriveAndShootClose extends LinearOpMode {
 		lastGoalTagTime = getRuntime();
 
 		timer.reset();
-		while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-			drivetrain.drive(new Vector2D(-DRIVE_POWER, 0), 0, false);
-		}
-
-		timer.reset();
-		drivetrain.stop();
-
 		while (opModeIsActive()
 				&& Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
 				&& timer.seconds() <= MAX_SPINUP_TIME) {
@@ -94,17 +87,14 @@ public class DriveAndShootClose extends LinearOpMode {
 		}
 
 		timer.reset();
+
 		while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-			drivetrain.drive(new Vector2D(0, DRIVE_POWER), 0, false);
+			drivetrain.drive(new Vector2D(DRIVE_POWER, 0), 0, false);
 		}
-
-		drivetrain.stop();
-
-		timer.reset();
 	}
 
 	private void runBallistics() {
-		AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+		AprilTagDetection goalTag = vision.getTagById(!isRed ? BLUE_GOAL : RED_GOAL);
 		if (goalTag != null) {
 			lastGoalTagTime = getRuntime();
 			double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
