@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.oldOpModes;
+package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
