@@ -11,9 +11,7 @@ public class Globals {
     public static final double K_PROPORTIONAL = 0; // Error magnifier
     public static final double K_INTEGRAL = 0; // Anti consistent Error
     public static final double K_DERIVATIVE = 0; // Anti oscillations
-
-    // The Robot Hardware object thing
-    public static RobotHardwareGroup robotHardwareGroup; // New object created every match. The first thing to be init in
+    
     // OpMode
 
     // Motor Tick Rates

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 @Configurable
 public class Turret {
-    
+
     public static final double kP = 0.0, kF = 0.04, MAX_POWER = 0.6, MAX_ACCEL = 0.02, ANGLE_TOLERANCE = 1.5, MIN_ANGLE = -80, MAX_ANGLE = 80, SOFT_ZONE_DEG = 5.0, LOST_TAG_RETURN_DELAY = 2.0;
 
     // TODO: measure wheel diameter / Lazy Susan diameter
