@@ -1,8 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.pedropathing.ivy.commands.Commands.instant;
+
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class SubsystemHandler implements SubsystemBase {
@@ -13,18 +19,35 @@ public class SubsystemHandler implements SubsystemBase {
     }
 
     public void update() {
-        forEverySubsys(SubsystemBase::update);
+        forEverySubsystem(SubsystemBase::update);
     }
 
-    private void forEverySubsys(Consumer<SubsystemBase> func) {
+    private void forEverySubsystem(Consumer<SubsystemBase> func) {
         for (SubsystemBase subsys : subsystems) {
             func.accept(subsys);
         }
     }
 
+
     public void init(RobotHardwareGroup robotHardware) {
-        forEverySubsys(subsys -> subsys.init(robotHardware));
+        forEverySubsystem(subsys -> subsys.init(robotHardware));
     }
 
+    public void schedule(Command command) {
+        Scheduler.schedule(command);
+    }
 
+    public void schedule(Runnable func) {
+        Scheduler.schedule(instant(func));
+
+    }
+
+    public void schedule(Runnable start, Runnable loop, BooleanSupplier done) {
+        Scheduler.schedule(
+                Command.build()
+                        .setStart(start)
+                        .setExecute(loop)
+                        .setDone(done)
+        );
+    }
 }

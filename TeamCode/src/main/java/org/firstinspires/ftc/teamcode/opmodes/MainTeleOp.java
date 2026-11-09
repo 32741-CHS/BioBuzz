@@ -20,7 +20,6 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init() {
-
         driverGamepad = gamepad1;
         shooterGamepad = gamepad2;
         Scheduler.reset(); // Init Ivy
