@@ -1,208 +1,130 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.Vector3D;
+import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.IMU;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
+import com.pedropathing.math.Pose;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
+import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
-/** Handles movement of the 4 mecanum wheels */
-public class Drivetrain {
+/// Drivetrain class design for movement handling.
+/// It controls all four vector wheels + gathers data from odometry.
+///
+/// ## Functions of value:
+/// 1. bindToGamepad (Actives TeleOp Binds)
+/// 2. setPosition (Resets internal position tracker)
+/// 2. getX
+/// 3. getY
+/// 4. getHeading
+public class Drivetrain implements SubsystemBase {
 
-	// /** How many encoder ticks equal one centimeter of physical travel */
-	// static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER *
-	// Math.PI); //
+    private final Pose startPose;
+    private GamepadEx driverGamepad;
+    private Follower follower;
+    private double forward = 0, strafe = 0, turn = 0, powerMultiplier = 1;
 
-	private static final double SPEED_SLOW = 0.4;
-	private static final double SPEED_NORMAL = 1;
-	public static double AUTO_DRIVE_SPEED = 0.4;
-	private final DcMotor flDrive, frDrive, blDrive, brDrive;
-	private final IMU imu;
-	public Vector2D ExpectedPosition = new Vector2D(0.0, 0.0);
+    public Drivetrain(Pose startPose) {
+        this.startPose = startPose;
+    }
 
-	/**
-	 * Tracks the elapsed time since the drive() function has been called gets set
-	 * to 0 when using
-	 * Shift functions so beware
-	 */
-	public double PrevLastMoved = 0;
+    public Drivetrain(double x, double y, double heading) {
+        this.startPose = createPose(x, y, heading);
+    }
 
-	public double LastMoved = 0;
-	private double speedMultiplier = SPEED_NORMAL;
+    private static Pose createPose(double x, double y, double heading) {
+        return new Pose(x, y, heading);
+    }
 
-	public Drivetrain() {
-		(flDrive = robotHardwareGroup.flDrive).setDirection(Direction.REVERSE);
-		(blDrive = robotHardwareGroup.blDrive).setDirection(Direction.REVERSE);
-		(frDrive = robotHardwareGroup.frDrive).setDirection(Direction.FORWARD);
-		(brDrive = robotHardwareGroup.brDrive).setDirection(Direction.FORWARD);
-		imu = robotHardwareGroup.imu;
+    public void bindToGamepad(GamepadEx gamepad) {
+        driverGamepad = gamepad;
+    }
 
-		for (DcMotor m : new DcMotor[] { flDrive, frDrive, blDrive, brDrive }) {
-			m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-			m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-			m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		}
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+        follower = Constants.create(robotHardware.hardwareMap);
+        this.setPosition(startPose);
+        follower.update();
+    }
 
-		resetIMU();
-	}
+    @Override
+    public void update() {
+        if (driverGamepad != null) { // Runs only if bindToGamepad called
+            forwardInput(powerMultiplier * deadband(-driverGamepad.raw.left_stick_y));
+            strafeInput(powerMultiplier * deadband(-driverGamepad.raw.left_stick_x));
+            turnInput(powerMultiplier * deadband(driverGamepad.raw.right_stick_x));
+        }
 
-	// /**
-	// * Normalises speed (meters per second) to a value from 0 to 1 makes it viable
-	// to use for
-	// * DcMotor.setPower()
-	// */
-	// private float NormalizeSpeed(float speed) {
-	// float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
-	// float power = (60 * speed) / (WHEEL_RADIUS * (float) Math.PI * (float)
-	// GOBILDA_5203_312RPM);
-	// return power > 1 ? 1 : power;
-	// }
-	//
-	// /** converts power to speed (meters per second) */
-	// private float PowerToSpeed(float power) {
-	// float WHEEL_RADIUS = (float) WHEEL_DIAMETER / 2;
-	// return (float) Math.PI * WHEEL_RADIUS / 60 * (float) GOBILDA_5203_312RPM *
-	// power;
-	// }
+        if (fieldCentricDriving) {
+            // If the forwards = the same direction relative to the field
+            follower.manual(ManualDrive.fieldCentric(forward, strafe, turn, follower.pose().heading()));
+        } else {
+            // If the forwards = the same direction relative to the robot
+            follower.manual(forward, strafe, turn);
+        }
 
-	/**
-	 * takes in joystick input and applies to all motors thanks Omar and Kiaan
-	 *
-	 * @param Joystick      The Joystick X and Y as a Vector2D
-	 * @param rx            TODO investigate and find out
-	 * @param fieldRelative TODO investigate and find out <-- oh my god :sob:
-	 */
-	public void drive(Vector2D Joystick, double rx, boolean fieldRelative) {
-		PrevLastMoved = LastMoved;
-		LastMoved = System.currentTimeMillis();
+        turn = strafe = forward = 0;
+        follower.update();
+    }
 
-		double y = deadband(Joystick.y);
-		double x = deadband(Joystick.x) * 1.1;
-		rx = deadband(rx);
+    public void forwardInput(double power) {
+        forward = clamp(forward + power);
+    }
 
-		if (fieldRelative) {
-			double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-			double cos = Math.cos(-heading);
-			double sin = Math.sin(-heading);
-			double rotX = x * cos - y * sin;
-			double rotY = x * sin + y * cos;
-			x = rotX;
-			y = rotY;
-		}
+    private double deadband(double value) {
+        return Math.abs(value) < Globals.STICK_DEADBAND ? 0 : value;
+    }
 
-		double fl = (y + x + rx);
-		double fr = (y - x - rx);
-		double bl = (y - x + rx);
-		double br = (y + x - rx);
+    public void strafeInput(double power) {
+        strafe = clamp(strafe + power);
+    }
 
-		double max = Math.max(
-				1.0,
-				Math.max(
-						Math.abs(fl),
-						Math.max(Math.abs(fr), Math.max(Math.abs(bl), Math.abs(br)))));
+    public void turnInput(double power) {
+        turn = clamp(turn + power);
+    }
 
-		double flSpeed = (fl / max) * speedMultiplier;
-		flDrive.setPower(flSpeed);
+    private static double clamp(double value) {
+        return Math.max(-1, Math.min(1, value));
+    }
 
-		double frSpeed = (fr / max) * speedMultiplier;
-		frDrive.setPower(frSpeed);
+    public void speed(double powerMultiplier) {
+        this.powerMultiplier = powerMultiplier;
+    }
 
-		double blSpeed = (bl / max) * speedMultiplier;
-		blDrive.setPower(blSpeed);
+    public Pose getPosition() {
+        return follower.pose();
+    }
 
-		double brSpeed = (br / max) * speedMultiplier;
-		brDrive.setPower(brSpeed);
+    public void setPosition(Pose pose) {
+        follower.setPose(pose);
+    }
 
-		// TODO find a way to update ExpectedPosition based on the movement of the drive
-	}
+    public void setPosition(double x, double y, double heading) {
+        follower.setPose(createPose(x, y, heading));
+    }
 
-	private double deadband(double value) {
-		return Math.abs(value) < STICK_DEADBAND ? 0 : value;
-	}
+    /**
+     * X = Front and back on the pitch
+     */
+    public double getX() {
+        return follower.pose().x();
+    }
 
-	// /** shifts the robot forward in reverse based off direction default is
-	// forward */
-	// public void Shift(float speed, Direction dir) {
-	// PrevLastMoved = LastMoved;
-	// LastMoved = System.currentTimeMillis();
-	// flDrive.setDirection(dir);
-	// frDrive.setDirection(dir);
-	//
-	// if (dir == Direction.FORWARD) {
-	// ExpectedPosition.x += speed;
-	// } else {
-	// ExpectedPosition.y -= speed;
-	// }
-	//
-	// float power = NormalizeSpeed(speed);
-	// flDrive.setPower(power);
-	// frDrive.setPower(power);
-	// }
+    /**
+     * Y = Left and right on the pitch
+     */
+    public double getY() {
+        return follower.pose().y();
+    }
 
-	// public void Shift(float speed) {
-	// Shift(speed, Direction.FORWARD);
-	// }
-	//
-	// /** updates the movement of the robot to be to their right */
-	// public void ShiftRight(float speed) {
-	// PrevLastMoved = LastMoved;
-	// LastMoved = System.currentTimeMillis();
-	// frDrive.setDirection(Direction.REVERSE);
-	// brDrive.setDirection(Direction.FORWARD);
-	//
-	// ExpectedPosition.x += speed;
-	//
-	// float power = NormalizeSpeed(speed);
-	// frDrive.setPower(power);
-	// brDrive.setPower(power);
-	// }
-	//
-	// /**
-	// * updates the movement of the robot to be their left
-	// *
-	// * @param speed in ...
-	// */
-	// public void ShiftLeft(float speed) {
-	// PrevLastMoved = LastMoved;
-	// LastMoved = System.currentTimeMillis();
-	// flDrive.setDirection(Direction.REVERSE);
-	// blDrive.setDirection(Direction.FORWARD);
-	//
-	// ExpectedPosition.x -= speed;
-	//
-	// float power = NormalizeSpeed(speed);
-	// flDrive.setPower(power);
-	// blDrive.setPower(power);
-	// }
+    public double getHeading() {
+        return follower.pose().heading();
+    }
 
-	public void resetIMU() {
-		imu.initialize(
-				new IMU.Parameters(
-						new RevHubOrientationOnRobot(
-								RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-								RevHubOrientationOnRobot.UsbFacingDirection.DOWN)));
-	}
-
-	public double getSpeedMultiplier() {
-		return speedMultiplier;
-	}
-
-	public void setSpeedMultiplier(double newSpeed) {
-		speedMultiplier = newSpeed;
-	}
-
-	public void stop() {
-		speedMultiplier = 0;
-
-		flDrive.setPower(0);
-		frDrive.setPower(0);
-		blDrive.setPower(0);
-		brDrive.setPower(0);
-	}
+    public Follower getFollower() {
+        return follower;
+    }
 }

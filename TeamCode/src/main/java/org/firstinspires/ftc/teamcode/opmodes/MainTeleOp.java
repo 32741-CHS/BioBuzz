@@ -1,65 +1,77 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
+
 import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
+import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
 @TeleOp(name = "BioBuzz TeleOp")
 public class MainTeleOp extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.
     private final Pose startPose = poseFactory.of(24, 24, 0);
-    Gamepad driverGamepad, shooterGamepad;
-    private Follower follower;
+    GamepadEx driverGamepad, shooterGamepad;
+    private RobotHardwareGroup robotHardware;
+    private SubsystemHandler allSubsystems;
+    private Drivetrain drivetrain;
 
     @Override
     public void init() {
-        driverGamepad = gamepad1;
-        shooterGamepad = gamepad2;
-        Scheduler.reset(); // Init Ivy
-        follower = Constants.create(hardwareMap); // Init Pedro
-        follower.setPose(startPose);
+        // Robot Hardware Special Init
+        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
-        // Our Subsystems
+        // Subsystems
+        driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
+        shooterGamepad = GamepadEx.newOperatorGamepad(gamepad2);
+        drivetrain = new Drivetrain(startPose);
+        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
+        // Pass all subsystems into the handler
+        allSubsystems = new SubsystemHandler(
+                drivetrain,
+                driverGamepad,
+                shooterGamepad
+        );
+
+
+        allSubsystems.init(robotHardware);
+
+        // Key Binds
+        driverGamepad.leftBumper
+                .onPress(() -> drivetrain.speed(0.5))
+                .onRelease(() -> drivetrain.speed(1));
+        driverGamepad.btnY
+                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
+
+//        shooterGamepad.leftBumper // Manual Flywheel Control
+//                .whenHeld()
+//                .whenNotHeld()
+//        shooterGamepad.leftBumper.whenHeld(intake::eat);
+//        shooterGamepad.btnA.whenHeld(intake::invert);
+//        shooterGamepad.rightTrigger.whenHeld(shooter::feed);
+//        shooterGamepad.btnA.whenHeld(shooter::reverseFeed);
     }
 
     @Override
     public void loop() {
-
-        // Manual driving
-        follower.manual(
-                -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x
-        );
-
-        // Update Pedro localisation and drivetrain
-        follower.update();
-
-        // Update Ivy commands
-        Scheduler.execute();
-
-        // Retrieve current robot position
-        Pose pose = follower.pose();
+        allSubsystems.update();
 
         // Telemetry
-        telemetry.addData("X", "%.2f", pose.x());
-        telemetry.addData("Y", "%.2f", pose.y());
+        telemetry.addData("[drivetrain] X", "%.2f", drivetrain.getX());
+        telemetry.addData("[drivetrain] Y", "%.2f", drivetrain.getY());
 
         telemetry.addData(
-                "Heading",
+                "[drivetrain] Heading",
                 "%.2f°",
-                Math.toDegrees(pose.heading())
+                Math.toDegrees(drivetrain.getHeading())
         );
-
-        telemetry.addData("Pedro Mode", follower.mode());
 
         telemetry.update();
     }

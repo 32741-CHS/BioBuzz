@@ -18,19 +18,24 @@ public class SubsystemHandler implements SubsystemBase {
         this.subsystems = subsystems;
     }
 
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+        Scheduler.reset();
+        forEverySubsystem(subsys -> subsys.init(robotHardware));
+    }
+
+    @Override
     public void update() {
+        Scheduler.execute();
         forEverySubsystem(SubsystemBase::update);
+        panelsGraph.update();
+        panelsTelemetry.update();
     }
 
     private void forEverySubsystem(Consumer<SubsystemBase> func) {
         for (SubsystemBase subsys : subsystems) {
             func.accept(subsys);
         }
-    }
-
-
-    public void init(RobotHardwareGroup robotHardware) {
-        forEverySubsystem(subsys -> subsys.init(robotHardware));
     }
 
     public void schedule(Command command) {
