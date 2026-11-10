@@ -28,14 +28,27 @@ public class Globals {
 	// Shooter
 	public static final double FLYWHEEL_ERROR_TOL = 1.0;
 	public static final double TRIGGER_THRESHOLD = 0.5;
+
 	// Current Position
 	public static double distanceToCamera;
 	public static double cameraPositionX;
 	public static double expectedRobotPositionX;
+
 	// Vision
 	public static double cameraPositionY;
 	public static double expectedRobotPositionY;
 	public static double realRobotPositionX;
 	public static double realRobotPositionY;
 	public static int currentGoal;
+
+	// Ball colors
+	public static final enum NectarColor {
+		Red,
+		Blue
+	}
+
+	public static final double PollenThreshold = 0.7;
+	public static final double NectarThreshold = 0.7;
+	public final NectarColor NectarColor; // lazily initializes in utils/Camera.java; not static for easily changing stuff
+																				// if we change teams
 }
