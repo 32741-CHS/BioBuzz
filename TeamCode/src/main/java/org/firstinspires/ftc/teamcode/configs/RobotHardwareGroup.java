@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.configs;
 
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -21,12 +22,15 @@ public class RobotHardwareGroup {
             FEEDER_MOTOR_NAME = "feeder",
             INTAKE_MOTOR_NAME = "intake",
             IMU_NAME = "imu",
+            PINPOINT_NAME = "pinpoint",
             MAIN_WEBCAM_NAME = "webcam";
+
     public HardwareMap hardwareMap;
     public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
     public DcMotorEx turret, flywheel;
     public IMU imu;
     public WebcamName vision;
+    public GoBildaPinpointDriver pinpoint;
 
     public void init(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -34,11 +38,12 @@ public class RobotHardwareGroup {
         frDrive = hardwareMap.get(DcMotor.class, FR_MOTOR_NAME);
         blDrive = hardwareMap.get(DcMotor.class, BL_MOTOR_NAME);
         brDrive = hardwareMap.get(DcMotor.class, BR_MOTOR_NAME);
-        turret = hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
-        flywheel = hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
-        feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
-        intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
+//        turret = hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
+//        flywheel = hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
+//        feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
+//        intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         imu = hardwareMap.get(IMU.class, IMU_NAME);
-        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
+//        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
     }
 }

@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import com.bylazar.graph.GraphManager;
 import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -25,6 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Locale;
 
+@Disabled
 @TeleOp(name = "Old Main TeleOp", group = "TeleOp")
 public class OldMainTeleOp extends OpMode {
     public static boolean isRed = false;
@@ -38,6 +39,7 @@ public class OldMainTeleOp extends OpMode {
     private Shooter shooter;
     private Turret turret;
     private Vision vision;
+    private RobotHardwareGroup robotHardware;
     private boolean isFieldDriving = false;
     private boolean turretManualMode = false;
     private double manualTurretAngle = 0;
@@ -50,8 +52,8 @@ public class OldMainTeleOp extends OpMode {
 
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
-        robotHardwareGroup = new RobotHardwareGroup();
-        robotHardwareGroup.init(hardwareMap);
+        robotHardware = new RobotHardwareGroup();
+        robotHardware.init(hardwareMap);
         driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
         operatorGamepad = GamepadEx.newOperatorGamepad(gamepad2);
 

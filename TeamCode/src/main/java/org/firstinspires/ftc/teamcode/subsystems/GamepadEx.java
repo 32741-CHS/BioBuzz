@@ -6,9 +6,16 @@ import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.utils.Binder;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
-public class GamepadEx {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class GamepadEx implements SubsystemBase {
 
     public final GamepadButton btnA = new GamepadButton();
     public final GamepadButton btnB = new GamepadButton();
@@ -44,10 +51,15 @@ public class GamepadEx {
         return new GamepadEx(PanelsGamepad.INSTANCE.getSecondManager(), gamepad2);
     }
 
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+    }
+
     /**
      * Called every frame of the loop, it will call any bound events, and keep the button states up
      * to date.
      */
+    @Override
     public void update() {
         // because panels can't directly write to the gamepad when controlled via the dashboard.
         // It just makes sure to update the values
@@ -75,34 +87,14 @@ public class GamepadEx {
         protected boolean prevState = false;
 
         /**
-         * True the frame you just pressed it
-         */
-        public boolean wasPressed() {
-            return currentState && !prevState;
-        }
-
-        /**
-         * true while held
-         */
-        public boolean isHeld() {
-            return currentState;
-        }
-
-        /**
-         * true the frame you just let go
-         */
-        public boolean wasReleased() {
-            return !currentState && prevState;
-        }
-
-        /**
          * The callback function is called only when the button goes down, will be like a pulse. Sort of
          * like onclick in js event listeners
          *
          * @param callback The action you want to perform if the button goes down.
          */
-        public void onPress(Runnable callback) {
+        public GamepadButton onPress(Runnable callback) {
             callbackBinds.bind("WAS_PRESSED", callback);
+            return this;
         }
 
         /**
@@ -111,8 +103,9 @@ public class GamepadEx {
          *
          * @param callback The function that gets called when the button is released
          */
-        public void onRelease(Runnable callback) {
+        public GamepadButton onRelease(Runnable callback) {
             callbackBinds.bind("WAS_RELEASED", callback);
+            return this;
         }
 
         /**
@@ -121,8 +114,9 @@ public class GamepadEx {
          *
          * @param callback The function to run EVERY FRAME WHEN BUTTON DOWN
          */
-        public void whenHeld(Runnable callback) {
+        public GamepadButton whenHeld(Runnable callback) {
             callbackBinds.bind("IS_HELD", callback);
+            return this;
         }
 
         /**
@@ -130,8 +124,9 @@ public class GamepadEx {
          *
          * @param callback The function to call
          */
-        public void whenNotHeld(Runnable callback) {
+        public GamepadButton whenNotHeld(Runnable callback) {
             callbackBinds.bind("IS_NOT_HELD", callback);
+            return this;
         }
 
         /**
@@ -149,6 +144,27 @@ public class GamepadEx {
             if (isHeld()) callbackBinds.call("IS_HELD");
             if (!isHeld()) callbackBinds.call("IS_NOT_HELD");
         }
+
+        /**
+         * True the frame you just pressed it
+         */
+        public boolean wasPressed() {
+            return currentState && !prevState;
+        }
+
+        /**
+         * true the frame you just let go
+         */
+        public boolean wasReleased() {
+            return !currentState && prevState;
+        }
+
+        /**
+         * true while held
+         */
+        public boolean isHeld() {
+            return currentState;
+        }
     }
 
     public static class GamepadTrigger extends GamepadButton {
@@ -161,6 +177,40 @@ public class GamepadEx {
         public void update(float currentPercentPressed) {
             percentPressed = currentPercentPressed;
             super.update(percentPressed >= TRIGGER_THRESHOLD);
+        }
+    }
+
+    public static class Binder {
+        private final Map<String, List<Runnable>> binds = new HashMap<>();
+
+        /**
+         * Binds an anonymous function to a key. Supports binding multiple callbacks to the same key.
+         *
+         * @param key The string id, is case-sensitive and will the one you put in the call method to
+         *     later call the thing
+         * @param callback The function that will be called when you do Binder.call(key)
+         */
+        public void bind(String key, Runnable callback) {
+            // Automatically creates a new ArrayList if the key doesn't exist yet and store to the
+            // hashmap, then adds the callback to the list
+            binds.computeIfAbsent(key, k -> new ArrayList<>()).add(callback);
+        }
+
+        /**
+         * Executes all anonymous functions registered under the given key. If the key does not exist,
+         * it safely does nothing.
+         *
+         * @param key The key you defined in the bind method.
+         */
+        public void call(String key) {
+            // Safely retrieves the list, defaulting to an empty list if the key is missing
+            List<Runnable> callbacks = binds.getOrDefault(key, Collections.emptyList());
+
+            // Loop through and fire each runnable sequentially
+            assert callbacks != null; // This will never be false, but IDE insist.
+            for (Runnable callback : callbacks) {
+                callback.run();
+            }
         }
     }
 }
