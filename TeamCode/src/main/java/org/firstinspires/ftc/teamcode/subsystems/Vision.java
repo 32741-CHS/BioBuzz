@@ -29,10 +29,7 @@ public class Vision implements SubsystemBase {
                 .build();
     }
 
-    public void setTeam(boolean isRed) {
-        this.isRed = isRed;
-    }
-
+    @Override
     public void update() {
 
         distanceToGoal = Double.NaN;
@@ -80,6 +77,10 @@ public class Vision implements SubsystemBase {
         xRadians = Math.toRadians(best.ftcPose.bearing);
 
         zRadians = Math.toRadians(best.ftcPose.elevation);
+    }
+
+    public void setTeam(boolean isRed) {
+        this.isRed = isRed;
     }
 
     public double getDistance() {

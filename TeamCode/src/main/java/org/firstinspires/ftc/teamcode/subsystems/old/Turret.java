@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 
 @Configurable
 public class Turret {
@@ -16,11 +17,11 @@ public class Turret {
     // TODO: measure wheel diameter / Lazy Susan diameter
     private static final double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
     public static double desiredAngle;
-    private final DcMotorEx turret;
+    private DcMotorEx turret;
     private double lastPower = 0;
 
-    public Turret() {
-        turret = robotHardwareGroup.turret;
+    public void init(RobotHardwareGroup robotHardware) {
+        turret = robotHardware.turret;
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

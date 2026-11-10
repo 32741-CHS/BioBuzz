@@ -2,8 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
-import static org.firstinspires.ftc.teamcode.opmodes.OldMainTeleOp.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.old_opmodes.OldMainTeleOp.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -39,18 +38,19 @@ public class DriveAndShootFar extends LinearOpMode {
     private Vision vision;
     private Turret turret;
     private double lastGoalTagTime = 0;
+    private RobotHardwareGroup robotHardware;
 
     @Override
     public void runOpMode() {
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
-        robotHardwareGroup = new RobotHardwareGroup();
-        robotHardwareGroup.init(hardwareMap);
-        drivetrain = new Drivetrain();
-        shooter = new Shooter();
-        intake = new Intake();
-        turret = new Turret();
-        vision = new Vision();
+        robotHardware = new RobotHardwareGroup();
+        robotHardware.init(hardwareMap);
+        (drivetrain = new Drivetrain()).init(robotHardware);
+        (shooter = new Shooter()).init(robotHardware);
+        (intake = new Intake()).init(robotHardware);
+        (turret = new Turret()).init(robotHardware);
+        (vision = new Vision()).init(robotHardware);
 
         while (opModeInInit()) {
             if (gamepad1.x) {

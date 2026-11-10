@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedro.procedures;
+package org.firstinspires.ftc.teamcode.configs.pedro.procedures;
 
 import com.pedropathing.math.Pose;
 import com.pedropathing.revhub.localizers.Encoder;
@@ -16,6 +16,29 @@ public class TwoWheelTuner extends Procedure {
 
     public TwoWheelTuner() {
         super("Two Wheel Tuner", "A procedure for tuning the Two Wheel localizer.");
+    }
+
+    static TwoWheelConfig config(
+            TwoWheelSetup values,
+            double forwardTicksToInches,
+            double strafeTicksToInches,
+            double xPodDirection,
+            double yPodDirection,
+            double xPodOffset,
+            double yPodOffset
+    ) {
+        return new TwoWheelConfig(c -> {
+            c.xPodName.set(values.forwardPodName);
+            c.yPodName.set(values.strafePodName);
+            c.imuName.set(values.imuName);
+            c.xPodOffset.set(xPodOffset);
+            c.yPodOffset.set(yPodOffset);
+            c.forwardTicksToInches.set(forwardTicksToInches);
+            c.strafeTicksToInches.set(strafeTicksToInches);
+            c.xPodDirection.set(xPodDirection);
+            c.yPodDirection.set(yPodDirection);
+            c.imu.set(new RevHubIMU(new RevHubOrientationOnRobot(values.logoDirection, values.usbDirection)));
+        });
     }
 
     @Override
@@ -112,29 +135,6 @@ public class TwoWheelTuner extends Procedure {
                         "    )));\n" +
                         "});"
         );
-    }
-
-    static TwoWheelConfig config(
-            TwoWheelSetup values,
-            double forwardTicksToInches,
-            double strafeTicksToInches,
-            double xPodDirection,
-            double yPodDirection,
-            double xPodOffset,
-            double yPodOffset
-    ) {
-        return new TwoWheelConfig(c -> {
-            c.xPodName.set(values.forwardPodName);
-            c.yPodName.set(values.strafePodName);
-            c.imuName.set(values.imuName);
-            c.xPodOffset.set(xPodOffset);
-            c.yPodOffset.set(yPodOffset);
-            c.forwardTicksToInches.set(forwardTicksToInches);
-            c.strafeTicksToInches.set(strafeTicksToInches);
-            c.xPodDirection.set(xPodDirection);
-            c.yPodDirection.set(yPodDirection);
-            c.imu.set(new RevHubIMU(new RevHubOrientationOnRobot(values.logoDirection, values.usbDirection)));
-        });
     }
 }
 
