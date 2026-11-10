@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.robotHardwareGroup;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -21,14 +19,16 @@ public class DriveForTime extends LinearOpMode {
 
     public static final double WAIT_TIME = 20;
     private final ElapsedTime timer = new ElapsedTime();
+    private RobotHardwareGroup robotHardware;
+    private Drivetrain drivetrain;
 
     @Override
     public void runOpMode() {
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
-        robotHardwareGroup = new RobotHardwareGroup();
-        robotHardwareGroup.init(hardwareMap);
-        Drivetrain drivetrain = new Drivetrain();
+        robotHardware = new RobotHardwareGroup();
+        robotHardware.init(hardwareMap);
+        (drivetrain = new Drivetrain()).init(robotHardware);
 
         waitForStart();
         timer.reset();

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedro.procedures;
+package org.firstinspires.ftc.teamcode.configs.pedro.procedures;
 
 import com.pedropathing.math.Pose;
 import com.pedropathing.revhub.localizers.OctoQuadConfig;
@@ -14,15 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.List;
 
 public class OctoQuadTuner extends Procedure {
-    enum PodType {
-        SWING_ARM,
-        FOUR_BAR,
-        CUSTOM
-    }
-
     public static double SWING_ARM = 336.877962768;
     public static double FOUR_BAR = 505.316944406;
-
     public OctoQuadTuner() {
         super("OctoQuad Tuner", "A procedure for tuning the OctoQuad localizer.");
     }
@@ -31,8 +24,8 @@ public class OctoQuadTuner extends Procedure {
     public void run() throws InterruptedException {
         Inputs inputs = inputs("Setup", "Set OctoQuad HardwareMap Name and Odometry Pod Type");
         Inputs.Field<String> octoquadName = inputs.s("HardwareMap Name").withDefault("octoquad");
-        Inputs.Field<Integer> xPort =  inputs.i("Forward Pod Port").withDefault(0);
-        Inputs.Field<Integer> yPort =  inputs.i("Strafe Pod Port").withDefault(1);
+        Inputs.Field<Integer> xPort = inputs.i("Forward Pod Port").withDefault(0);
+        Inputs.Field<Integer> yPort = inputs.i("Strafe Pod Port").withDefault(1);
         Inputs.Field<OctoQuadTuner.PodType> podType = inputs.e("Odometry Pod Type", OctoQuadTuner.PodType.class).withDefault(OctoQuadTuner.PodType.FOUR_BAR);
         Inputs.Field<OctoQuad.I2cRecoveryMode> recoveryMode = inputs.e("Recovery Mode", OctoQuad.I2cRecoveryMode.class).withDefault(OctoQuad.I2cRecoveryMode.MODE_1_PERIPH_RST_ON_FRAME_ERR);
         awaitInputs(inputs);
@@ -71,7 +64,7 @@ public class OctoQuadTuner extends Procedure {
         result("xPodOffset", offsets.get(0));
         result("yPodOffset", offsets.get(1));
 
-        code(Language.JAVA,"public static OctoQuadConfig localizerConfig = new OctoQuadConfig(c -> {\n" +
+        code(Language.JAVA, "public static OctoQuadConfig localizerConfig = new OctoQuadConfig(c -> {\n" +
                 "    c.name.set(\"" + octoquadName.get() + "\");\n" +
                 "    c.xPodPort.set(" + xPort.get() + ");\n" +
                 "    c.yPodPort.set(" + yPort.get() + ");\n" +
@@ -86,6 +79,12 @@ public class OctoQuadTuner extends Procedure {
                 "    c.headingScalar.set(" + headingScalar + ");\n" +
                 "});");
     }
+
+    enum PodType {
+        SWING_ARM,
+        FOUR_BAR,
+        CUSTOM
+    }
 }
 
 class OctoQuadHeadingScalar extends TuningOpMode<Double> {
@@ -99,7 +98,7 @@ class OctoQuadHeadingScalar extends TuningOpMode<Double> {
     public OctoQuadHeadingScalar(String name, int turns, int xPodPort, int yPodPort) {
         super("Heading Scalar Identification",
                 "Determines the scalar for the custom pods of the OctoQuad localizer. \n"
-                        + "Turn your robot " + turns * 360 + " degrees exactly ("+ turns + " times) exactly and then stop the OpMode.",
+                        + "Turn your robot " + turns * 360 + " degrees exactly (" + turns + " times) exactly and then stop the OpMode.",
                 true);
         this.name = name;
         this.turns = turns;
@@ -342,7 +341,7 @@ class OctoQuadOffsets extends TuningOpMode<List<Double>> {
         }
 
         if (localizer.pose().x() != Pose.zero().x() || localizer.pose().y() != Pose.zero().y()) {
-            previous =  localizer.pose();
+            previous = localizer.pose();
         }
 
         return List.of(((-previous.y()) / 2.0), ((-previous.x()) / 2.0));
