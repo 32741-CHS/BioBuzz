@@ -1,10 +1,13 @@
 @echo off
 
+adb disconnect
+
 @REM The line below is to make sure all works fine
 echo.
 echo [Code] Restarting ADB server (Prevents random bugs)
-adb kill-server && adb start-server
+@REM adb kill-server && adb start-server
 
+pause
 @REM Connect to the device (Note echo. is new line for a spacer)
 echo.
 echo [Code] connecting to 192.168.43.1:5555 (Robot)...
