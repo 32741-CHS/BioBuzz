@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.self_contained;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

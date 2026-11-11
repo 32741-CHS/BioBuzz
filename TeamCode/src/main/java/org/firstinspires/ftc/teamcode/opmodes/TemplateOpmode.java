@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.templates;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
 
