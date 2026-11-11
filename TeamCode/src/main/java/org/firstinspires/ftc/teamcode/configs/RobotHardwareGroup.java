@@ -29,7 +29,7 @@ public class RobotHardwareGroup {
     public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
     public DcMotorEx turret, flywheel;
     public IMU imu;
-    public WebcamName vision;
+    public WebcamName vision, insideCam;
     public GoBildaPinpointDriver pinpoint;
 
     public void init(HardwareMap hardwareMap) {
@@ -44,6 +44,7 @@ public class RobotHardwareGroup {
 //        intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         imu = hardwareMap.get(IMU.class, IMU_NAME);
 //        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
+//        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
     }
 }

@@ -34,4 +34,14 @@ public class Globals {
     // Panels
     public static TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     public static GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
+
+    // Ball colors & Detection
+    public enum NectarColorEnum {
+        Red,
+        Blue
+    }
+
+    public static final double PollenThreshold = 0.7;
+    public static final double NectarThreshold = 0.7;
+    public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
 }
