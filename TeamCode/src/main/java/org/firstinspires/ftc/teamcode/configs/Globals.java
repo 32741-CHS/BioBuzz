@@ -2,6 +2,11 @@ package org.firstinspires.ftc.teamcode.configs;
 
 // ONLY CONSTANTS!! Avoid NonConstants as they are a bit dangerous as we need to wipe them before every match
 
+import com.bylazar.graph.GraphManager;
+import com.bylazar.graph.PanelsGraph;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+
 public class Globals {
     // Remember Final = no change; static = same var shared across instances, so
     // update one
@@ -11,9 +16,6 @@ public class Globals {
     public static final double K_PROPORTIONAL = 0; // Error magnifier
     public static final double K_INTEGRAL = 0; // Anti consistent Error
     public static final double K_DERIVATIVE = 0; // Anti oscillations
-    
-    // OpMode
-
     // Motor Tick Rates
     public static final double GOBILDA_5203_6000RPM = 28;
     public static final double GOBILDA_5203_312RPM = 537.7;
@@ -28,4 +30,8 @@ public class Globals {
     // Shooter
     public static final double FLYWHEEL_ERROR_TOL = 1.0;
     public static final double TRIGGER_THRESHOLD = 0.5;
+
+    // Panels
+    public static TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    public static GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
 }

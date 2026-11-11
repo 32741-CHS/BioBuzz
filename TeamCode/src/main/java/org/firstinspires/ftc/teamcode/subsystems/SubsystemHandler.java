@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.instant;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 

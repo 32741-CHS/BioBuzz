@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.bylazar.graph.GraphManager;
-import com.bylazar.graph.PanelsGraph;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
@@ -21,8 +20,6 @@ public class MainTeleOp extends OpMode {
     // EXAMPLE starting position. Replace with your actual position.
     private final Pose startPose = poseFactory.of(24, 24, 0);
     GamepadEx driverGamepad, shooterGamepad;
-    TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
