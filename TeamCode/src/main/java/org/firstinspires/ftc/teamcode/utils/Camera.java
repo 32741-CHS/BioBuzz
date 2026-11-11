@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.utils;
 import android.graphics.color;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
+import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.webcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
@@ -26,7 +28,7 @@ public final class Camera {
 		None
 	};
 
-	public final Color getRGB(webcamName cam, float x, float y) {
+	public final Color getRGB(webcamName cam, Vector2D coord) {
 		if (cam == null) {
 			return Color.valueOf(0, 0, 0);
 		}
@@ -44,15 +46,34 @@ public final class Camera {
 		}
 
 		PixelProcessor proc = Processors.get(cam);
-		if (!proc == null) {
-			proc.setCoordinates(x, y);
+		if (proc != null) {
+			proc.setCoordinates((int) coord.x, (int) coord.y);
 			return proc.getLastColor();
 		}
 
 		return Color.valueOf(0, 0, 0);
 	};
 
+	// this assumes balls are in the middle of the webcam
 	public final BallType getBallType() {
+		// default is 640, 480 for ftc webcams
+		int cam_x = 640;
+		int cam_y = 480;
+		Vector2D coord = new Vector2D(cam_x / 2, cam_y / 2);
 
+		Color color = getRGB(insideCam, coord);
+		if (color.yellow() >= Globals.PollenThreshold) {
+			return BallType.Small;
+		}
+
+		if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
+			if (color.red() >= Globals.NectarThreshold)
+				return BallType.Big;
+		} else if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
+			if (color.blue() >= Globals.NectarThreshold)
+				return BallType.Big;
+		}
+
+		return BallType.None;
 	}
 }

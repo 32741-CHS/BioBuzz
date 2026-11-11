@@ -42,13 +42,12 @@ public class Globals {
 	public static int currentGoal;
 
 	// Ball colors
-	public static final enum NectarColor {
+	public static final enum NectarColorEnum {
 		Red,
 		Blue
 	}
 
 	public static final double PollenThreshold = 0.7;
 	public static final double NectarThreshold = 0.7;
-	public final NectarColor NectarColor; // lazily initializes in utils/Camera.java; not static for easily changing stuff
-																				// if we change teams
+	public final NectarColorEnum NectarColor = NectarColorEnum.Red; // not static so we can change it easily
 }
