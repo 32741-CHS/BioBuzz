@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-import android.graphics.color;
+import android.graphics.Color;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.PixelProcessor;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.webcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.visionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -16,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Camera {
-	private static final Map<webcamName, PixelProcessor> Processors = new HashMap();
-	private static final Map<webcamName, VisionPortal> Portals = new HashMap();
-
-	private final webcamName insideCam = RobotHardware.insideCam;
-	private VisionPortal Portal = VisionPortal;
+	private static final Map<WebcamName, PixelProcessor> Processors = new HashMap();
+	private static final Map<WebcamName, VisionPortal> Portals = new HashMap();
+	private final WebcamName insideCam = RobotHardware.insideCam;
 
 	public final enum BallType {
 		Big,
@@ -28,7 +27,8 @@ public final class Camera {
 		None
 	};
 
-	public final Color getRGB(webcamName cam, Vector2D coord) {
+	// coord should be from (1, 1) to (0, 0) aka it takes percentages
+	public final Color getRGB(WebcamName cam, Vector2D coord) {
 		if (cam == null) {
 			return Color.valueOf(0, 0, 0);
 		}
@@ -36,9 +36,9 @@ public final class Camera {
 		// init any new cameras
 		if (!Portals.containsKey(cam)) {
 			PixelProcessor newprocessor = new PixelProcessor();
-			VisionPortal newportal = new VisionPortal.builder()
+			VisionPortal newportal = new VisionPortal.Builder()
 					.setCamera(cam)
-					.addProcessor(newProcessor)
+					.addProcessor(newprocessor)
 					.build();
 
 			Processors.put(cam, newprocessor);
@@ -47,7 +47,7 @@ public final class Camera {
 
 		PixelProcessor proc = Processors.get(cam);
 		if (proc != null) {
-			proc.setCoordinates((int) coord.x, (int) coord.y);
+			proc.setCoordinates(coord.x, coord.y);
 			return proc.getLastColor();
 		}
 
@@ -56,13 +56,9 @@ public final class Camera {
 
 	// this assumes balls are in the middle of the webcam
 	public final BallType getBallType() {
-		// default is 640, 480 for ftc webcams
-		int cam_x = 640;
-		int cam_y = 480;
-		Vector2D coord = new Vector2D(cam_x / 2, cam_y / 2);
-
+		Vector2D coord = new Vector2D(0.5, 0.5);
 		Color color = getRGB(insideCam, coord);
-		if (color.yellow() >= Globals.PollenThreshold) {
+		if (color.green() + color.blue() / 2.0f >= Globals.PollenThreshold) {
 			return BallType.Small;
 		}
 
