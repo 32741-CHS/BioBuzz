@@ -17,7 +17,9 @@ public class Turret implements SubsystemBase {
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
-
+        intake = robotHardware.intake;
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override

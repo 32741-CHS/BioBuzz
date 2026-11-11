@@ -12,15 +12,8 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 @Configurable
 public class Turret {
 
-    public static final double kP = 0.03;
-    public static final double kF = 0.04;
-    public static final double MAX_POWER = 0.6;
-    public static final double MAX_ACCEL = 0.02;
-    public static final double ANGLE_TOLERANCE = 1.5;
-    public static final double MIN_ANGLE = -80;
-    public static final double MAX_ANGLE = 80;
-    public static final double SOFT_ZONE_DEG = 5.0;
-    public static final double LOST_TAG_RETURN_DELAY = 2.0;
+    public static final double kP = 0.0, kF = 0.04, MAX_POWER = 0.6, MAX_ACCEL = 0.02, ANGLE_TOLERANCE = 1.5, MIN_ANGLE = -80, MAX_ANGLE = 80, SOFT_ZONE_DEG = 5.0, LOST_TAG_RETURN_DELAY = 2.0;
+
     // TODO: measure wheel diameter / Lazy Susan diameter
     private static final double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
     public static double desiredAngle;
@@ -34,12 +27,21 @@ public class Turret {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void returnHome() {
-        goTo(0);
+    public double getCurrentAngle() {
+        int ticks = turret.getCurrentPosition();
+        return ticks / GOBILDA_5203_312RPM * MOTOR_TO_TURRET_RATIO * 360;
+    }
+
+    public double getErrorAngle() {
+        return desiredAngle - getCurrentAngle();
     }
 
     public void goTo(double angle) {
         desiredAngle = Range.clip(angle, MIN_ANGLE, MAX_ANGLE);
+    }
+
+    public void returnHome() {
+        goTo(0);
     }
 
     public void resetTurretEncoder() {
@@ -84,14 +86,5 @@ public class Turret {
 
         turret.setPower(power);
         lastPower = power;
-    }
-
-    public double getCurrentAngle() {
-        int ticks = turret.getCurrentPosition();
-        return ticks / GOBILDA_5203_312RPM * MOTOR_TO_TURRET_RATIO * 360;
-    }
-
-    public double getErrorAngle() {
-        return desiredAngle - getCurrentAngle();
     }
 }

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
-
+import com.bylazar.graph.GraphManager;
+import com.bylazar.graph.PanelsGraph;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
+import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
 @TeleOp(name = "BioBuzz TeleOp")
@@ -18,9 +21,12 @@ public class MainTeleOp extends OpMode {
     // EXAMPLE starting position. Replace with your actual position.
     private final Pose startPose = poseFactory.of(24, 24, 0);
     GamepadEx driverGamepad, shooterGamepad;
+    TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
+    private OdometryLogger pinpointLogger;
 
     @Override
     public void init() {
@@ -28,6 +34,7 @@ public class MainTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
+        pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadEx.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
@@ -35,6 +42,7 @@ public class MainTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
+                pinpointLogger,
                 drivetrain,
                 driverGamepad,
                 shooterGamepad
@@ -47,8 +55,8 @@ public class MainTeleOp extends OpMode {
         driverGamepad.leftBumper
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
-        driverGamepad.btnY
-                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
+//        driverGamepad.btnY
+//                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
 //        shooterGamepad.leftBumper // Manual Flywheel Control
 //                .whenHeld()
@@ -64,15 +72,15 @@ public class MainTeleOp extends OpMode {
         allSubsystems.update();
 
         // Telemetry
-        telemetry.addData("[drivetrain] X", "%.2f", drivetrain.getX());
-        telemetry.addData("[drivetrain] Y", "%.2f", drivetrain.getY());
+        panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
+        panelsTelemetry.addData("[drivetrain] Y", drivetrain.getY());
 
-        telemetry.addData(
+        panelsTelemetry.addData(
                 "[drivetrain] Heading",
-                "%.2f°",
+
                 Math.toDegrees(drivetrain.getHeading())
         );
 
-        telemetry.update();
+        panelsTelemetry.update();
     }
 }
