@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
+import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.old.OldDrivetrain;
@@ -32,8 +32,8 @@ public class OldMainTeleOp extends OpMode {
     public static boolean useFlywheelLookups = true;
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    private GamepadEx driverGamepad;
-    private GamepadEx operatorGamepad;
+    private GamepadWrapper driverGamepad;
+    private GamepadWrapper operatorGamepad;
     private OldDrivetrain oldDrivetrain;
     private Intake intake;
     private Shooter shooter;
@@ -54,8 +54,8 @@ public class OldMainTeleOp extends OpMode {
         // config.
         robotHardware = new RobotHardwareGroup();
         robotHardware.init(hardwareMap);
-        driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
-        operatorGamepad = GamepadEx.newOperatorGamepad(gamepad2);
+        driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
+        operatorGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
 
         oldDrivetrain = new OldDrivetrain();
         intake = new Intake();

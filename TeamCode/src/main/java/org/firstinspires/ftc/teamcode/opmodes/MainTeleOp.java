@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
+import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
@@ -19,7 +19,7 @@ public class MainTeleOp extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.
     private final Pose startPose = poseFactory.of(24, 24, 0);
-    GamepadEx driverGamepad, shooterGamepad;
+    GamepadWrapper driverGamepad, shooterGamepad;
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
@@ -32,8 +32,8 @@ public class MainTeleOp extends OpMode {
 
         // Subsystems
         pinpointLogger = new OdometryLogger();
-        driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
-        shooterGamepad = GamepadEx.newOperatorGamepad(gamepad2);
+        driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
+        shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 

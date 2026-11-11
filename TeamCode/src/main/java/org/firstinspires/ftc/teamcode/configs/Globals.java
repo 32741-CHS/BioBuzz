@@ -30,18 +30,18 @@ public class Globals {
     // Shooter
     public static final double FLYWHEEL_ERROR_TOL = 1.0;
     public static final double TRIGGER_THRESHOLD = 0.5;
-
+    public static final double PollenThreshold = 0.7;
+    public static final double NectarThreshold = 0.7;
+    public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
+    public static final double flywheelKP = 16.5;
+    public static final double flywheelKF = 13.5;
     // Panels
     public static TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     public static GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-
+    public static boolean fieldCentricDriving = false;
     // Ball colors & Detection
     public enum NectarColorEnum {
         Red,
         Blue
     }
-
-    public static final double PollenThreshold = 0.7;
-    public static final double NectarThreshold = 0.7;
-    public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
 }

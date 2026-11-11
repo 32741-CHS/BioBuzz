@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
+import static org.firstinspires.ftc.teamcode.configs.Globals.fieldCentricDriving;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 public class Drivetrain implements SubsystemBase {
 
     private final Pose startPose;
-    private GamepadEx driverGamepad;
+    private GamepadWrapper driverGamepad;
     private Follower follower;
     private double forward = 0, strafe = 0, turn = 0, powerMultiplier = 1;
 
@@ -39,7 +39,7 @@ public class Drivetrain implements SubsystemBase {
         return new Pose(x, y, heading);
     }
 
-    public void bindToGamepad(GamepadEx gamepad) {
+    public void bindToGamepad(GamepadWrapper gamepad) {
         driverGamepad = gamepad;
     }
 

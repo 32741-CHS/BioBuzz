@@ -15,40 +15,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GamepadEx implements SubsystemBase {
+public class GamepadWrapper implements SubsystemBase {
 
-    public final GamepadButton btnA = new GamepadButton();
-    public final GamepadButton btnB = new GamepadButton();
-    public final GamepadButton btnX = new GamepadButton();
-    public final GamepadButton btnY = new GamepadButton();
-    public final GamepadButton leftBumper = new GamepadButton();
-    public final GamepadButton rightBumper = new GamepadButton();
-    public final GamepadButton backButton = new GamepadButton();
-    public final GamepadButton startButton = new GamepadButton();
-    public final GamepadButton dpadUp = new GamepadButton();
-    public final GamepadButton dpadDown = new GamepadButton();
-    public final GamepadButton dpadLeft = new GamepadButton();
-    public final GamepadButton dpadRight = new GamepadButton();
+    public final GamepadButtonWrapper
+            btnA = new GamepadButtonWrapper(),
+            btnB = new GamepadButtonWrapper(),
+            btnX = new GamepadButtonWrapper(),
+            btnY = new GamepadButtonWrapper(),
+            leftBumper = new GamepadButtonWrapper(),
+            rightBumper = new GamepadButtonWrapper(),
+            backButton = new GamepadButtonWrapper(),
+            startButton = new GamepadButtonWrapper(),
+            dpadUp = new GamepadButtonWrapper(),
+            dpadDown = new GamepadButtonWrapper(),
+            dpadLeft = new GamepadButtonWrapper(),
+            dpadRight = new GamepadButtonWrapper();
 
-    public final GamepadTrigger leftTrigger = new GamepadTrigger();
-    public final GamepadTrigger rightTrigger = new GamepadTrigger();
+    public final GamepadTriggerWrapper
+            leftTrigger = new GamepadTriggerWrapper(),
+            rightTrigger = new GamepadTriggerWrapper();
 
     private final GamepadManager panelsGamepadManager;
     private final Gamepad hardwareGamepad;
     public Gamepad raw;
 
-    public GamepadEx(GamepadManager panelsGamepadManager, Gamepad hardwareGamepad) {
+    private GamepadWrapper(GamepadManager panelsGamepadManager, Gamepad hardwareGamepad) {
         this.panelsGamepadManager = panelsGamepadManager;
         this.hardwareGamepad = hardwareGamepad;
         raw = panelsGamepadManager.asCombinedFTCGamepad(hardwareGamepad);
     }
 
-    public static GamepadEx newDriverGamepad(Gamepad gamepad1) {
-        return new GamepadEx(PanelsGamepad.INSTANCE.getFirstManager(), gamepad1);
+    public static GamepadWrapper newDriverGamepad(Gamepad gamepad1) {
+        return new GamepadWrapper(PanelsGamepad.INSTANCE.getFirstManager(), gamepad1);
     }
 
-    public static GamepadEx newOperatorGamepad(Gamepad gamepad2) {
-        return new GamepadEx(PanelsGamepad.INSTANCE.getSecondManager(), gamepad2);
+    public static GamepadWrapper newOperatorGamepad(Gamepad gamepad2) {
+        return new GamepadWrapper(PanelsGamepad.INSTANCE.getSecondManager(), gamepad2);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class GamepadEx implements SubsystemBase {
         rightTrigger.update(raw.right_trigger);
     }
 
-    public static class GamepadButton {
+    public static class GamepadButtonWrapper {
         protected final Binder callbackBinds = new Binder();
         protected boolean currentState;
         protected boolean prevState = false;
@@ -92,7 +94,7 @@ public class GamepadEx implements SubsystemBase {
          *
          * @param callback The action you want to perform if the button goes down.
          */
-        public GamepadButton onPress(Runnable callback) {
+        public GamepadButtonWrapper onPress(Runnable callback) {
             callbackBinds.bind("WAS_PRESSED", callback);
             return this;
         }
@@ -103,7 +105,7 @@ public class GamepadEx implements SubsystemBase {
          *
          * @param callback The function that gets called when the button is released
          */
-        public GamepadButton onRelease(Runnable callback) {
+        public GamepadButtonWrapper onRelease(Runnable callback) {
             callbackBinds.bind("WAS_RELEASED", callback);
             return this;
         }
@@ -114,7 +116,7 @@ public class GamepadEx implements SubsystemBase {
          *
          * @param callback The function to run EVERY FRAME WHEN BUTTON DOWN
          */
-        public GamepadButton whenHeld(Runnable callback) {
+        public GamepadButtonWrapper whenHeld(Runnable callback) {
             callbackBinds.bind("IS_HELD", callback);
             return this;
         }
@@ -124,13 +126,13 @@ public class GamepadEx implements SubsystemBase {
          *
          * @param callback The function to call
          */
-        public GamepadButton whenNotHeld(Runnable callback) {
+        public GamepadButtonWrapper whenNotHeld(Runnable callback) {
             callbackBinds.bind("IS_NOT_HELD", callback);
             return this;
         }
 
         /**
-         * Called every frame by the GamepadEx class to pass the latest button states, and call the
+         * Called every frame by the GamepadWrapper class to pass the latest button states, and call the
          * callbacks
          *
          * @param pressed Whether the button is pressed or not at this moment of time
@@ -167,7 +169,7 @@ public class GamepadEx implements SubsystemBase {
         }
     }
 
-    public static class GamepadTrigger extends GamepadButton {
+    public static class GamepadTriggerWrapper extends GamepadButtonWrapper {
         private float percentPressed = 0;
 
         public float getPercentPressed() {
@@ -186,8 +188,8 @@ public class GamepadEx implements SubsystemBase {
         /**
          * Binds an anonymous function to a key. Supports binding multiple callbacks to the same key.
          *
-         * @param key The string id, is case-sensitive and will the one you put in the call method to
-         *     later call the thing
+         * @param key      The string id, is case-sensitive and will the one you put in the call method to
+         *                 later call the thing
          * @param callback The function that will be called when you do Binder.call(key)
          */
         public void bind(String key, Runnable callback) {

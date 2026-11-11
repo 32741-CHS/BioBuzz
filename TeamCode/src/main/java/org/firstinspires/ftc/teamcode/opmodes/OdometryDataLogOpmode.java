@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 @Autonomous(name = "Odometry", group = "Auto")
-public class OdometryDataLog extends LinearOpMode {
+public class OdometryDataLogOpmode extends LinearOpMode {
 
     private final DcMotor motor = null;
 
@@ -30,9 +30,9 @@ public class OdometryDataLog extends LinearOpMode {
             pinpoint.update();
             Pose2D pos = pinpoint.getPosition();
 
-            telemetry.addData("X", pos.getX(DistanceUnit.CM));
-            telemetry.addData("Y", pos.getY(DistanceUnit.CM));
-            telemetry.addData("Heading", pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("X", pos.getX(DistanceUnit.INCH));
+            telemetry.addData("Y", pos.getY(DistanceUnit.INCH));
+            telemetry.addData("Heading", pos.getHeading(AngleUnit.RADIANS));
             telemetry.update();
         }
     }

@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.configs.TunableConstants;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
@@ -47,7 +47,7 @@ public class Shooter implements SubsystemBase {
         // apply PIDF every frame so @Configurable changes work
         flywheel.setPIDFCoefficients(
                 DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(TunableConstants.flywheelKP, 0, 0, TunableConstants.flywheelKF));
+                new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
