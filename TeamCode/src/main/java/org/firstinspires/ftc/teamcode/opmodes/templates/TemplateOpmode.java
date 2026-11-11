@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.templates;
 
+import static org.firstinspires.ftc.teamcode.configs.TunableConstants.fieldCentricDriving;
+
 import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,14 +12,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
-@Disabled
 @TeleOp(name = "BioBuzz TeleOp")
 public class TemplateOpmode extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.
     private final Pose startPose = poseFactory.of(24, 24, 0);
     GamepadEx driverGamepad, shooterGamepad;
-    private Follower follower;
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
@@ -33,7 +31,7 @@ public class TemplateOpmode extends OpMode {
         driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadEx.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
-        drivetrain.bindToGamepad(driverGamepad);
+        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
@@ -42,8 +40,31 @@ public class TemplateOpmode extends OpMode {
                 shooterGamepad
         );
 
-
         allSubsystems.init(robotHardware);
+
+        // Key Binds
+        driverGamepad.leftBumper
+                .onPress(() -> drivetrain.speed(0.5))
+                .onRelease(() -> drivetrain.speed(1));
+        driverGamepad.btnY
+                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
+
+//        shooterGamepad.leftBumper // Manual Flywheel Control
+//                .whenHeld()
+//                .whenNotHeld()
+//        shooterGamepad.leftBumper.whenHeld(intake::eat);
+//        shooterGamepad.btnA.whenHeld(intake::invert);
+//        shooterGamepad.rightTrigger.whenHeld(shooter::feed);
+//        shooterGamepad.btnA.whenHeld(shooter::reverseFeed);
+    }
+
+    @Override
+    public void init_loop() {
+
+    }
+
+    @Override
+    public void start() {
     }
 
     @Override
@@ -59,9 +80,7 @@ public class TemplateOpmode extends OpMode {
                 "%.2f°",
                 Math.toDegrees(drivetrain.getHeading())
         );
-
-        telemetry.addData("Pedro Mode", follower.mode());
-
         telemetry.update();
     }
+
 }
