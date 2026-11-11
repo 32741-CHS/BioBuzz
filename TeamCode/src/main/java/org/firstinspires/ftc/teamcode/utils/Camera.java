@@ -21,7 +21,7 @@ public final class Camera {
 	private static final Map<WebcamName, VisionPortal> Portals = new HashMap();
 	private final WebcamName insideCam = RobotHardware.insideCam;
 
-	public final enum BallType {
+	public enum BallType {
 		Big,
 		Small,
 		None
@@ -34,6 +34,8 @@ public final class Camera {
 		}
 
 		// init any new cameras
+		// this would be better if it were in an `init()` function that
+		// gets all webcames and would do this automatically
 		if (!Portals.containsKey(cam)) {
 			PixelProcessor newprocessor = new PixelProcessor();
 			VisionPortal newportal = new VisionPortal.Builder()

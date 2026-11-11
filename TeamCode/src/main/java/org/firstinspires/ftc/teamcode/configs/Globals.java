@@ -42,7 +42,7 @@ public class Globals {
 	public static int currentGoal;
 
 	// Ball colors
-	public static final enum NectarColorEnum {
+	public enum NectarColorEnum {
 		Red,
 		Blue
 	}
