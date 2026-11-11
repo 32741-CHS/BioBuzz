@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,8 +45,8 @@ public class Flywheel implements SubsystemBase {
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
-        panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
-        panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
+        panelsTelemetry.addData("Flywheel RPS", getFlywheelRPS());
+        panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }
 
     public double getFlywheelRPS() {
