@@ -7,7 +7,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class Vision implements SubsystemBase {
+public class GoalTracker implements SubsystemBase {
 
     private AprilTagProcessor aprilTag;
 
