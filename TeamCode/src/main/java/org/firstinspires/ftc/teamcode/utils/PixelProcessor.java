@@ -2,21 +2,19 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
-import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.opencv.core.Mat;
 
 public class PixelProcessor implements VisionProcessor {
-	private volatile Vector2D Coordinates = new Vector2D(0, 0);
+	private volatile Vector2D Coordinates = new Vector2D(0.5, 0.5);
 	private volatile int lastColor = Color.BLACK;
 	private volatile boolean processedFrame = false;
 
 	public void setCoordinates(double normX, double normY) {
+		normX = Math.max(0.0, Math.min(1.0, normX));
+		normY = Math.max(0.0, Math.min(1.0, normY));
 		Coordinates = new Vector2D(normX, normY);
 	}
 
@@ -31,6 +29,10 @@ public class PixelProcessor implements VisionProcessor {
 
 	public boolean hasProcessedFrame() {
 		return processedFrame;
+	}
+
+	private static int clampChannel(double value) {
+		return (int) Math.max(0, Math.min(255, Math.round(value)));
 	}
 
     @Override
@@ -59,9 +61,9 @@ public class PixelProcessor implements VisionProcessor {
 
 		// returns int as always
 		lastColor = Color.rgb(
-				(int) Math.round(rgb[0]),
-				(int) Math.round(rgb[1]),
-				(int) Math.round(rgb[2])
+				clampChannel(rgb[0]),
+				clampChannel(rgb[1]),
+				clampChannel(rgb[2])
 		);
 		processedFrame = true;
 

@@ -23,6 +23,8 @@ public final class Camera {
 	// always be sure to call this when possible
 	// takes varargs (cam1, cam2, cam3) and not an array
 	public final void init(WebcamName... cams) {
+		if (cams == null) return;
+
 		for ( WebcamName cam : cams ) {
 			if (cam == null || Portals.containsKey(cam)) continue;
 
