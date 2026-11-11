@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import android.graphics.Color;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroups;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.teamcode.utils.PixelProcessor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.vision.visionPortal;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Mat;
 
@@ -19,7 +19,6 @@ import java.util.Map;
 public final class Camera {
 	private static final Map<WebcamName, PixelProcessor> Processors = new HashMap();
 	private static final Map<WebcamName, VisionPortal> Portals = new HashMap();
-	private final WebcamName insideCam = RobotHardware.insideCam;
 
 	public enum BallType {
 		Big,
@@ -57,7 +56,7 @@ public final class Camera {
 	};
 
 	// this assumes balls are in the middle of the webcam
-	public final BallType getBallType() {
+	public final BallType getBallType(WebcamName insideCam) {
 		Vector2D coord = new Vector2D(0.5, 0.5);
 		Color color = getRGB(insideCam, coord);
 		if (color.green() + color.blue() / 2.0f >= Globals.PollenThreshold) {
@@ -67,7 +66,7 @@ public final class Camera {
 		if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
 			if (color.red() >= Globals.NectarThreshold)
 				return BallType.Big;
-		} else if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
+		} else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
 			if (color.blue() >= Globals.NectarThreshold)
 				return BallType.Big;
 		}

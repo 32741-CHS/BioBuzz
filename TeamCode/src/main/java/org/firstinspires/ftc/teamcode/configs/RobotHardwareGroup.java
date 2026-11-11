@@ -13,7 +13,7 @@ public class RobotHardwareGroup {
 	public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
 	public DcMotorEx turret, flywheel;
 	public IMU imu;
-	public WebcamName vision;
+	public WebcamName vision, insideCam;
 
 	public void init(HardwareMap hardwareMap) {
 		flDrive = hardwareMap.get(DcMotor.class, "flDrive");

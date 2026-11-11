@@ -49,5 +49,5 @@ public class Globals {
 
 	public static final double PollenThreshold = 0.7;
 	public static final double NectarThreshold = 0.7;
-	public final NectarColorEnum NectarColor = NectarColorEnum.Red; // not static so we can change it easily
+	public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
 }
