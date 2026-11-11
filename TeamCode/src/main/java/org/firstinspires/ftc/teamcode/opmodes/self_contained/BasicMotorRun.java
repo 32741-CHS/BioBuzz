@@ -31,7 +31,7 @@ public class BasicMotorRun extends LinearOpMode {
         while (opModeIsActive()) {
             // Set motor power to 50% speed (-1.0 to 1.0 range)
 
-            motor.setPower(0.5);
+            motor.setPower(1);
 
             telemetry.addData("Motor Power", 1);
             telemetry.update();

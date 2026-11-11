@@ -41,39 +41,6 @@ public class Shooter implements SubsystemBase {
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public double getFlywheelRPS() {
-        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
-    }
-
-    public double getFeederPower() {
-        return feeder.getPower();
-    }
-
-    public void speedUpFlywheel() {
-        desiredFlywheelRPS = Math.min(desiredFlywheelRPS + 1, 100);
-    }
-
-    public void slowDownFlywheel() {
-        desiredFlywheelRPS = Math.max(desiredFlywheelRPS - 1, 0);
-    }
-
-    public double getFlywheelErrorRPS() {
-        return getFlywheelRPS() - desiredFlywheelRPS;
-    }
-
-    public void toggleFlywheel() {
-        canSpinFlywheel = !canSpinFlywheel;
-    }
-
-    public void feed() {
-        requestedFeed = true;
-    }
-
-    public void reverseFeed() {
-        requestedFeed = true;
-        requestedReverseFeed = true;
-    }
-
     @Override
     public void update() {
         // apply PIDF every frame so @Configurable changes work
@@ -90,5 +57,46 @@ public class Shooter implements SubsystemBase {
         }
         requestedFeed = false;
         requestedReverseFeed = false;
+
+        panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
+        panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
+    }
+
+    public double getFlywheelErrorRPS() {
+        return getFlywheelRPS() - desiredFlywheelRPS;
+    }
+
+    public double getFlywheelRPS() {
+        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
+    }
+
+    public double getFeederPower() {
+        return feeder.getPower();
+    }
+
+    public void speedUpFlywheel() {
+        desiredFlywheelRPS = Math.min(desiredFlywheelRPS + 1, 100);
+    }
+
+    public void slowDownFlywheel() {
+        desiredFlywheelRPS = Math.max(desiredFlywheelRPS - 1, 0);
+    }
+
+    public void toggleFlywheel() {
+        canSpinFlywheel = !canSpinFlywheel;
+    }
+
+    public void feed() {
+        requestedFeed = true;
+    }
+
+    public void feed(boolean reverse) {
+        requestedFeed = true;
+        requestedReverseFeed = true;
+    }
+
+    public void reverseFeed() {
+        requestedFeed = true;
+        requestedReverseFeed = true;
     }
 }
