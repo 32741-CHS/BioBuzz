@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.Feeder;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
@@ -24,6 +26,9 @@ public class MainTeleOp extends OpMode {
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
     private OdometryLogger pinpointLogger;
+    private Intake intake;
+    private Feeder feeder;
+    private Flywheel flywheel;
 
     @Override
     public void init() {
@@ -31,6 +36,9 @@ public class MainTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
+        flywheel = new Flywheel();
+        feeder = new Feeder(flywheel);
+        intake = new Intake();
         pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
@@ -39,6 +47,9 @@ public class MainTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
+                flywheel,
+                intake,
+                feeder,
                 pinpointLogger,
                 drivetrain,
                 driverGamepad,
@@ -55,13 +66,19 @@ public class MainTeleOp extends OpMode {
 //        driverGamepad.btnY
 //                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
-//        shooterGamepad.leftBumper // Manual Flywheel Control
-//                .whenHeld()
-//                .whenNotHeld()
-//        shooterGamepad.leftBumper.whenHeld(intake::eat);
-//        shooterGamepad.btnA.whenHeld(intake::invert);
-//        shooterGamepad.rightTrigger.whenHeld(shooter::feed);
-//        shooterGamepad.btnA.whenHeld(shooter::reverseFeed);
+        shooterGamepad.leftTrigger
+                .onPress(intake::run)
+                .onRelease(intake::stopRunning);
+
+        shooterGamepad.btnA
+                .onPress(intake::reverse)
+                .onPress(feeder::reverse)
+                .onRelease(intake::unReverse)
+                .onRelease(feeder::unReverse);
+
+        shooterGamepad.rightTrigger
+                .whenHeld(feeder::tryRun)
+                .onRelease(feeder::stopRunning);
     }
 
     @Override

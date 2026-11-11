@@ -14,9 +14,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.old.OldDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldIntake;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldShooter;
 import org.firstinspires.ftc.teamcode.subsystems.old.OldTurret;
 import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
@@ -35,8 +35,8 @@ public class OldMainTeleOp extends OpMode {
     private GamepadWrapper driverGamepad;
     private GamepadWrapper operatorGamepad;
     private OldDrivetrain oldDrivetrain;
-    private Intake intake;
-    private Shooter shooter;
+    private OldIntake oldIntake;
+    private OldShooter oldShooter;
     private OldTurret oldTurret;
     private OldVision oldVision;
     private RobotHardwareGroup robotHardware;
@@ -58,8 +58,8 @@ public class OldMainTeleOp extends OpMode {
         operatorGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
 
         oldDrivetrain = new OldDrivetrain();
-        intake = new Intake();
-        shooter = new Shooter();
+        oldIntake = new OldIntake();
+        oldShooter = new OldShooter();
         oldVision = new OldVision();
         oldTurret = new OldTurret();
 
@@ -93,15 +93,15 @@ public class OldMainTeleOp extends OpMode {
         // parameter
         driverGamepad.leftBumper.whenHeld(() -> oldDrivetrain.setSpeedMultiplier(1));
         driverGamepad.leftBumper.whenNotHeld(() -> oldDrivetrain.setSpeedMultiplier(0.1));
-        operatorGamepad.dpadUp.onPress(shooter::speedUpFlywheel);
-        operatorGamepad.dpadDown.onPress(shooter::slowDownFlywheel);
+        operatorGamepad.dpadUp.onPress(oldShooter::speedUpFlywheel);
+        operatorGamepad.dpadDown.onPress(oldShooter::slowDownFlywheel);
         operatorGamepad.btnY.onPress(oldDrivetrain::resetIMU);
         operatorGamepad.btnB.onPress(oldTurret::resetTurretEncoder);
-        operatorGamepad.leftBumper.whenHeld(intake::eat);
-        operatorGamepad.btnA.whenHeld(intake::invert);
-        operatorGamepad.rightTrigger.whenHeld(shooter::feed);
-        operatorGamepad.btnA.whenHeld(shooter::reverseFeed);
-        operatorGamepad.btnX.onPress(shooter::toggleFlywheel);
+        operatorGamepad.leftBumper.whenHeld(oldIntake::eat);
+        operatorGamepad.btnA.whenHeld(oldIntake::invert);
+        operatorGamepad.rightTrigger.whenHeld(oldShooter::feed);
+        operatorGamepad.btnA.whenHeld(oldShooter::reverseFeed);
+        operatorGamepad.btnX.onPress(oldShooter::toggleFlywheel);
         driverGamepad.btnY.onPress(() -> isFieldDriving = !isFieldDriving);
         operatorGamepad.leftBumper.onPress(() -> useFlywheelLookups = !useFlywheelLookups);
     }
@@ -149,18 +149,18 @@ public class OldMainTeleOp extends OpMode {
 
         if (useFlywheelLookups && goalTag != null) {
             double distance = goalTag.ftcPose.range;
-            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            OldShooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         }
 
-        intake.update();
-        shooter.update();
+        oldIntake.update();
+        oldShooter.update();
         oldTurret.update();
 
         // Telemetry
-        panelsTelemetry.addData("Intake power", intake.getPower());
-        panelsTelemetry.addData("Feeder power", shooter.getFeederPower());
-        panelsTelemetry.addData("Flywheel rps", shooter.getFlywheelRPS());
-        panelsTelemetry.addData("Flywheel error", shooter.getFlywheelErrorRPS());
+        panelsTelemetry.addData("OldIntake power", oldIntake.getPower());
+        panelsTelemetry.addData("Feeder power", oldShooter.getFeederPower());
+        panelsTelemetry.addData("Flywheel rps", oldShooter.getFlywheelRPS());
+        panelsTelemetry.addData("Flywheel error", oldShooter.getFlywheelErrorRPS());
         panelsTelemetry.addData("OldDrivetrain speed", oldDrivetrain.getSpeedMultiplier());
         panelsTelemetry.addData("OldTurret angle", oldTurret.getCurrentAngle());
         panelsTelemetry.addData("OldTurret error", oldTurret.getErrorAngle());
@@ -182,11 +182,11 @@ public class OldMainTeleOp extends OpMode {
         }
 
         // panels graph feed
-        panelsGraph.addData("flywheelRPS", shooter.getFlywheelRPS());
-        panelsGraph.addData("flywheelTarget", Shooter.desiredFlywheelRPS);
-        panelsGraph.addData("flywheelError", shooter.getFlywheelErrorRPS());
-        panelsGraph.addData("feederPower", shooter.getFeederPower());
-        panelsGraph.addData("intakePower", intake.getPower());
+        panelsGraph.addData("flywheelRPS", oldShooter.getFlywheelRPS());
+        panelsGraph.addData("flywheelTarget", OldShooter.desiredFlywheelRPS);
+        panelsGraph.addData("flywheelError", oldShooter.getFlywheelErrorRPS());
+        panelsGraph.addData("feederPower", oldShooter.getFeederPower());
+        panelsGraph.addData("intakePower", oldIntake.getPower());
 
         panelsGraph.update();
         panelsTelemetry.update(telemetry);

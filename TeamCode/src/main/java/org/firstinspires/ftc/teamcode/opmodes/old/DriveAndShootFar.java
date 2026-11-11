@@ -11,9 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.old.OldDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldIntake;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldShooter;
 import org.firstinspires.ftc.teamcode.subsystems.old.OldTurret;
 import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
@@ -33,8 +33,8 @@ public class DriveAndShootFar extends LinearOpMode {
     public static final double FLYWHEEL_ERROR_TOL = 100;
     private final ElapsedTime timer = new ElapsedTime();
     private OldDrivetrain oldDrivetrain;
-    private Shooter shooter;
-    private Intake intake;
+    private OldShooter oldShooter;
+    private OldIntake oldIntake;
     private OldVision oldVision;
     private OldTurret oldTurret;
     private double lastGoalTagTime = 0;
@@ -47,8 +47,8 @@ public class DriveAndShootFar extends LinearOpMode {
         robotHardware = new RobotHardwareGroup();
         robotHardware.init(hardwareMap);
         (oldDrivetrain = new OldDrivetrain()).init(robotHardware);
-        (shooter = new Shooter()).init(robotHardware);
-        (intake = new Intake()).init(robotHardware);
+        (oldShooter = new OldShooter()).init(robotHardware);
+        (oldIntake = new OldIntake()).init(robotHardware);
         (oldTurret = new OldTurret()).init(robotHardware);
         (oldVision = new OldVision()).init(robotHardware);
 
@@ -66,26 +66,26 @@ public class DriveAndShootFar extends LinearOpMode {
 
         waitForStart();
 
-        Shooter.canSpinFlywheel = true;
+        OldShooter.canSpinFlywheel = true;
         lastGoalTagTime = getRuntime();
 
         timer.reset();
         while (opModeIsActive()
-                && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
+                && Math.abs(oldShooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
                 && timer.seconds() <= MAX_SPINUP_TIME) {
             runBallistics();
             oldTurret.update();
-            shooter.update();
+            oldShooter.update();
         }
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() <= SHOOT_TIME) {
             runBallistics();
-            shooter.feed();
-            intake.eat();
+            oldShooter.feed();
+            oldIntake.eat();
             oldTurret.update();
-            shooter.update();
-            intake.update();
+            oldShooter.update();
+            oldIntake.update();
         }
 
         timer.reset();
@@ -104,7 +104,7 @@ public class DriveAndShootFar extends LinearOpMode {
             oldTurret.goTo(angle);
 
             double distance = goalTag.ftcPose.range;
-            Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
+            OldShooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
         } else if (getRuntime() - lastGoalTagTime > OldTurret.LOST_TAG_RETURN_DELAY) {
             oldTurret.returnHome();
         }

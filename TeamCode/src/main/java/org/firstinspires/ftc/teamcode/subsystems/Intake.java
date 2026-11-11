@@ -10,32 +10,34 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 @Configurable
 public class Intake implements SubsystemBase {
 
-    public static final double desiredPower = 1;
-    public static boolean isInverted = false;
-    private static double targetPower;
+    private boolean reverseMode = false;
     private DcMotor intake;
 
+    @Override
     public void init(RobotHardwareGroup robotHardware) {
         intake = robotHardware.intake;
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public void eat() {
-        targetPower = desiredPower;
-    }
-
-    public double getPower() {
-        return intake.getPower();
-    }
-
-    public void invert() {
-        isInverted = true;
-    }
-
+    @Override
     public void update() {
-        intake.setPower(!isInverted ? targetPower : -targetPower);
-        targetPower = 0;
-        isInverted = false;
     }
+
+    public void run() {
+        intake.setPower(reverseMode ? 1 : 0);
+    }
+
+    public void stopRunning() {
+        intake.setPower(0);
+    }
+
+    public void reverse() {
+        reverseMode = true;
+    }
+
+    public void unReverse() {
+        reverseMode = false;
+    }
+
 }
