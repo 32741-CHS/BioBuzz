@@ -31,7 +31,6 @@ public class Vision implements SubsystemBase {
 
     @Override
     public void update() {
-
         distanceToGoal = Double.NaN;
         xRadians = Double.NaN;
         zRadians = Double.NaN;
@@ -73,9 +72,7 @@ public class Vision implements SubsystemBase {
             return;
 
         distanceToGoal = best.ftcPose.range;
-
         xRadians = Math.toRadians(best.ftcPose.bearing);
-
         zRadians = Math.toRadians(best.ftcPose.elevation);
     }
 
