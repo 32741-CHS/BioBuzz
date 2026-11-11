@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 // 20 = blue goal, 24 = red goal
-public class Vision {
+public class OldVision {
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
-    public Vision() {
+    public OldVision() {
     }
 
     public void init(RobotHardwareGroup robotHardware) {
@@ -62,8 +62,15 @@ public class Vision {
         PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);
     }
 
-    public List<AprilTagDetection> getDetections() {
-        return processor.getDetections();
+    public AprilTagDetection getTagById(int tagId) {
+        List<AprilTagDetection> detections = getDetections();
+        for (AprilTagDetection detection : detections) {
+            if (detection instanceof AprilTagSingleDetection
+                    && ((AprilTagSingleDetection) detection).id == tagId) {
+                return detection;
+            }
+        }
+        return null;
     }
 
     //    // check if a specific goal tag is visible
@@ -90,15 +97,8 @@ public class Vision {
     //        return Math.toDegrees(tag.ftcPose.yaw);
     //    }
 
-    public AprilTagDetection getTagById(int tagId) {
-        List<AprilTagDetection> detections = getDetections();
-        for (AprilTagDetection detection : detections) {
-            if (detection instanceof AprilTagSingleDetection
-                    && ((AprilTagSingleDetection) detection).id == tagId) {
-                return detection;
-            }
-        }
-        return null;
+    public List<AprilTagDetection> getDetections() {
+        return processor.getDetections();
     }
     //    public void stop() {
     //        if (portal != null) {

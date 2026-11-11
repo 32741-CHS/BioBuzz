@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
@@ -16,11 +16,11 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadEx;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.old.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.old.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldTurret;
 import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.old.Vision;
+import org.firstinspires.ftc.teamcode.utils.old.OldVision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Locale;
@@ -34,11 +34,11 @@ public class OldMainTeleOp extends OpMode {
     private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private GamepadEx driverGamepad;
     private GamepadEx operatorGamepad;
-    private Drivetrain drivetrain;
+    private OldDrivetrain oldDrivetrain;
     private Intake intake;
     private Shooter shooter;
-    private Turret turret;
-    private Vision vision;
+    private OldTurret oldTurret;
+    private OldVision oldVision;
     private RobotHardwareGroup robotHardware;
     private boolean isFieldDriving = false;
     private boolean turretManualMode = false;
@@ -57,11 +57,11 @@ public class OldMainTeleOp extends OpMode {
         driverGamepad = GamepadEx.newDriverGamepad(gamepad1);
         operatorGamepad = GamepadEx.newOperatorGamepad(gamepad2);
 
-        drivetrain = new Drivetrain();
+        oldDrivetrain = new OldDrivetrain();
         intake = new Intake();
         shooter = new Shooter();
-        vision = new Vision();
-        turret = new Turret();
+        oldVision = new OldVision();
+        oldTurret = new OldTurret();
 
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Alliance", "Square = Red, X = Blue");
@@ -91,12 +91,12 @@ public class OldMainTeleOp extends OpMode {
         // - OnPress when the key goes down, fire the function ONCE
         // - The "::" means don't call this function, just pass it forward as a
         // parameter
-        driverGamepad.leftBumper.whenHeld(() -> drivetrain.setSpeedMultiplier(1));
-        driverGamepad.leftBumper.whenNotHeld(() -> drivetrain.setSpeedMultiplier(0.1));
+        driverGamepad.leftBumper.whenHeld(() -> oldDrivetrain.setSpeedMultiplier(1));
+        driverGamepad.leftBumper.whenNotHeld(() -> oldDrivetrain.setSpeedMultiplier(0.1));
         operatorGamepad.dpadUp.onPress(shooter::speedUpFlywheel);
         operatorGamepad.dpadDown.onPress(shooter::slowDownFlywheel);
-        operatorGamepad.btnY.onPress(drivetrain::resetIMU);
-        operatorGamepad.btnB.onPress(turret::resetTurretEncoder);
+        operatorGamepad.btnY.onPress(oldDrivetrain::resetIMU);
+        operatorGamepad.btnB.onPress(oldTurret::resetTurretEncoder);
         operatorGamepad.leftBumper.whenHeld(intake::eat);
         operatorGamepad.btnA.whenHeld(intake::invert);
         operatorGamepad.rightTrigger.whenHeld(shooter::feed);
@@ -112,14 +112,14 @@ public class OldMainTeleOp extends OpMode {
         operatorGamepad.update();
 
         // TODO: replace with follower.setTeleOpDrive() once Pedro Pathing is added
-        drivetrain.drive(
+        oldDrivetrain.drive(
                 new Vector2D(
                         -driverGamepad.raw.left_stick_y,
                         driverGamepad.raw.left_stick_x),
                 driverGamepad.raw.right_stick_x,
                 isFieldDriving);
 
-        // turret: right stick x for manual override, or auto-track the goal tag
+        // oldTurret: right stick x for manual override, or auto-track the goal tag
         double stickX = operatorGamepad.raw.right_stick_x;
         if (Math.abs(stickX) > STICK_DEADBAND) {
             if (!turretManualMode) {
@@ -129,21 +129,21 @@ public class OldMainTeleOp extends OpMode {
             turretManualMode = false;
         }
 
-        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+        AprilTagDetection goalTag = oldVision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
 
         if (turretManualMode) {
             lastGoalTagTime = getRuntime();
-            manualTurretAngle = turret.getCurrentAngle();
+            manualTurretAngle = oldTurret.getCurrentAngle();
             manualTurretAngle += stickX * 3;
-            turret.goTo(manualTurretAngle);
+            oldTurret.goTo(manualTurretAngle);
         } else {
             if (goalTag != null) {
                 lastGoalTagTime = getRuntime();
                 double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
-                double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
-                turret.goTo(angle);
-            } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
-                turret.returnHome();
+                double angle = Ballistics.calculateTurretAngle(bearing, oldTurret.getCurrentAngle());
+                oldTurret.goTo(angle);
+            } else if (getRuntime() - lastGoalTagTime > OldTurret.LOST_TAG_RETURN_DELAY) {
+                oldTurret.returnHome();
             }
         }
 
@@ -154,17 +154,17 @@ public class OldMainTeleOp extends OpMode {
 
         intake.update();
         shooter.update();
-        turret.update();
+        oldTurret.update();
 
         // Telemetry
         panelsTelemetry.addData("Intake power", intake.getPower());
         panelsTelemetry.addData("Feeder power", shooter.getFeederPower());
         panelsTelemetry.addData("Flywheel rps", shooter.getFlywheelRPS());
         panelsTelemetry.addData("Flywheel error", shooter.getFlywheelErrorRPS());
-        panelsTelemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
-        panelsTelemetry.addData("Turret angle", turret.getCurrentAngle());
-        panelsTelemetry.addData("Turret error", turret.getErrorAngle());
-        panelsTelemetry.addData("Turret mode", turretManualMode ? "MANUAL" : "AUTO");
+        panelsTelemetry.addData("OldDrivetrain speed", oldDrivetrain.getSpeedMultiplier());
+        panelsTelemetry.addData("OldTurret angle", oldTurret.getCurrentAngle());
+        panelsTelemetry.addData("OldTurret error", oldTurret.getErrorAngle());
+        panelsTelemetry.addData("OldTurret mode", turretManualMode ? "MANUAL" : "AUTO");
         panelsTelemetry.addData("Field Centric", isFieldDriving);
         panelsTelemetry.addData("Use lookups", useFlywheelLookups);
 

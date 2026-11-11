@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.utils.Vector2D;
 /**
  * Handles movement of the 4 mecanum wheels
  */
-public class Drivetrain implements SubsystemBase {
+public class OldDrivetrain implements SubsystemBase {
 
     // /** How many encoder ticks equal one centimeter of physical travel */
     // static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER *
@@ -77,6 +77,14 @@ public class Drivetrain implements SubsystemBase {
 
     }
 
+    public void resetIMU() {
+        imu.initialize(
+                new IMU.Parameters(
+                        new RevHubOrientationOnRobot(
+                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                                RevHubOrientationOnRobot.UsbFacingDirection.DOWN)));
+    }
+
     /**
      * takes in joystick input and applies to all motors thanks Omar and Kiaan
      *
@@ -126,10 +134,6 @@ public class Drivetrain implements SubsystemBase {
         brDrive.setPower(brSpeed);
 
         // TODO find a way to update ExpectedPosition based on the movement of the drive
-    }
-
-    private double deadband(double value) {
-        return Math.abs(value) < STICK_DEADBAND ? 0 : value;
     }
 
     // /** shifts the robot forward in reverse based off direction default is
@@ -187,12 +191,8 @@ public class Drivetrain implements SubsystemBase {
     // blDrive.setPower(power);
     // }
 
-    public void resetIMU() {
-        imu.initialize(
-                new IMU.Parameters(
-                        new RevHubOrientationOnRobot(
-                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                                RevHubOrientationOnRobot.UsbFacingDirection.DOWN)));
+    private double deadband(double value) {
+        return Math.abs(value) < STICK_DEADBAND ? 0 : value;
     }
 
     public double getSpeedMultiplier() {

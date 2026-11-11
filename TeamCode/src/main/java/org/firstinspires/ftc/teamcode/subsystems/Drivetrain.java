@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
-/// Drivetrain class design for movement handling.
+/// OldDrivetrain class design for movement handling.
 /// It controls all four vector wheels + gathers data from odometry.
 ///
 /// ## Functions of value:

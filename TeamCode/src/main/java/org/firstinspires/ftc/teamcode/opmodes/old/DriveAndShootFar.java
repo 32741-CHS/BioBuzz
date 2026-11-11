@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.opmodes.old_opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
-import static org.firstinspires.ftc.teamcode.opmodes.old_opmodes.OldMainTeleOp.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.old.OldMainTeleOp.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,18 +13,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.old.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.old.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.old.OldTurret;
 import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.old.Vision;
+import org.firstinspires.ftc.teamcode.utils.old.OldVision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Disabled
 @Configurable
-@Autonomous(name = "Drive and shoot close", group = "Robot")
-public class DriveAndShootClose extends LinearOpMode {
-    public static final double DRIVE_TIME = 2;
+@Autonomous(name = "Drive and shoot far", group = "Robot")
+public class DriveAndShootFar extends LinearOpMode {
+    public static final double DRIVE_TIME = 1.2;
     public static final double DRIVE_POWER = 0.4;
 
     public static final double SHOOT_TIME = 10;
@@ -32,11 +32,11 @@ public class DriveAndShootClose extends LinearOpMode {
 
     public static final double FLYWHEEL_ERROR_TOL = 100;
     private final ElapsedTime timer = new ElapsedTime();
-    private Drivetrain drivetrain;
+    private OldDrivetrain oldDrivetrain;
     private Shooter shooter;
     private Intake intake;
-    private Vision vision;
-    private Turret turret;
+    private OldVision oldVision;
+    private OldTurret oldTurret;
     private double lastGoalTagTime = 0;
     private RobotHardwareGroup robotHardware;
 
@@ -46,11 +46,11 @@ public class DriveAndShootClose extends LinearOpMode {
         // config.
         robotHardware = new RobotHardwareGroup();
         robotHardware.init(hardwareMap);
-        (drivetrain = new Drivetrain()).init(robotHardware);
+        (oldDrivetrain = new OldDrivetrain()).init(robotHardware);
         (shooter = new Shooter()).init(robotHardware);
         (intake = new Intake()).init(robotHardware);
-        (turret = new Turret()).init(robotHardware);
-        (vision = new Vision()).init(robotHardware);
+        (oldTurret = new OldTurret()).init(robotHardware);
+        (oldVision = new OldVision()).init(robotHardware);
 
         while (opModeInInit()) {
             if (gamepad1.x) {
@@ -70,18 +70,11 @@ public class DriveAndShootClose extends LinearOpMode {
         lastGoalTagTime = getRuntime();
 
         timer.reset();
-        while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-            drivetrain.drive(new Vector2D(-DRIVE_POWER, 0), 0, false);
-        }
-
-        timer.reset();
-        drivetrain.stop();
-
         while (opModeIsActive()
                 && Math.abs(shooter.getFlywheelErrorRPS()) > FLYWHEEL_ERROR_TOL
                 && timer.seconds() <= MAX_SPINUP_TIME) {
             runBallistics();
-            turret.update();
+            oldTurret.update();
             shooter.update();
         }
 
@@ -90,33 +83,30 @@ public class DriveAndShootClose extends LinearOpMode {
             runBallistics();
             shooter.feed();
             intake.eat();
-            turret.update();
+            oldTurret.update();
             shooter.update();
             intake.update();
         }
 
         timer.reset();
+
         while (opModeIsActive() && timer.seconds() <= DRIVE_TIME) {
-            drivetrain.drive(new Vector2D(0, DRIVE_POWER), 0, false);
+            oldDrivetrain.drive(new Vector2D(DRIVE_POWER, 0), 0, false);
         }
-
-        drivetrain.stop();
-
-        timer.reset();
     }
 
     private void runBallistics() {
-        AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
+        AprilTagDetection goalTag = oldVision.getTagById(!isRed ? BLUE_GOAL : RED_GOAL);
         if (goalTag != null) {
             lastGoalTagTime = getRuntime();
             double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
-            double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
-            turret.goTo(angle);
+            double angle = Ballistics.calculateTurretAngle(bearing, oldTurret.getCurrentAngle());
+            oldTurret.goTo(angle);
 
             double distance = goalTag.ftcPose.range;
             Shooter.setDesiredFlywheelRPS(Ballistics.calculateFlywheelRPS(distance));
-        } else if (getRuntime() - lastGoalTagTime > Turret.LOST_TAG_RETURN_DELAY) {
-            turret.returnHome();
+        } else if (getRuntime() - lastGoalTagTime > OldTurret.LOST_TAG_RETURN_DELAY) {
+            oldTurret.returnHome();
         }
     }
 }
