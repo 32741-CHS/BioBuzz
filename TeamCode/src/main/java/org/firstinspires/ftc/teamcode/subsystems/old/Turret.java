@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 
@@ -34,21 +34,12 @@ public class Turret {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public double getCurrentAngle() {
-        int ticks = turret.getCurrentPosition();
-        return ticks / GOBILDA_5203_312RPM * MOTOR_TO_TURRET_RATIO * 360;
-    }
-
-    public double getErrorAngle() {
-        return desiredAngle - getCurrentAngle();
+    public void returnHome() {
+        goTo(0);
     }
 
     public void goTo(double angle) {
         desiredAngle = Range.clip(angle, MIN_ANGLE, MAX_ANGLE);
-    }
-
-    public void returnHome() {
-        goTo(0);
     }
 
     public void resetTurretEncoder() {
@@ -93,5 +84,14 @@ public class Turret {
 
         turret.setPower(power);
         lastPower = power;
+    }
+
+    public double getCurrentAngle() {
+        int ticks = turret.getCurrentPosition();
+        return ticks / GOBILDA_5203_312RPM * MOTOR_TO_TURRET_RATIO * 360;
+    }
+
+    public double getErrorAngle() {
+        return desiredAngle - getCurrentAngle();
     }
 }
