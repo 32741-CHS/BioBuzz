@@ -213,7 +213,10 @@ class ForwardVelocity extends TuningOpMode<Double> {
                 double currentVelocity = Math.abs(localizer.twist().toVector2D().x());
                 velocities.addLast(currentVelocity);
                 velocities.removeFirst();
+                telemetry.addData("currentVelocity", currentVelocity); /// TODO REMOVE THIS LOGGING
             }
+            telemetry.addData("X", localizer.pose().x()); /// TODO REMOVE THIS LOGGING
+            telemetry.addData("distance", distance); /// TODO REMOVE THIS LOGGING
         }
 
         drivetrain.stop();

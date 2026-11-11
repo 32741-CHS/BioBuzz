@@ -49,7 +49,7 @@ public class MainTeleOp extends OpMode {
         allSubsystems.init(robotHardware);
 
         // Key Binds
-        driverGamepad.leftBumper
+        driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
 //        driverGamepad.btnY
@@ -74,7 +74,6 @@ public class MainTeleOp extends OpMode {
 
         panelsTelemetry.addData(
                 "[drivetrain] Heading",
-
                 Math.toDegrees(drivetrain.getHeading())
         );
 

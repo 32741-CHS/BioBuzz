@@ -24,8 +24,8 @@ public class OdometryLogger implements SubsystemBase {
     public void update() {
         pinpoint.update();
         Pose2D pos = pinpoint.getPosition();
-        panelsTelemetry.addData("Odometry (CM) X", pos.getX(DistanceUnit.CM));
-        panelsTelemetry.addData("Odometry (CM) Y", pos.getY(DistanceUnit.CM));
+        panelsTelemetry.addData("Odometry (CM) X", pos.getX(DistanceUnit.INCH));
+        panelsTelemetry.addData("Odometry (CM) Y", pos.getY(DistanceUnit.INCH));
         panelsTelemetry.addData("Odometry (DEGREES) Heading", pos.getHeading(AngleUnit.DEGREES));
     }
 }
