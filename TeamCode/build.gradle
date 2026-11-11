@@ -1,6 +1,6 @@
-//
 apply plugin: 'com.android.application'
 
+//
 // build.gradle in TeamCode
 //
 // Most of the definitions for building your module reside in a common, shared
@@ -29,7 +29,4 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
-    implementation 'com.bylazar:fullpanels:1.0.0'
-    implementation 'com.bylazar:camerastream:1.0.0'
-    implementation 'com.pedropathing:ftc:2.1.2'
-    implementation 'com.pedropathing:telemetry:1.0.0'}
+}

@@ -43,11 +43,6 @@ captures/
 *.iml
 .idea/
 
-# Eclipse
-.settings/
-.classpath
-.project
-
 # For Mac users
 .DS_Store
 
