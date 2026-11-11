@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import android.graphics.Color;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardware;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroups;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.teamcode.utils.PixelProcessor;
