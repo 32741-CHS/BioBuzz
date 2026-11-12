@@ -35,9 +35,9 @@ public class Flywheel implements SubsystemBase {
 	private DcMotorEx flywheel;
 	private GoalTracker goal;
 	private Drivetrain drivetrain;
-	private static double CameraDisplacementX = 0.2;
-	private static double CameraHeight = 0.2;
-	private static double HeightFromAprilTag = 1;
+	private static double CameraDisplacementX = 0.2; // made up number, change when cam added
+	private static double CameraHeight = 0.2; // made up number, change when cam added
+	private static double HeightFromAprilTag = 1; // tweak if not good
 
 	public Flywheel(GoalTracker goal, Drivetrain dt) {
 		this.goal = goal;
