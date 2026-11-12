@@ -84,6 +84,9 @@ public class MainTeleOp extends OpMode {
     @Override
     public void loop() {
         allSubsystems.update();
+        feeder.tryRun();
+        intake.run();
+
 
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());

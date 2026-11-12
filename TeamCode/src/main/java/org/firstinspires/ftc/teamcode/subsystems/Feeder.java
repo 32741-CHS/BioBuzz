@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FEEDER_POWER;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -31,6 +32,8 @@ public class Feeder implements SubsystemBase {
 
     @Override
     public void update() {
+        panelsTelemetry.addData("Feeder Power", reverseMode ? -FEEDER_POWER : FEEDER_POWER);
+        panelsTelemetry.addData("Flywheel ready to feed?", flywheel.isReadyForFeed());
     }
 
     public void tryRun() {
