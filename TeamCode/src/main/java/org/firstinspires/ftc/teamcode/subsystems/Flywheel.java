@@ -55,25 +55,12 @@ public class Flywheel implements SubsystemBase {
 		return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
 	}
 
-<<<<<<< HEAD
-    public void runFlywheel(){}
+	public void runFlywheel() {
+	}
 
-    public double getFlywheelRPS() {
-        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
-    }
-
-    public double getFlywheelErrorRPS() {
-        return getFlywheelRPS() - desiredFlywheelRPS;
-    }
-
-    public boolean isReadyForFeed() {
-        return Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
-    }
-=======
 	public double getFlywheelErrorRPS() {
 		return getFlywheelRPS() - desiredFlywheelRPS;
 	}
->>>>>>> ae3028fefb40ebbea429762b6db38d10b5efe9dd
 
 	public boolean isReadyForFeed() {
 		return Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
