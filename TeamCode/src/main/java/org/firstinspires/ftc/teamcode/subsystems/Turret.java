@@ -12,13 +12,25 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 import java.lang.Math;
+import java.lang.System;
 
 @Configurable
-public class TemplateSubsystem implements SubsystemBase {
+public class Turret implements SubsystemBase {
+	private Drivetrain drivetrain;
 	private static Follower follower;
 	private static volatile double CurrentRotation = 0;
 	private static volatile Vector2D CurrentGoalPosition = null;
-	private DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
+	private DcMotor flDrive, frDrive, blDrive, brDrive;
+
+	private double lastError = 0;
+	private long lastTimeNs = System.nanoTime();
+
+	// Config
+	public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
+
+	public Turret(Drivetrain dt) {
+		this.drivetrain = dt;
+	}
 
 	public static void changeRotation(double rotation) {
 		CurrentRotation = rotation;
@@ -41,10 +53,39 @@ public class TemplateSubsystem implements SubsystemBase {
 	@Override
 	public void init(RobotHardwareGroup robotHardware) {
 		flDrive = robotHardware.flDrive;
-
+		frDrive = robotHardware.frDrive;
+		blDrive = robotHardware.blDrive;
+		brDrive = robotHardware.brDrive;
 	}
 
 	@Override
 	public void update() {
+		if (follower == null || CurrentGoalPosition == null) {
+			return;
+		}
+
+		Pose currpose = follower.getPose();
+		CurrentRotation = currpose.getHeading();
+
+		double dx = CurrentGoalPosition.x - currpose.getX();
+		double dy = CurrentGoalPosition.y - currpose.getY();
+		double targetHeading = Math.atan2(dy, dx);
+
+		double error = normalizeAngle(targetHeading - CurrentRotation);
+
+		double turnPower = calcTurnPower(error);
+		drivetrain.turnInput(turnPower);
+	}
+
+	private double calcTurnPower(double err) {
+
+	}
+
+	private double normalizeAngle(double angle) {
+		while (angle > Math.PI)
+			angle -= 2.0 * Math.PI;
+		while (angle < -Math.PI)
+			angle += 2.0 * Math.PI;
+		return angle;
 	}
 }
