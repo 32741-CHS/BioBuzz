@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.configs.pedro.procedures.ForesightTuner;
 import org.firstinspires.ftc.teamcode.configs.pedro.procedures.MecanumTuner;
 import org.firstinspires.ftc.teamcode.configs.pedro.procedures.PinpointTuner;
 import org.firstinspires.ftc.teamcode.configs.pedro.procedures.Tests;
+import org.firstinspires.ftc.teamcode.configs.pedro.procedures.TwoWheelTuner;
 
 public class Tuning {
     // Tuners go here
@@ -27,13 +28,15 @@ public class Tuning {
     }
 
     /// UnComment when the constants file is set up.
-//    @Tuner
-//    public static Procedure tests() {
-//        return new Tests(hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig), (hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig)), () -> new Foresight(Constants.foresightConfig));
-//    }
+
     @Tuner
     public static Procedure foresightTuner() {
         return new ForesightTuner((hardwareMap) -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig), (hardwareMap) -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
+    }
+
+    @Tuner
+    public static Procedure twoWheelTuner() {
+        return new TwoWheelTuner();
     }
 
     @Tuner
