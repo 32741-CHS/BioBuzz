@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
 import static org.firstinspires.ftc.teamcode.configs.Globals.TRIGGER_THRESHOLD;
 
 import com.bylazar.gamepad.GamepadManager;
@@ -34,6 +35,10 @@ public class GamepadWrapper implements SubsystemBase {
     public final GamepadTriggerWrapper
             leftTrigger = new GamepadTriggerWrapper(),
             rightTrigger = new GamepadTriggerWrapper();
+
+    public final GamepadStickWrapper
+            leftStick = new GamepadStickWrapper(),
+            rightStick = new GamepadStickWrapper();
 
     private final GamepadManager panelsGamepadManager;
     private final Gamepad hardwareGamepad;
@@ -81,6 +86,8 @@ public class GamepadWrapper implements SubsystemBase {
         dpadRight.update(raw.dpad_right);
         leftTrigger.update(raw.left_trigger);
         rightTrigger.update(raw.right_trigger);
+        leftStick.update(raw.left_stick_x, raw.left_stick_y);
+        rightStick.update(raw.right_stick_x, raw.right_stick_y);
     }
 
     public static class GamepadButtonWrapper {
@@ -215,4 +222,77 @@ public class GamepadWrapper implements SubsystemBase {
             }
         }
     }
+
+
+    public static class GamepadStickWrapper {
+
+        private final Binder callbackBinds = new Binder();
+        private float x = 0;
+        private float y = 0;
+        private boolean currentState = false;
+        private boolean prevState = false;
+
+        public GamepadStickWrapper onMove(Runnable callback) {
+            callbackBinds.bind("WAS_MOVED", callback);
+            return this;
+        }
+
+        public GamepadStickWrapper onRelease(Runnable callback) {
+            callbackBinds.bind("WAS_RELEASED", callback);
+            return this;
+        }
+
+        public GamepadStickWrapper whenMoved(Runnable callback) {
+            callbackBinds.bind("IS_MOVED", callback);
+            return this;
+        }
+
+        public GamepadStickWrapper whenNotMoved(Runnable callback) {
+            callbackBinds.bind("IS_NOT_MOVED", callback);
+            return this;
+        }
+
+        public void update(float x, float y) {
+            this.x = x;
+            this.y = y;
+
+            prevState = currentState;
+            currentState = getMagnitude() > STICK_DEADBAND;
+
+            if (wasMoved()) callbackBinds.call("WAS_MOVED");
+            if (wasReleased()) callbackBinds.call("WAS_RELEASED");
+
+            if (isMoved()) callbackBinds.call("IS_MOVED");
+            else callbackBinds.call("IS_NOT_MOVED");
+        }
+
+        public float getMagnitude() {
+            return (float) Math.sqrt(x * x + y * y);
+        }
+
+        public boolean wasMoved() {
+            return currentState && !prevState;
+        }
+
+        public boolean wasReleased() {
+            return !currentState && prevState;
+        }
+
+        public boolean isMoved() {
+            return currentState;
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public float getAngle() {
+            return (float) Math.atan2(y, x);
+        }
+    }
+
 }
