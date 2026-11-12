@@ -60,33 +60,30 @@ public class MainTeleOp extends OpMode {
         allSubsystems.init(robotHardware);
 
         // Key Binds
-        driverGamepad.leftTrigger
+        driverGamepad.leftTrigger /// Robot Speed
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
 //        driverGamepad.btnY
 //                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
-        shooterGamepad.leftTrigger
-                .onPress(intake::run)
-                .onRelease(intake::stopRunning);
+        shooterGamepad.leftTrigger /// Intake
+                .whenHeld(intake::tryRunMotorIfReady)
+                .onRelease(intake::stopMotor);
 
-        shooterGamepad.btnA
-                .onPress(intake::reverse)
-                .onPress(feeder::reverse)
-                .onRelease(intake::unReverse)
-                .onRelease(feeder::unReverse);
+        shooterGamepad.btnA /// Reverse ALL
+                .onPress(intake::reverseMode)
+                .onPress(feeder::reverseMode)
+                .onRelease(intake::deactivateReverseMode)
+                .onRelease(feeder::deactivateReverseMode);
 
-        shooterGamepad.rightTrigger
-                .whenHeld(feeder::tryRun)
-                .onRelease(feeder::stopRunning);
+        shooterGamepad.rightTrigger /// Feed Ball (Shoot)
+                .whenHeld(feeder::tryRunMotorIfReady)
+                .onRelease(feeder::stopMotor);
     }
 
     @Override
     public void loop() {
         allSubsystems.update();
-        feeder.tryRun();
-        intake.run();
-
 
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
