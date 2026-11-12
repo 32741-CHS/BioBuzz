@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.PID_And_KalmanFilter;
+import org.firstinspires.ftc.teamcode.utils.PID_and_KalmanFilter;
 
 import java.lang.Math;
 import java.lang.System;
@@ -18,7 +18,7 @@ import java.lang.System;
 @Configurable
 public class Turret implements SubsystemBase {
 	private Drivetrain drivetrain;
-	private PID_And_KalmanFilter pid = PID_And_KalmanFilter();
+	private PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
 	private static Follower follower;
 	private static volatile double CurrentRotation = 0;
 	private static volatile Vector2D CurrentGoalPosition = null;
