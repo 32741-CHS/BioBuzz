@@ -22,10 +22,6 @@ public class Turret implements SubsystemBase {
 	private static Follower follower;
 	private static volatile double CurrentRotation = 0;
 	private static volatile Vector2D CurrentGoalPosition = null;
-	private DcMotor flDrive, frDrive, blDrive, brDrive;
-
-	private double lastError = 0;
-	private long lastTimeNs = System.nanoTime();
 
 	// Config
 	public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
@@ -58,10 +54,7 @@ public class Turret implements SubsystemBase {
 
 	@Override
 	public void init(RobotHardwareGroup robotHardware) {
-		flDrive = robotHardware.flDrive;
-		frDrive = robotHardware.frDrive;
-		blDrive = robotHardware.blDrive;
-		brDrive = robotHardware.brDrive;
+
 	}
 
 	@Override
