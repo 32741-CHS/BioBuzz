@@ -6,8 +6,7 @@ import com.bylazar.configurables.annotations.Configurable;
 public class Ballistics {
     public static final DataInterpolation speedToDistanceLookUp =
             new DataInterpolation(
-                    new double[][]{
-                            {0.71, 37.0},
+                    new double[][]{{0.71, 37.0},
                             {1.4, 43.5},
                             {1.85, 52.5},
                             {2.85, 64.5},

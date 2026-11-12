@@ -2,8 +2,7 @@ package org.firstinspires.ftc.teamcode.configs;
 
 // ONLY CONSTANTS!! Avoid NonConstants as they are a bit dangerous as we need to wipe them before every match
 
-import com.bylazar.graph.GraphManager;
-import com.bylazar.graph.PanelsGraph;
+
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
@@ -39,7 +38,6 @@ public class Globals {
     public static final double FEEDER_POWER = 0.7;
     // Panels
     public static TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    public static GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     public static boolean fieldCentricDriving = false;
 
     // Ball colors & Detection

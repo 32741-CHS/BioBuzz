@@ -86,7 +86,7 @@ public final class Camera {
         None
     }
 
-    public static class PixelProcessor implements VisionProcessor {
+    private static class PixelProcessor implements VisionProcessor {
         private volatile Vector2D Coordinates = new Vector2D(0.5, 0.5);
         private volatile int lastColor = Color.BLACK;
         private volatile boolean processedFrame = false;

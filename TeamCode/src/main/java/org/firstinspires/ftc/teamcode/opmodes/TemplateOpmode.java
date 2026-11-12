@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.fieldCentricDriving
 
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
+@Disabled
 @TeleOp(name = "BioBuzz TeleOp")
 public class TemplateOpmode extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();

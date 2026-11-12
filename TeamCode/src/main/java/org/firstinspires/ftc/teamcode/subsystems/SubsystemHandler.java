@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.instant;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 
+import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
@@ -31,7 +31,7 @@ public class SubsystemHandler implements SubsystemBase {
     public void update() {
         Scheduler.execute();
         forEverySubsystem(SubsystemBase::update);
-        panelsGraph.update();
+        Globals.panelsTelemetry.update();
         panelsTelemetry.update();
     }
 

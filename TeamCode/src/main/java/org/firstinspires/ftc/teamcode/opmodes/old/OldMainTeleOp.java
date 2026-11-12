@@ -3,11 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.old;
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
-import com.bylazar.graph.GraphManager;
-import com.bylazar.graph.PanelsGraph;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -30,8 +27,6 @@ import java.util.Locale;
 public class OldMainTeleOp extends OpMode {
     public static boolean isRed = false;
     public static boolean useFlywheelLookups = true;
-    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private GamepadWrapper driverGamepad;
     private GamepadWrapper operatorGamepad;
     private OldDrivetrain oldDrivetrain;
@@ -182,13 +177,13 @@ public class OldMainTeleOp extends OpMode {
         }
 
         // panels graph feed
-        panelsGraph.addData("flywheelRPS", oldShooter.getFlywheelRPS());
-        panelsGraph.addData("flywheelTarget", OldShooter.desiredFlywheelRPS);
-        panelsGraph.addData("flywheelError", oldShooter.getFlywheelErrorRPS());
-        panelsGraph.addData("feederPower", oldShooter.getFeederPower());
-        panelsGraph.addData("intakePower", oldIntake.getPower());
+        panelsTelemetry.addData("flywheelRPS", oldShooter.getFlywheelRPS());
+        panelsTelemetry.addData("flywheelTarget", OldShooter.desiredFlywheelRPS);
+        panelsTelemetry.addData("flywheelError", oldShooter.getFlywheelErrorRPS());
+        panelsTelemetry.addData("feederPower", oldShooter.getFeederPower());
+        panelsTelemetry.addData("intakePower", oldIntake.getPower());
 
-        panelsGraph.update();
+        panelsTelemetry.update();
         panelsTelemetry.update(telemetry);
     }
 }
