@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
+import org.firstinspires.ftc.teamcode.subsystems.GoalTracker;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
@@ -29,6 +30,7 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
+    private GoalTracker goaltracker;
 
     @Override
     public void init() {
@@ -36,7 +38,7 @@ public class MainTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
-        flywheel = new Flywheel();
+        goaltracker = new GoalTracker();
         feeder = new Feeder(flywheel);
         intake = new Intake();
         pinpointLogger = new OdometryLogger();
@@ -44,6 +46,7 @@ public class MainTeleOp extends OpMode {
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
+        flywheel = new Flywheel(goaltracker, drivetrain);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(

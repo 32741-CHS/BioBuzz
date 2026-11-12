@@ -1,7 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.AerodynamicDrag;
+import static org.firstinspires.ftc.teamcode.configs.Globals.BallGeneralMass;
+import static org.firstinspires.ftc.teamcode.configs.Globals.DecaySpin;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FlywheelDiameter;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.Gravity;
+import static org.firstinspires.ftc.teamcode.configs.Globals.InitialCamHeight;
+import static org.firstinspires.ftc.teamcode.configs.Globals.RotationalDirection;
+import static org.firstinspires.ftc.teamcode.configs.Globals.ShootingAngle;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
+import static org.firstinspires.ftc.teamcode.configs.Globals.TimeInterval;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,78 +23,124 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
-import org.firstinspires.ftc.teamcode.utils.PID_and_KalmanFilter;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
-public class Flywheel implements SubsystemBase, MotorBasicActions {
-    public static double desiredFlywheelRPS = 13;
-    public static boolean canSpinFlywheel = true;
-    private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
-    private DcMotorEx flywheel;
-    private boolean reverseMode;
+public class Flywheel implements SubsystemBase {
+	public static double desiredFlywheelRPS = 13;
+	public static double maximumFlywheelRPM = 6000;
+	public static double minimumFlywheelRPM = 0;
+	public static boolean useDynamicSpeed = true;
+	public static boolean canSpinFlywheel = false;
+	private DcMotorEx flywheel;
+	private GoalTracker goal;
+	private Drivetrain drivetrain;
+	private static double CameraDisplacementX = 0.2;
+	private static double CameraHeight = 0.2;
+	private static double HeightFromAprilTag = 1;
 
-    public Flywheel() {
-    }
+	public Flywheel(GoalTracker goal, Drivetrain dt) {
+		this.goal = goal;
+		this.drivetrain = dt;
+	}
 
-    public static void setDesiredFlywheelRPS(double rps) {
-        desiredFlywheelRPS = rps;
-    }
+	private void UpdateDynamicRPS() {
+		double distance = goal.getDistance();
+		double zRadians = goal.getZRadians();
 
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        flywheel = robotHardware.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
+		double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
+		double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
 
-    @Override
-    public void update() {
-        // apply PIDF every frame so @Configurable changes work
-        flywheel.setPIDFCoefficients(
-                DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
+		double initialVelocity = desiredFlywheelRPS * Math.PI * FlywheelDiameter / 60;
+		double initialVelocityX = Math.cos(ShootingAngle) * initialVelocity;
+		double initialVelocityY = Math.sin(ShootingAngle) * initialVelocity;
 
-        flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
+		double velocityInVacuum =
+				Math.sqrt(Gravity * Math.sqrt(verticalDistance - InitialCamHeight) / (2 * Math.pow(Math.cos(ShootingAngle), 2)) * InitialCamHeight + verticalDistance * Math.tan(ShootingAngle) - horizontalDistance);
 
-        panelsGraph.addData("Flywheel Vel", canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
-        panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
-        panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
-    }
+		double flywheelRadius = FlywheelDiameter / 2;
+		double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
+		BallRPM = maximumFlywheelRPM;
+		Vx = initialVelocityX;
+		Vy = initialVelocityY;
+		Px = CameraDisplacementX;
+		Py = InitialCamHeight;
 
-    private double getFlywheelRPS() {
-        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
-    }
+		double desiredRPS = (velocityInVacuum * 60) / (2 * Math.PI * flywheelRadius) * 60;
 
-    /// Just to for MotorPID tuning
-    private double getFlywheelErrorRPS() {
-        return getFlywheelRPS() - desiredFlywheelRPS;
-    }
+		double currTime = 0;
+		boolean simulationComplete = false;
+		while (simulationComplete) {
+			Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
+			Geff = Gravity + RotationalDirection * BallGeneralMass * Math.pow(velocityInVacuum, 2) * (verticalDistance - InitialCamHeight) / Spin;
+			BallRPM = BallRPM * Math.pow(Math.E, DecaySpin) * currTime;
+			Vx = Vx - AerodynamicDrag * TimeInterval;
+			Vy = Vy - AerodynamicDrag * Geff * TimeInterval;
+			Px = Px + Vx * TimeInterval;
+			Py = Py + Vy * TimeInterval;
 
-    public boolean isReadyForFeed() {
-        return true;//Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
-    }
+			if (Px >= horizontalDistance) {
+				panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+				break;
+			};
 
-    public void tryRunMotorIfReady() {
-        desiredFlywheelRPS = calcRPS();
-    }
+			if (currTime > SimulationTimeout) {
+				simulationComplete = true;
+				if (!(Px >= horizontalDistance)) {
+					panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
+					panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
+					desiredRPS += desiredRPS / 100 * 5;
+				};
+				break;
+			};
+			currTime += TimeInterval;
+		}
 
-    public double calcRPS() {
-        return 300;
-    }
+		desiredFlywheelRPS = desiredRPS;
+	};
 
-    public void stopMotor() {
-        desiredFlywheelRPS = 0;
-    }
+	public static void setDesiredFlywheelRPS(double rps) {
+		desiredFlywheelRPS = rps;
+	}
 
-    public void reverseMode() {
-        reverseMode = true;
-    }
+	@Override
+	public void init(RobotHardwareGroup robotHardware) {
+		flywheel = robotHardware.flywheel;
+		flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+		flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+	}
 
-    public void deactivateReverseMode() {
-        reverseMode = false;
-    }
+	@Override
+	public void update() {
+		if (useDynamicSpeed) UpdateDynamicRPS();
+
+		// apply PIDF every frame so @Configurable changes work
+		flywheel.setPIDFCoefficients(
+				DcMotor.RunMode.RUN_USING_ENCODER,
+				new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
+
+		flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
+
+		panelsGraph.addData("Flywheel Vel", canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
+		panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
+		panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
+	}
+
+	public double getFlywheelRPS() {
+		return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
+	}
+
+	public void runFlywheel() {
+
+	}
+
+	public double getFlywheelErrorRPS() {
+		return getFlywheelRPS() - desiredFlywheelRPS;
+	}
+
+	public boolean isReadyForFeed() {
+		return Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
+	}
 
 }

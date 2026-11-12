@@ -50,4 +50,19 @@ public class Globals {
         Blue
     }
 
+    // Flywheel constants
+    public static final double Gravity = 9.8;
+    private static final double DragCoefficient = 0.4;
+    public static final double DecaySpin = 0.223; // Guessed, tweak it ig
+    public static final double AerodynamicDrag = 0.00005320098663;
+    public static final double AirPressure = 1.225;
+    public static final double SlipagePercentage = 0.1;
+    public static final double MagnusEffect = 0.019;
+    public static final double TimeInterval = 0.01;
+    public static final double SimulationTimeout = 1;
+    public static final double RotationalDirection = -1;
+    public static final double FlywheelDiameter = 0.096;
+    public static final double BallGeneralMass = 0.03; // should change for nectar / pollen
+    public static final double ShootingAngle = 65;
+    public static final double InitialCamHeight = 0.3; // Temporary made up number
 }
