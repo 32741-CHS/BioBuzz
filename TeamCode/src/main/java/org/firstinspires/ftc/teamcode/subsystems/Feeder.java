@@ -8,20 +8,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
-public class Feeder implements SubsystemBase {
-
+public class Feeder implements SubsystemBase, MotorBasicActions {
     private final Flywheel flywheel;
+    private double desiredPower = 0;
     private boolean reverseMode = false;
     private DcMotor feeder;
 
     public Feeder(Flywheel flywheel) {
         this.flywheel = flywheel;
-
     }
-
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
@@ -32,23 +31,24 @@ public class Feeder implements SubsystemBase {
 
     @Override
     public void update() {
+        feeder.setPower(desiredPower);
         panelsTelemetry.addData("Feeder Power", reverseMode ? -FEEDER_POWER : FEEDER_POWER);
         panelsTelemetry.addData("Flywheel ready to feed?", flywheel.isReadyForFeed());
     }
 
-    public void tryRun() {
-        if (flywheel.isReadyForFeed()) feeder.setPower(reverseMode ? -FEEDER_POWER : FEEDER_POWER);
+    public void tryRunMotorIfReady() {
+        if (flywheel.isReadyForFeed()) desiredPower = reverseMode ? -FEEDER_POWER : FEEDER_POWER;
     }
 
-    public void stopRunning() {
-        feeder.setPower(0);
+    public void stopMotor() {
+        desiredPower = 0;
     }
 
-    public void reverse() {
+    public void reverseMode() {
         reverseMode = true;
     }
 
-    public void unReverse() {
+    public void deactivateReverseMode() {
         reverseMode = false;
     }
 
