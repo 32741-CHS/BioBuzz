@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous.ga;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 public class PIDTestResult {
 

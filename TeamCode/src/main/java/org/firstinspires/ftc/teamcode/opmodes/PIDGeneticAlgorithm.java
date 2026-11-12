@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Genetic algorithm used to tune PID gains.
- *
- * Each chromosome contains:
- * [kP, kI, kD]
- */
+/** Genetic algorithm used to tune PID gains. Each chromosome contains: [kP, kI, kD]*/
 public class PIDGeneticAlgorithm {
 
     public interface FitnessFunction {

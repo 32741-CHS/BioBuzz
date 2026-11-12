@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.autonomous.ga.PIDTestResult;
+import org.firstinspires.ftc.teamcode.opmodes.PIDTestResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class PIDGeneticTunerOpMode extends LinearOpMode {
             0.050   // kD
     };
 
-    private final List<org.firstinspires.ftc.teamcode.autonomous.ga.PIDTestResult> testResults = new ArrayList<>();
+    private final List<org.firstinspires.ftc.teamcode.opmodes.PIDTestResult> testResults = new ArrayList<>();
 
     @Override
     public void runOpMode() {
@@ -80,7 +80,7 @@ public class PIDGeneticTunerOpMode extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            org.firstinspires.ftc.teamcode.autonomous.ga.PIDTestResult result = runPIDTest(kP, kI, kD);
+            org.firstinspires.ftc.teamcode.opmodes.PIDTestResult result = runPIDTest(kP, kI, kD);
 
             testResults.add(result);
 
