@@ -49,6 +49,8 @@ public class Flywheel implements SubsystemBase {
         panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }
 
+    public void runFlywheel(){}
+
     public double getFlywheelRPS() {
         return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
     }

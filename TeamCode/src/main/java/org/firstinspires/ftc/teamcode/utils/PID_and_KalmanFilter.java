@@ -13,12 +13,12 @@ public class PID_and_KalmanFilter {
     private double Py = 1.00;     // Y Error covariance
 
     // PID_system
-    private final ElapsedTime timerX = new ElapsedTime();
+    private final ElapsedTime timerA = new ElapsedTime();
     private final ElapsedTime timerY = new ElapsedTime();
     //x
-    private double preTimeX = 0;
-    private double prevErrorX = 0;
-    private double cumErrorX = 0;
+    private double preTimeA= 0;
+    private double prevErrorA= 0;
+    private double cumErrorA = 0;
     //y
     private double preTimeY = 0;
     private double prevErrorY = 0;
@@ -71,31 +71,31 @@ public class PID_and_KalmanFilter {
         return Uhaty;
     }
 
-    public float PIDX(float realVal, float setpoint) {
-        double currentTime = timerX.seconds();
-        double elapsedTime = currentTime - preTimeX;
+    public float PIDA(float realVal, float setpoint) {
+        double currentTime = timerA.seconds();
+        double elapsedTime = currentTime - preTimeA;
 
         // Run calculation only if enough time has passed to prevent divide by zero or jitter this just makes it smoother
         if (elapsedTime >= 0.01) {
             double error = setpoint - realVal;
-            cumErrorX += error * elapsedTime;
-            double rateError = (error - prevErrorX) / elapsedTime;
+            cumErrorA += error * elapsedTime;
+            double rateError = (error - prevErrorA) / elapsedTime;
 
-            cumErrorX = Range.clip(cumErrorX, -1000, 1000);
-            double output = (Kp * error) + (Ki * cumErrorX) + (Kd * rateError);
+            cumErrorA = Range.clip(cumErrorA, -1000, 1000);
+            double output = (Kp * error) + (Ki * cumErrorA) + (Kd * rateError);
 
             // Clip to motor powers (-1.0 to 1.0) can change the range if you want
             output = Range.clip(output, -1.0, 1.0);
 
             // Save states for next loop cycle of these values
-            prevErrorX = error;
-            preTimeX = currentTime;
+            prevErrorA = error;
+            preTimeA = currentTime;
 
             return (float) output;
         }
 
         // Return previous cached calculation if called too quickly to avoid dead zones of no value
-        return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorX), -1.0, 1.0);
+        return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorA), -1.0, 1.0);
     }
 
     public float PIDY(float realVal, float setpoint) {
