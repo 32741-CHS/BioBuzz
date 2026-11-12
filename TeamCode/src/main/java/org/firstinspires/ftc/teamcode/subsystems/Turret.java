@@ -49,7 +49,7 @@ public class Turret implements SubsystemBase {
 	}
 
 	private double calcTurnPower(double target) {
-		return pid.PIDA(CurrentRotation, target);
+		return pid.PIDangle(CurrentRotation, target);
 	}
 
 	@Override
