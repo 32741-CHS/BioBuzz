@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.PID_And_KalmanFilter;
 
 import java.lang.Math;
 import java.lang.System;
@@ -17,6 +18,7 @@ import java.lang.System;
 @Configurable
 public class Turret implements SubsystemBase {
 	private Drivetrain drivetrain;
+	private PID_And_KalmanFilter pid = PID_And_KalmanFilter();
 	private static Follower follower;
 	private static volatile double CurrentRotation = 0;
 	private static volatile Vector2D CurrentGoalPosition = null;
@@ -50,6 +52,10 @@ public class Turret implements SubsystemBase {
 		CurrentGoalPosition = vec;
 	}
 
+	private double calcTurnPower(double target) {
+		return pid.PIDA(CurrentRotation, target);
+	}
+
 	@Override
 	public void init(RobotHardwareGroup robotHardware) {
 		flDrive = robotHardware.flDrive;
@@ -71,21 +77,8 @@ public class Turret implements SubsystemBase {
 		double dy = CurrentGoalPosition.y - currpose.getY();
 		double targetHeading = Math.atan2(dy, dx);
 
-		double error = normalizeAngle(targetHeading - CurrentRotation);
-
-		double turnPower = calcTurnPower(error);
+		double turnPower = calcTurnPower(target);
 		drivetrain.turnInput(turnPower);
 	}
 
-	private double calcTurnPower(double err) {
-
-	}
-
-	private double normalizeAngle(double angle) {
-		while (angle > Math.PI)
-			angle -= 2.0 * Math.PI;
-		while (angle < -Math.PI)
-			angle += 2.0 * Math.PI;
-		return angle;
-	}
 }
