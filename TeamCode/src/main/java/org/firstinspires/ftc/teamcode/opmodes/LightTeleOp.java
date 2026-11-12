@@ -55,7 +55,11 @@ public class LightTeleOp extends OpMode {
                 .onPress(() -> robotHardware.intake.setPower(-1))
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
+        shooterGamepad.leftBumper
+                .whenHeld(() -> robotHardware.servo.setPosition(Math.max(robotHardware.servo.getPosition() - 0.01, 0)));
 
+        shooterGamepad.rightBumper
+                .whenHeld(() -> robotHardware.servo.setPosition(Math.min(robotHardware.servo.getPosition() + 0.01, 1)));
     }
 
     @Override

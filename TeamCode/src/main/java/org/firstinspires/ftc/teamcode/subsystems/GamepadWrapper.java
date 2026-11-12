@@ -86,8 +86,8 @@ public class GamepadWrapper implements SubsystemBase {
         dpadRight.update(raw.dpad_right);
         leftTrigger.update(raw.left_trigger);
         rightTrigger.update(raw.right_trigger);
-        leftStick.update(raw.left_stick_x, raw.left_stick_y);
-        rightStick.update(raw.right_stick_x, raw.right_stick_y);
+        leftStick.update(-raw.left_stick_x, -raw.left_stick_y); // FTC is inverted, so we revert it
+        rightStick.update(-raw.right_stick_x, -raw.right_stick_y);
     }
 
     public static class GamepadButtonWrapper {
