@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.configs;
 // ONLY CONSTANTS!! Avoid NonConstants as they are a bit dangerous as we need to wipe them before every match
 
 
+import com.bylazar.graph.GraphManager;
+import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
@@ -27,17 +29,19 @@ public class Globals {
     public static final int MAX_FPS = 15;
 
     // OldShooter
-    public static final double FLYWHEEL_ERROR_TOL = 1.0;
-    public static final double TRIGGER_THRESHOLD = 0.5;
-    public static final double PollenThreshold = 0.7;
-    public static final double NectarThreshold = 0.7;
+    public static final double
+            FLYWHEEL_ERROR_TOL = 1.0,
+            TRIGGER_THRESHOLD = 0.5,
+            PollenThreshold = 0.7,
+            flywheelKP = 16.5,
+            flywheelKF = 13.5,
+            NectarThreshold = 0.7;
     public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
-    public static final double flywheelKP = 16.5;
-    public static final double flywheelKF = 13.5;
     // FEEDER
     public static final double FEEDER_POWER = 0.7;
     // Panels
-    public static TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    public static final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    public static final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     public static boolean fieldCentricDriving = false;
 
     // Ball colors & Detection
