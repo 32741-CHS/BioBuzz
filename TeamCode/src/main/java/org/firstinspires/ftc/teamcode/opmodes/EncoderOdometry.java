@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "EncoderOdometry Logger")
+@Autonomous(name = "EncoderOdometry Logger", group = "Tests")
 public class EncoderOdometry extends OpMode {
     private DcMotor xMotor, yMotor;
 

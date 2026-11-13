@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
 @Disabled
-@TeleOp(name = "TemplateOpmode")
+@TeleOp(name = "TemplateOpmode", group = "Tests")
 public class TemplateOpmode extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.

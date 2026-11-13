@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.pedropathing.api.Paths.*;
 import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "GenericTestOpMode", group = "Robot")
+@Autonomous(name = "GenericTestOpMode", group = "Tests")
 public class GenericTestOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();

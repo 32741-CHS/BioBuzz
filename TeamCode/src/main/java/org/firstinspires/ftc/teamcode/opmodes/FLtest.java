@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp(name = "FLtest")
+@TeleOp(name = "FLtest", group = "Tests")
 public class FLtest extends OpMode {
     private DcMotor motor;
 

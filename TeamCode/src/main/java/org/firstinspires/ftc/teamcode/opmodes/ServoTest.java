@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "ServoTest")
+@TeleOp(name = "ServoTest", group = "Tests")
 public class ServoTest extends OpMode {
     private Servo servo;
     private DcMotor motor;

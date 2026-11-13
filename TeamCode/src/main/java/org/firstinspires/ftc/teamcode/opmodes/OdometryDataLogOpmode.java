@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-@Autonomous(name = "Odometry", group = "Auto")
+@Autonomous(name = "Odometry", group = "Tests")
 public class OdometryDataLogOpmode extends LinearOpMode {
 
     private final DcMotor motor = null;
