@@ -19,18 +19,17 @@ public class Constants {
         c.xPodName.set("frDrive");
         c.yPodName.set("flDrive");
         c.imuName.set("imu");
-        c.xPodOffset.set(-1.31825255373095);
-        c.yPodOffset.set(-5.9822952451323275);
-        c.forwardTicksToInches.set(1.7682112675608357);
-        c.strafeTicksToInches.set(0.002141540966247379);
-        c.xPodDirection.set(Encoder.REVERSE);
-        c.yPodDirection.set(Encoder.FORWARD);
+        c.xPodOffset.set(1.699039449722557);
+        c.yPodOffset.set(11.452578902524735);
+        c.forwardTicksToInches.set(23.02115724178473);
+        c.strafeTicksToInches.set(0.0021213702775474907);
+        c.xPodDirection.set(Encoder.FORWARD);
+        c.yPodDirection.set(Encoder.REVERSE);
         c.imu.set(new RevHubIMU(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         )));
     });
-
     public static MecanumConfig drivetrainConfig = new MecanumConfig(c -> {
         c.frontLeftName.set("flDrive");
         c.frontRightName.set("frDrive");
