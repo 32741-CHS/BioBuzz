@@ -63,12 +63,16 @@ public class Turret implements SubsystemBase {
         double targetHeading = Math.atan2(dy, dx);
 
         double turnPower = calcTurnPower(targetHeading);
-        panelsTelemetry.addData("Turret Turn Power", turnPower);
         drivetrain.turnInput(turnPower);
     }
 
     private double calcTurnPower(double target) {
-        return pid.PIDangle((float) CurrentRotation, (float) target);
+        // get anglewrapping to prevent 360 spin when crossing rear boundary
+        double angleError = Math.atan2(
+                Math.sin(target - CurrentRotation),
+                Math.cos(target - CurrentRotation)
+        );
+        return pid.PIDangle(0, (float)angleError);
     }
 
 }
