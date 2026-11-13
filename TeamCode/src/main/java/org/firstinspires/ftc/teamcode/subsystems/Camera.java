@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
@@ -19,7 +21,11 @@ import org.opencv.core.Mat;
 import java.util.HashMap;
 import java.util.Map;
 
+@Configurable
 public final class Camera implements SubsystemBase {
+    // config
+    public static double NectarThreshold = 200.0;
+    public static double PollenThreshold = 150.0;
     private final Map<WebcamName, PixelProcessor> Processors = new HashMap<>();
     private final Map<WebcamName, VisionPortal> Portals = new HashMap<>();
 
@@ -57,18 +63,18 @@ public final class Camera implements SubsystemBase {
     public BallType getBallType(WebcamName insideCam) {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
-        if ((Color.green(color) + Color.blue(color)) / 2.0f >= Globals.PollenThreshold) {
+        if ((Color.green(color) + Color.blue(color)) / 2.0f >= PollenThreshold) {
             panelsTelemetry.addData("Camera Ball Type", "Small");
             return BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
-            if (Color.red(color) >= Globals.NectarThreshold) {
+            if (Color.red(color) >= NectarThreshold) {
                 panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
             }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
-            if (Color.blue(color) >= Globals.NectarThreshold) {
+            if (Color.blue(color) >= NectarThreshold) {
                 panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
             }
