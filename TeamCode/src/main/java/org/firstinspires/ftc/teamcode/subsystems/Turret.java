@@ -13,6 +13,7 @@ public class Turret implements SubsystemBase {
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     private static volatile double CurrentRotation = 0;
     private static volatile Vector2D CurrentGoalPosition = null;
+    private static volatile boolean HasGoal = false;
     private final Drivetrain drivetrain;
     private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
 
@@ -25,6 +26,7 @@ public class Turret implements SubsystemBase {
     }
 
     public static void changeGoal(double distance, double xradians, double zradians) {
+        HasGoal = true;
         double angle = Math.atan2(zradians, xradians);
         Vector2D vec = new Vector2D(
                 distance * Math.cos(angle),
@@ -45,6 +47,7 @@ public class Turret implements SubsystemBase {
 
     @Override
     public void update() {
+        if (!HasGoal) return;
         if (drivetrain.getFollower() == null || CurrentGoalPosition == null) {
             return;
         }
