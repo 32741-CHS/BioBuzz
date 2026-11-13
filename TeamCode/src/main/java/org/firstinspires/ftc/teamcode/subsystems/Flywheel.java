@@ -41,8 +41,8 @@ public class Flywheel implements SubsystemBase {
 	private Camera camera;
 	private Drivetrain drivetrain;
 	private WebcamName insideCam;
-	private static double CameraDisplacementX = 0.06; // made up number, change when cam added
-	private static double CameraHeight = 0.37; // made up number, change when cam added
+	private static double CameraDisplacementX = 0.06;
+	private static double CameraHeight = 0.37;
 	private static double HeightFromAprilTag = 0.15; // tweak if not good
 	// NEW: lumped Magnus (spin lift) constant, units 1/m. 0 = Magnus off. Tune on the field.
 	private static double MagnusCoefficient = 0.019;
