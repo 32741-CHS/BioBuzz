@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.configs.pedro;
 
 // pinpoint is plugged into an I2C port other than port 0
 
+import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.pedropathing.revhub.localizers.PinpointLocalizer;
 import com.pedropathing.tuning.autotune.Procedure;
@@ -41,7 +42,11 @@ public class Tuning {
 
     @Tuner
     public static Procedure tests() {
-        return new Tests(hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig), hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig), null);
+        return new Tests(
+                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig),
+                hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
+                () -> new Foresight(Constants.foresightConfig)
+        );
     }
 
 }

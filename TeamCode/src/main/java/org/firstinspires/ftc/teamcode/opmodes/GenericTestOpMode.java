@@ -28,10 +28,12 @@ public class GenericTestOpMode extends OpMode {
     private final Pose point5Control1 = poseFactory.of(56.2407, 36.3107, 0);
     private final Pose point6 = poseFactory.of(56.1905, 9.1712, 90.1096);
     private final Pose point6Control1 = poseFactory.of(56.1392, 35.9608, 0);
+
     private Follower follower;
 
     @Override
     public void init() {
+        Scheduler.reset();
         follower = Constants.create(hardwareMap);
         Scheduler.schedule(sequential(
                 follow(follower, path1()),
