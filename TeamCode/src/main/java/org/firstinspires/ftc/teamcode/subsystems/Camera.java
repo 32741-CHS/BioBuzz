@@ -6,7 +6,9 @@ import android.graphics.Color;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.BallType;
+import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -15,13 +17,13 @@ import org.opencv.core.Mat;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Camera {
+public final class Camera implements SubsystemBase {
     private final Map<WebcamName, PixelProcessor> Processors = new HashMap<>();
     private final Map<WebcamName, VisionPortal> Portals = new HashMap<>();
 
     // always be sure to call this when possible
     // takes varargs (cam1, cam2, cam3) and not an array
-    public void init(WebcamName... cams) {
+    public Camera(WebcamName... cams) {
         if (cams == null) return;
 
         for (WebcamName cam : cams) {
@@ -36,6 +38,16 @@ public final class Camera {
             Processors.put(cam, newprocessor);
             Portals.put(cam, newportal);
         }
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+
     }
 
     // this assumes balls are in the middle of the webcam

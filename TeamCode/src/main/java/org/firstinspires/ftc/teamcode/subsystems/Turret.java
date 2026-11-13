@@ -28,19 +28,38 @@ public class Turret implements SubsystemBase {
         CurrentRotation = rotation;
     }
 
-    public void changeGoal(double distance, double xradians, double zradians) {
+    /**
+     * Calculates absolute field coordinates from camera relative distance and bearing.
+     *
+     * @param distance       Distance to goal
+     * @param bearingRadians Bearing angle from camera in radians
+     */
+    public void changeGoal(double distance, double bearingRadians) {
+        if (drivetrain == null) return;
         HasGoal = true;
-        double angle = Math.atan2(zradians, xradians);
-        Vector2D vec = new Vector2D(
-                distance * Math.cos(angle),
-                distance * Math.sin(angle));
-        CurrentGoalPosition = vec;
+
+        double robotX = drivetrain.getX();
+        double robotY = drivetrain.getY();
+        double robotHeading = drivetrain.getHeading();
+
+        // FTC bearing: positive = right (clockwise). Field heading increases counter-clockwise.
+        double fieldAngleToGoal = robotHeading - bearingRadians;
+
+        double goalX = robotX + distance * Math.cos(fieldAngleToGoal);
+        double goalY = robotY + distance * Math.sin(fieldAngleToGoal);
+
+        CurrentGoalPosition = new Vector2D(goalX, goalY);
     }
 
-    public void changeGoal(Vector2D vec) {
-        if (vec == null)
+    public void changeGoal(double distance, double xradians, double zradians) {
+        changeGoal(distance, xradians);
+    }
+
+    public void changeGoal(Vector2D fieldPosition) {
+        if (fieldPosition == null)
             return;
-        CurrentGoalPosition = vec;
+        HasGoal = true;
+        CurrentGoalPosition = fieldPosition;
     }
 
     @Override
@@ -52,7 +71,7 @@ public class Turret implements SubsystemBase {
     public void update() {
         if (!AllowAutoRotate) return;
         if (!HasGoal) return;
-        if (drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
+        if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
 
         CurrentRotation = drivetrain.getHeading();
         panelsTelemetry.addData("Turret Rotation", CurrentRotation);

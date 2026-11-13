@@ -60,7 +60,7 @@ public class Flywheel implements SubsystemBase {
 	}
 
 	private void UpdateDynamicRPS() {
-		if (distance == Double.NaN || zRadians == Double.NaN) return;
+		if (Double.isNaN(distance) || Double.isNaN(zRadians)) return;
 
 		double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
 		double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
