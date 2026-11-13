@@ -26,7 +26,7 @@ public class RobotHardwareGroup {
             IMU_NAME = "imu",
             PINPOINT_NAME = "pinpoint",
             SERVO_NAME = "servo",
-            MAIN_WEBCAM_NAME = "webcam",
+            MAIN_WEBCAM_NAME = "vision",
             INSIDE_WEBCAM_NAME = "insideCam";
 
     public HardwareMap hardwareMap;
