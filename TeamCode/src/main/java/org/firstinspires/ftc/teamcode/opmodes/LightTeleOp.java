@@ -34,10 +34,10 @@ public class LightTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                pinpointLogger,
-                drivetrain,
                 driverGamepad,
-                shooterGamepad
+                shooterGamepad,
+                pinpointLogger,
+                drivetrain
         );
 
 

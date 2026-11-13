@@ -37,9 +37,9 @@ public class TemplateOpmode extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                drivetrain,
                 driverGamepad,
-                shooterGamepad
+                shooterGamepad,
+                drivetrain
         );
 
         allSubsystems.init(robotHardware);

@@ -41,11 +41,11 @@ public class LightTeleOpWithShooter extends OpMode {
         gps = new GoalTrackerSimple();
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
+                driverGamepad,
+                shooterGamepad,
                 gps,
                 pinpointLogger,
-                drivetrain,
-                driverGamepad,
-                shooterGamepad
+                drivetrain
         );
 
         allSubsystems.init(robotHardware);
