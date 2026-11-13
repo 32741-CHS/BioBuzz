@@ -35,6 +35,9 @@ public class GenericTestOpMode extends OpMode {
     public void init() {
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
+        follower.setPose(start);
+
+        Scheduler.reset();
         Scheduler.schedule(sequential(
                 follow(follower, path1()),
                 follow(follower, path2()),
@@ -47,6 +50,7 @@ public class GenericTestOpMode extends OpMode {
 
     @Override
     public void loop() {
+        follower.update();
         Scheduler.execute();
     }
 
@@ -74,5 +78,3 @@ public class GenericTestOpMode extends OpMode {
         return Paths.curve(point5, point6Control1, point6).reverseTangent();
     }
 }
-
-
