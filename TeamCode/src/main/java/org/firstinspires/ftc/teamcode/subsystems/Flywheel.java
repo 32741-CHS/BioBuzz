@@ -70,8 +70,9 @@ public class Flywheel implements SubsystemBase {
 		// MATH FIX 1: standard projectile equation, ball speed needed with NO air resistance
 		// v^2 = g x^2 / (2 cos^2(theta) (x tan(theta) - dy))
 		double heightDiff = verticalDistance - InitialCamHeight;
-		double denominator = 2 * Math.pow(Math.cos(ShootingAngle), 2)
-				* (horizontalDistance * Math.tan(ShootingAngle) - heightDiff);
+		double angleRad = Math.toRadians(ShootingAngle);
+		double denominator = 2 * Math.pow(Math.cos(angleRad), 2)
+				* (horizontalDistance * Math.tan(angleRad) - heightDiff);
 		if (denominator <= 0) return; // target can't be hit at this launch angle (only added line that isn't maths)
 		double velocityInVacuum = Math.sqrt(Gravity * horizontalDistance * horizontalDistance / denominator);
 
@@ -82,8 +83,8 @@ public class Flywheel implements SubsystemBase {
 		double desiredRPS = (velocityInVacuum / (1 - SlipagePercentage)) / (Math.PI * FlywheelDiameter);
 
 		// MATH FIX 4: simulation starts from the speed we just calculated, not the old desiredFlywheelRPS
-		double initialVelocityX = Math.cos(ShootingAngle) * velocityInVacuum;
-		double initialVelocityY = Math.sin(ShootingAngle) * velocityInVacuum;
+		double initialVelocityX = Math.cos(angleRad) * velocityInVacuum;
+		double initialVelocityY = Math.sin(angleRad) * velocityInVacuum;
 
 		double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
 		BallRPM = desiredRPS * 60; // MATH FIX 5: spin comes from the wheel speed we are asking for
