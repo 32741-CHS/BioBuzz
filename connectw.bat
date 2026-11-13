@@ -1,11 +1,13 @@
 @echo off
 
+netsh wlan connect name="32741-RC"
+
 adb disconnect
 
 @REM The line below is to make sure all works fine
 echo.
 echo [Code] Restarting ADB server (Prevents random bugs)
-@REM adb kill-server && adb start-server
+adb kill-server && adb start-server
 
 pause
 @REM Connect to the device (Note echo. is new line for a spacer)

@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "EncoderOdometry Logger")
+@Autonomous(name = "EncoderOdometry Logger")
 public class EncoderOdometry extends OpMode {
     private DcMotor xMotor, yMotor;
 

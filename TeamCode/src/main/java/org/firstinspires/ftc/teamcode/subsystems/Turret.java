@@ -14,22 +14,21 @@ public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     public static boolean AllowAutoRotate = true;
-
-    private static volatile double CurrentRotation = 0;
-    private static volatile Vector2D CurrentGoalPosition = null;
-    private static volatile boolean HasGoal = false;
     private final Drivetrain drivetrain;
     private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
+    private double CurrentRotation = 0;
+    private Vector2D CurrentGoalPosition = null;
+    private boolean HasGoal = false;
 
     public Turret(Drivetrain dt) {
         this.drivetrain = dt;
     }
 
-    public static void changeRotation(double rotation) {
+    public void changeRotation(double rotation) {
         CurrentRotation = rotation;
     }
 
-    public static void changeGoal(double distance, double xradians, double zradians) {
+    public void changeGoal(double distance, double xradians, double zradians) {
         HasGoal = true;
         double angle = Math.atan2(zradians, xradians);
         Vector2D vec = new Vector2D(
@@ -38,7 +37,7 @@ public class Turret implements SubsystemBase {
         CurrentGoalPosition = vec;
     }
 
-    public static void changeGoal(Vector2D vec) {
+    public void changeGoal(Vector2D vec) {
         if (vec == null)
             return;
         CurrentGoalPosition = vec;
@@ -72,7 +71,7 @@ public class Turret implements SubsystemBase {
                 Math.sin(target - CurrentRotation),
                 Math.cos(target - CurrentRotation)
         );
-        return pid.PIDangle(0, (float)angleError);
+        return pid.PIDangle(0, (float) angleError);
     }
 
 }
