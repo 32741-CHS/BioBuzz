@@ -6,6 +6,7 @@ import android.graphics.Color;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.utils.BallType;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -79,12 +80,6 @@ public final class Camera {
 
         Portals.clear();
         Processors.clear();
-    }
-
-    public enum BallType {
-        Big,
-        Small,
-        None
     }
 
     private static class PixelProcessor implements VisionProcessor {

@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.BallType;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
@@ -74,9 +75,9 @@ public class Flywheel implements SubsystemBase {
 
 		double desiredRPS = (velocityInVacuum * 60) / (2 * Math.PI * flywheelRadius) * 60;
 		double ballMass = BallGeneralMass;
-		if (camera.getBallType(insideCam) == Camera.BallType.Big) {
+		if (camera.getBallType(insideCam) == BallType.Big) {
 			ballMass = NectarMass;
-		} else if (camera.getBallType(insideCam) == Camera.BallType.Small) {
+		} else if (camera.getBallType(insideCam) == BallType.Small) {
 			ballMass = PollenMass;
 		}
 

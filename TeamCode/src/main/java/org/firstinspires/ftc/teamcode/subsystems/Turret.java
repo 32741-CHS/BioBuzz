@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.utils.Vector2D;
 public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
+    public static boolean AllowAutoRotate = true;
 
     private static volatile double CurrentRotation = 0;
     private static volatile Vector2D CurrentGoalPosition = null;
@@ -50,6 +51,7 @@ public class Turret implements SubsystemBase {
 
     @Override
     public void update() {
+        if (!AllowAutoRotate) return;
         if (!HasGoal) return;
         if (drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
 

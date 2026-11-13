@@ -49,7 +49,7 @@ public class MainTeleOp extends OpMode {
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
         camera = new Camera();
         flywheel = new Flywheel(goaltracker, drivetrain, camera);
-        feeder = new Feeder(flywheel);
+        feeder = new Feeder(flywheel, camera);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
