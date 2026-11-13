@@ -58,15 +58,15 @@ public class MainTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
+                driverGamepad,
+                shooterGamepad,
                 flywheel,
                 turret,
                 goaltracker,
                 camera,
                 intake,
                 feeder,
-                drivetrain,
-                driverGamepad,
-                shooterGamepad
+                drivetrain
         );
 
 
