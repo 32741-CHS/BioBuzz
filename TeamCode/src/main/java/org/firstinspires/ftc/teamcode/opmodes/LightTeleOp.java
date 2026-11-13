@@ -45,6 +45,8 @@ public class LightTeleOp extends OpMode {
 
         robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+
         // Key Binds
         driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
