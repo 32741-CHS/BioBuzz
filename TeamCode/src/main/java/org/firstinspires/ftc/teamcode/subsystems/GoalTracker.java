@@ -52,6 +52,8 @@ public class GoalTracker implements SubsystemBase {
 
         AprilTagDetection best = null;
 
+        panelsTelemetry.addData("GoalTracker Detections", aprilTag.getDetections());
+
         for (AprilTagDetection detection : aprilTag.getDetections()) {
             if (detection == null || detection.ftcPose == null)
                 continue;
@@ -80,8 +82,12 @@ public class GoalTracker implements SubsystemBase {
             }
         }
 
-        if (best == null)
+        if (best == null) {
+            panelsTelemetry.addData("GoalTracker Best", "Not found");
             return;
+        }
+
+        panelsTelemetry.addData("GoalTracker Best", best);
 
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
