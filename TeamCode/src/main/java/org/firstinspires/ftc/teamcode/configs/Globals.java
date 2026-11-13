@@ -32,10 +32,10 @@ public class Globals {
     public static final double
             FLYWHEEL_ERROR_TOL = 1.0,
             TRIGGER_THRESHOLD = 0.5,
-            PollenThreshold = 0.7,
+            PollenThreshold = 150.0,
             flywheelKP = 16.5,
             flywheelKF = 13.5,
-            NectarThreshold = 0.7;
+            NectarThreshold = 200.0;
     public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
     // FEEDER
     public static final double FEEDER_POWER = 0.7;

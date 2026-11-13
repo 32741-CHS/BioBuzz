@@ -1,13 +1,20 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class DataInterpolation {
     private final double[] inputValues;
     private final double[] outputValues;
 
     public DataInterpolation(double[][] dataPoints) {
+        if (dataPoints == null || dataPoints.length == 0) {
+            throw new IllegalArgumentException("Data points cannot be null or empty");
+        }
         int len = dataPoints.length;
+        // Sort data points by input value to ensure binary search and interpolation work correctly
+        Arrays.sort(dataPoints, Comparator.comparingDouble(a -> a[0]));
+
         inputValues = new double[len];
         outputValues = new double[len];
         // Cause I don't want to deal with the mess that is type conversions
@@ -18,13 +25,22 @@ public class DataInterpolation {
     }
 
     public double interpolate(double x) {
+        // Handle NaN or Infinity input values (e.g., when sensor/vision data is unavailable)
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return 0.0;
+        }
+
+        if (inputValues.length == 0) {
+            return 0.0;
+        }
+
         // Handle out-of-bounds: lower than minimum boundary
         if (x <= inputValues[0]) {
             return outputValues[0];
         }
         // Handle out-of-bounds: higher than maximum boundary
         if (x >= inputValues[inputValues.length - 1]) {
-            return outputValues[outputValues.length - 1];
+            return outputValues[inputValues.length - 1];
         }
 
         // Find the index of x in the sorted array inputValues
@@ -38,11 +54,23 @@ public class DataInterpolation {
         // If not found, binarySearch returns (-(insertion point) - 1)
         int insertionPoint = -index - 1;
 
+        // Defensive checks to prevent any ArrayIndexOutOfBoundsException
+        if (insertionPoint <= 0) {
+            return outputValues[0];
+        }
+        if (insertionPoint >= inputValues.length) {
+            return outputValues[outputValues.length - 1];
+        }
+
         // Perform linear interpolation formula: y = y0 + (x - x0) * (y1 - y0) / (x1 - x0)
         double x0 = inputValues[insertionPoint - 1];
         double x1 = inputValues[insertionPoint];
         double y0 = outputValues[insertionPoint - 1];
         double y1 = outputValues[insertionPoint];
+
+        if (x1 == x0) {
+            return y0;
+        }
 
         return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
     }

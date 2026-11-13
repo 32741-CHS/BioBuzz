@@ -63,13 +63,15 @@ public final class Camera implements SubsystemBase {
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
-            if (Color.red(color) >= Globals.NectarThreshold)
+            if (Color.red(color) >= Globals.NectarThreshold) {
                 panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
+            }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
-            if (Color.blue(color) >= Globals.NectarThreshold)
+            if (Color.blue(color) >= Globals.NectarThreshold) {
                 panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
+            }
         }
 
         return BallType.None;
