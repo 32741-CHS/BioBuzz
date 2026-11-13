@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.FlywheelDiameter;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.Gravity;
 import static org.firstinspires.ftc.teamcode.configs.Globals.InitialCamHeight;
+import static org.firstinspires.ftc.teamcode.configs.Globals.NectarMass;
+import static org.firstinspires.ftc.teamcode.configs.Globals.PollenMass;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RotationalDirection;
 import static org.firstinspires.ftc.teamcode.configs.Globals.ShootingAngle;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
@@ -21,6 +23,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
@@ -34,14 +37,17 @@ public class Flywheel implements SubsystemBase {
 	public static boolean canSpinFlywheel = false;
 	private DcMotorEx flywheel;
 	private GoalTracker goal;
+	private Camera camera;
 	private Drivetrain drivetrain;
+	private WebcamName insideCam;
 	private static double CameraDisplacementX = 0.2; // made up number, change when cam added
 	private static double CameraHeight = 0.2; // made up number, change when cam added
 	private static double HeightFromAprilTag = 1; // tweak if not good
 
-	public Flywheel(GoalTracker goal, Drivetrain dt) {
+	public Flywheel(GoalTracker goal, Drivetrain dt, Camera cam) {
 		this.goal = goal;
 		this.drivetrain = dt;
+		this.camera = cam;
 	}
 
 	private void UpdateDynamicRPS() {
@@ -67,12 +73,18 @@ public class Flywheel implements SubsystemBase {
 		Py = InitialCamHeight;
 
 		double desiredRPS = (velocityInVacuum * 60) / (2 * Math.PI * flywheelRadius) * 60;
+		double ballMass = BallGeneralMass;
+		if (camera.getBallType(insideCam) == Camera.BallType.Big) {
+			ballMass = NectarMass;
+		} else if (camera.getBallType(insideCam) == Camera.BallType.Small) {
+			ballMass = PollenMass;
+		}
 
 		double currTime = 0;
 		boolean simulationComplete = false;
 		while (simulationComplete) {
 			Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
-			Geff = Gravity + RotationalDirection * BallGeneralMass * Math.pow(velocityInVacuum, 2) * (verticalDistance - InitialCamHeight) / Spin;
+			Geff = Gravity + RotationalDirection * ballMass * Math.pow(velocityInVacuum, 2) * (verticalDistance - InitialCamHeight) / Spin;
 			BallRPM = BallRPM * Math.pow(Math.E, DecaySpin) * currTime;
 			Vx = Vx - AerodynamicDrag * TimeInterval;
 			Vy = Vy - AerodynamicDrag * Geff * TimeInterval;
@@ -109,6 +121,7 @@ public class Flywheel implements SubsystemBase {
 		flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
 		flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 		flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		this.insideCam = robotHardware.insideCam;
 	}
 
 	@Override

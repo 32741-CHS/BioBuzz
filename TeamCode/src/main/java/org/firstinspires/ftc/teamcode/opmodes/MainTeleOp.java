@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -30,6 +31,7 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
+    private Camera camera;
     private GoalTracker goaltracker;
 
     @Override
@@ -46,7 +48,8 @@ public class MainTeleOp extends OpMode {
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
-        flywheel = new Flywheel(goaltracker, drivetrain);
+        camera = new Camera();
+        flywheel = new Flywheel(goaltracker, drivetrain, camera);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
