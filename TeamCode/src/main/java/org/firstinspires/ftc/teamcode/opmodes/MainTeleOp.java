@@ -71,6 +71,7 @@ public class MainTeleOp extends OpMode {
 
 
         allSubsystems.init(robotHardware);
+        Flywheel.canSpinFlywheel = true;
 
         // Key Binds
         driverGamepad.leftTrigger /// Robot Speed
