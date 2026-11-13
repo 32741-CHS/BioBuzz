@@ -44,6 +44,8 @@ public class Flywheel implements SubsystemBase {
 	private static double CameraDisplacementX = 0.2; // made up number, change when cam added
 	private static double CameraHeight = 0.2; // made up number, change when cam added
 	private static double HeightFromAprilTag = 1; // tweak if not good
+	// NEW: lumped Magnus (spin lift) constant, units 1/m. 0 = Magnus off. Tune on the field.
+	private static double MagnusCoefficient = 0;
 
 	// goal stuff
 	private double distance = Double.NaN;
@@ -65,22 +67,31 @@ public class Flywheel implements SubsystemBase {
 		double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
 		double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
 
-		double initialVelocity = desiredFlywheelRPS * Math.PI * FlywheelDiameter / 60;
-		double initialVelocityX = Math.cos(ShootingAngle) * initialVelocity;
-		double initialVelocityY = Math.sin(ShootingAngle) * initialVelocity;
-
-		double velocityInVacuum =
-				Math.sqrt(Gravity * Math.sqrt(verticalDistance - InitialCamHeight) / (2 * Math.pow(Math.cos(ShootingAngle), 2)) * InitialCamHeight + verticalDistance * Math.tan(ShootingAngle) - horizontalDistance) * (1 - SlipagePercentage);
+		// MATH FIX 1: standard projectile equation, ball speed needed with NO air resistance
+		// v^2 = g x^2 / (2 cos^2(theta) (x tan(theta) - dy))
+		double heightDiff = verticalDistance - InitialCamHeight;
+		double denominator = 2 * Math.pow(Math.cos(ShootingAngle), 2)
+				* (horizontalDistance * Math.tan(ShootingAngle) - heightDiff);
+		if (denominator <= 0) return; // target can't be hit at this launch angle (only added line that isn't maths)
+		double velocityInVacuum = Math.sqrt(Gravity * horizontalDistance * horizontalDistance / denominator);
 
 		double flywheelRadius = FlywheelDiameter / 2;
+
+		// MATH FIX 2: ball leaves slower than the wheel surface, so DIVIDE by (1 - slip).
+		// MATH FIX 3: RPS = surface speed / circumference (no *60 factors).
+		double desiredRPS = (velocityInVacuum / (1 - SlipagePercentage)) / (Math.PI * FlywheelDiameter);
+
+		// MATH FIX 4: simulation starts from the speed we just calculated, not the old desiredFlywheelRPS
+		double initialVelocityX = Math.cos(ShootingAngle) * velocityInVacuum;
+		double initialVelocityY = Math.sin(ShootingAngle) * velocityInVacuum;
+
 		double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
-		BallRPM = maximumFlywheelRPM;
+		BallRPM = desiredRPS * 60; // MATH FIX 5: spin comes from the wheel speed we are asking for
 		Vx = initialVelocityX;
 		Vy = initialVelocityY;
-		Px = CameraDisplacementX;
+		Px = 0; // MATH FIX 6: horizontalDistance is already measured from the launch point
 		Py = InitialCamHeight;
 
-		double desiredRPS = (velocityInVacuum * 60) / (2 * Math.PI * flywheelRadius) * 60;
 		double ballMass = BallGeneralMass;
 		if (camera.getBallType(insideCam) == BallType.Big) {
 			ballMass = NectarMass;
@@ -88,24 +99,39 @@ public class Flywheel implements SubsystemBase {
 			ballMass = PollenMass;
 		}
 
+		// AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
+		double dragK = AerodynamicDrag * BallGeneralMass / ballMass;
+
 		double currTime = 0;
 		boolean simulationComplete = false;
 		while (!simulationComplete) {
+			double speed = Math.hypot(Vx, Vy);
 			Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
-			Geff = Gravity + RotationalDirection * ballMass * Math.pow(velocityInVacuum, 2) * (verticalDistance - InitialCamHeight) / Spin;
-			BallRPM = BallRPM * Math.pow(Math.E, DecaySpin) * currTime;
-			Vx = Vx - AerodynamicDrag * TimeInterval;
-			Vy = Vy - AerodynamicDrag * Geff * TimeInterval;
+			// MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
+			// RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
+			Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
+			// MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
+			BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
+			// MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
+			Vx = Vx - dragK * speed * Vx * TimeInterval;
+			Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
 			Px = Px + Vx * TimeInterval;
 			Py = Py + Vy * TimeInterval;
 
 			if (Py <= 0.001) {
 				panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
+				desiredRPS += desiredRPS / 100 * 5;
 				break;
 			}
 
+			// MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
 			if (Px >= horizontalDistance) {
-				panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+				if (Py >= verticalDistance) {
+					panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+				} else {
+					panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
+					desiredRPS += desiredRPS / 100 * 5;
+				}
 				break;
 			};
 
