@@ -16,6 +16,13 @@ public class GoalTracker implements SubsystemBase {
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
+    private Turret turret;
+    private Flywheel flywheel;
+
+    public GoalTracker(Turret turret, Flywheel flywheel) {
+        this.turret = turret;
+        this.flywheel = flywheel;
+    }
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
@@ -74,6 +81,9 @@ public class GoalTracker implements SubsystemBase {
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
         zRadians = Math.toRadians(best.ftcPose.elevation);
+
+        turret.changeGoal(distanceToGoal, xRadians, zRadians);
+        flywheel.changeGoal(distanceToGoal, zRadians);
     }
 
     public void setTeam(boolean isRed) {

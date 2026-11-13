@@ -49,7 +49,7 @@ public class RobotHardwareGroup {
         imu = hardwareMap.get(IMU.class, IMU_NAME);
 //        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
 //        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
+//        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
         servo = hardwareMap.get(Servo.class, SERVO_NAME);
     }
 }

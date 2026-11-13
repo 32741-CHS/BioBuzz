@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+
 import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
@@ -11,6 +13,8 @@ import org.firstinspires.ftc.teamcode.utils.Vector2D;
 public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
+    public static boolean AllowAutoRotate = true;
+
     private static volatile double CurrentRotation = 0;
     private static volatile Vector2D CurrentGoalPosition = null;
     private static volatile boolean HasGoal = false;
@@ -47,12 +51,12 @@ public class Turret implements SubsystemBase {
 
     @Override
     public void update() {
+        if (!AllowAutoRotate) return;
         if (!HasGoal) return;
-        if (drivetrain.getFollower() == null || CurrentGoalPosition == null) {
-            return;
-        }
+        if (drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
 
         CurrentRotation = drivetrain.getHeading();
+        panelsTelemetry.addData("Turret Rotation", CurrentRotation);
 
         double dx = CurrentGoalPosition.x - drivetrain.getX();
         double dy = CurrentGoalPosition.y - drivetrain.getY();
@@ -63,7 +67,12 @@ public class Turret implements SubsystemBase {
     }
 
     private double calcTurnPower(double target) {
-        return pid.PIDangle((float) CurrentRotation, (float) target);
+        // get anglewrapping to prevent 360 spin when crossing rear boundary
+        double angleError = Math.atan2(
+                Math.sin(target - CurrentRotation),
+                Math.cos(target - CurrentRotation)
+        );
+        return pid.PIDangle(0, (float)angleError);
     }
 
 }

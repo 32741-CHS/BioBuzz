@@ -67,4 +67,12 @@ public class Globals {
     public static final double NectarMass = 0.0413;
     public static final double ShootingAngle = 65;
     public static final double InitialCamHeight = 0.3; // Temporary made up number, change when cam is added
+
+    // Feeder
+
+    // 22mm inward = pollen
+    // 0mm inward = nectar
+    public static final double PollenInwardAmount = 22;
+    public static final double NectarInwardAmount = 0;
+
 }
