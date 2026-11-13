@@ -44,8 +44,8 @@ public class LightTeleOp extends OpMode {
         allSubsystems.init(robotHardware);
 
         robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
-
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+        robotHardware.flywheel.setPower(0.65);
 
         // Key Binds
         driverGamepad.leftTrigger
@@ -70,8 +70,6 @@ public class LightTeleOp extends OpMode {
     @Override
     public void loop() {
         allSubsystems.update();
-
-        robotHardware.flywheel.setPower((-shooterGamepad.raw.right_stick_y + 1) / 2);
 
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
