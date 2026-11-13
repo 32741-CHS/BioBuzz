@@ -1,14 +1,21 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static com.pedropathing.ivy.groups.Groups.sequential;
+import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
 import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "GenericTestOpMode", group = "Tests")
-public class GenericTestOpMode {
-
+public class GenericTestOpMode extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(56, 8, 90);
@@ -21,6 +28,25 @@ public class GenericTestOpMode {
     private final Pose point5Control1 = poseFactory.of(56.2407, 36.3107, 0);
     private final Pose point6 = poseFactory.of(56.1905, 9.1712, 90.1096);
     private final Pose point6Control1 = poseFactory.of(56.1392, 35.9608, 0);
+    private Follower follower;
+
+    @Override
+    public void init() {
+        follower = Constants.create(hardwareMap);
+        Scheduler.schedule(sequential(
+                follow(follower, path1()),
+                follow(follower, path2()),
+                follow(follower, path3()),
+                follow(follower, path4()),
+                follow(follower, path5()),
+                follow(follower, path6())
+        ));
+    }
+
+    @Override
+    public void loop() {
+        Scheduler.execute();
+    }
 
     public Path path1() {
         return Paths.line(start, path1).linear(start, path1);
