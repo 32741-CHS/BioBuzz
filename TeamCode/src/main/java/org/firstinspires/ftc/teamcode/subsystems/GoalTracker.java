@@ -6,6 +6,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 public class GoalTracker implements SubsystemBase {
 
@@ -16,8 +17,8 @@ public class GoalTracker implements SubsystemBase {
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
-    private Turret turret;
-    private Flywheel flywheel;
+    private final Turret turret;
+    private final Flywheel flywheel;
 
     public GoalTracker(Turret turret, Flywheel flywheel) {
         this.turret = turret;
@@ -26,7 +27,6 @@ public class GoalTracker implements SubsystemBase {
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
-
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
 
@@ -42,36 +42,33 @@ public class GoalTracker implements SubsystemBase {
         xRadians = Double.NaN;
         zRadians = Double.NaN;
 
-        AprilTagClusterDetection best = null;
+        AprilTagDetection best = null;
 
         for (AprilTagDetection detection : aprilTag.getDetections()) {
-
-            if (!(detection instanceof AprilTagClusterDetection))
+            if (detection == null || detection.ftcPose == null)
                 continue;
 
-            AprilTagClusterDetection cluster =
-                    (AprilTagClusterDetection) detection;
+            String name = getTagName(detection);
 
-            if (cluster.metadata == null || cluster.ftcPose == null)
+            // Alliance filtering if name metadata exists
+            if (name != null) {
+                if (isRed && !name.startsWith("RED"))
+                    continue;
+
+                if (!isRed && !name.startsWith("BLUE"))
+                    continue;
+            }
+
+            // Reject upside-down tags
+            if (Math.abs(detection.ftcPose.roll) >= 90)
                 continue;
 
-            // Alliance filtering
-            String name = cluster.metadata.name;
+            // Prioritize multi-tag Cluster detections for higher accuracy, or choose closest
+            boolean isCluster = detection instanceof AprilTagClusterDetection;
+            boolean bestIsCluster = best instanceof AprilTagClusterDetection;
 
-            if (isRed && !name.startsWith("RED"))
-                continue;
-
-            if (!isRed && !name.startsWith("BLUE"))
-                continue;
-
-            // Reject upside-down cells
-            if (Math.abs(cluster.ftcPose.roll) >= 90)
-                continue;
-
-            // Choose closest valid cluster
-            if (best == null ||
-                    cluster.ftcPose.range < best.ftcPose.range) {
-                best = cluster;
+            if (best == null || (isCluster && !bestIsCluster) || (isCluster == bestIsCluster && detection.ftcPose.range < best.ftcPose.range)) {
+                best = detection;
             }
         }
 
@@ -82,8 +79,23 @@ public class GoalTracker implements SubsystemBase {
         xRadians = Math.toRadians(best.ftcPose.bearing);
         zRadians = Math.toRadians(best.ftcPose.elevation);
 
-        turret.changeGoal(distanceToGoal, xRadians, zRadians);
-        flywheel.changeGoal(distanceToGoal, zRadians);
+        if (turret != null) {
+            turret.changeGoal(distanceToGoal, xRadians, zRadians);
+        }
+        if (flywheel != null) {
+            flywheel.changeGoal(distanceToGoal, zRadians);
+        }
+    }
+
+    private String getTagName(AprilTagDetection detection) {
+        if (detection instanceof AprilTagSingleDetection) {
+            AprilTagSingleDetection single = (AprilTagSingleDetection) detection;
+            return single.metadata != null ? single.metadata.name : null;
+        } else if (detection instanceof AprilTagClusterDetection) {
+            AprilTagClusterDetection cluster = (AprilTagClusterDetection) detection;
+            return cluster.metadata != null ? cluster.metadata.name : null;
+        }
+        return null;
     }
 
     public void setTeam(boolean isRed) {
