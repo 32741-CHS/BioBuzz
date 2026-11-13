@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.GoalTracker;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @TeleOp(name = "BioBuzz TeleOp")
 public class MainTeleOp extends OpMode {
@@ -32,6 +33,7 @@ public class MainTeleOp extends OpMode {
     private Feeder feeder;
     private Flywheel flywheel;
     private Camera camera;
+    private Turret turret;
     private GoalTracker goaltracker;
 
     @Override
@@ -40,14 +42,15 @@ public class MainTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
-        goaltracker = new GoalTracker();
         intake = new Intake();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
         camera = new Camera();
-        flywheel = new Flywheel(goaltracker, drivetrain, camera);
+        flywheel = new Flywheel(drivetrain, camera);
+        turret = new Turret(drivetrain);
+        goaltracker = new GoalTracker(turret, flywheel);
         feeder = new Feeder(flywheel, camera);
 
         // Pass all subsystems into the handler

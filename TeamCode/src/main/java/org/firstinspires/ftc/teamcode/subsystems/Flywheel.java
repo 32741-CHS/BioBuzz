@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.PollenMass;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RotationalDirection;
 import static org.firstinspires.ftc.teamcode.configs.Globals.ShootingAngle;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SlipagePercentage;
 import static org.firstinspires.ftc.teamcode.configs.Globals.TimeInterval;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
@@ -37,7 +38,6 @@ public class Flywheel implements SubsystemBase {
 	public static boolean useDynamicSpeed = true;
 	public static boolean canSpinFlywheel = false;
 	private DcMotorEx flywheel;
-	private GoalTracker goal;
 	private Camera camera;
 	private Drivetrain drivetrain;
 	private WebcamName insideCam;
@@ -45,15 +45,22 @@ public class Flywheel implements SubsystemBase {
 	private static double CameraHeight = 0.2; // made up number, change when cam added
 	private static double HeightFromAprilTag = 1; // tweak if not good
 
-	public Flywheel(GoalTracker goal, Drivetrain dt, Camera cam) {
-		this.goal = goal;
+	// goal stuff
+	private double distance = Double.NaN;
+	private double zRadians = Double.NaN;
+
+	public Flywheel(Drivetrain dt, Camera cam) {
 		this.drivetrain = dt;
 		this.camera = cam;
 	}
 
+	public void changeGoal(double distance, double zRadians) {
+		this.distance = distance;
+		this.zRadians = zRadians;
+	}
+
 	private void UpdateDynamicRPS() {
-		double distance = goal.getDistance();
-		double zRadians = goal.getZRadians();
+		if (distance == Double.NaN || zRadians == Double.NaN) return;
 
 		double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
 		double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
@@ -63,7 +70,7 @@ public class Flywheel implements SubsystemBase {
 		double initialVelocityY = Math.sin(ShootingAngle) * initialVelocity;
 
 		double velocityInVacuum =
-				Math.sqrt(Gravity * Math.sqrt(verticalDistance - InitialCamHeight) / (2 * Math.pow(Math.cos(ShootingAngle), 2)) * InitialCamHeight + verticalDistance * Math.tan(ShootingAngle) - horizontalDistance);
+				Math.sqrt(Gravity * Math.sqrt(verticalDistance - InitialCamHeight) / (2 * Math.pow(Math.cos(ShootingAngle), 2)) * InitialCamHeight + verticalDistance * Math.tan(ShootingAngle) - horizontalDistance) * (1 - SlipagePercentage);
 
 		double flywheelRadius = FlywheelDiameter / 2;
 		double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
