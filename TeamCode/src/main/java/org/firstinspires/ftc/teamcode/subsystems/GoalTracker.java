@@ -27,17 +27,22 @@ public class GoalTracker implements SubsystemBase {
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
+        if (robotHardware == null || robotHardware.vision == null) return;
+
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
 
         VisionPortal visionPortal = new VisionPortal.Builder()
                 .setCamera(robotHardware.vision)
                 .addProcessor(aprilTag)
+                .enableLiveView(false)
                 .build();
     }
 
     @Override
     public void update() {
+        if (aprilTag == null) return;
+
         distanceToGoal = Double.NaN;
         xRadians = Double.NaN;
         zRadians = Double.NaN;

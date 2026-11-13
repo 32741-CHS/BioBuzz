@@ -35,6 +35,7 @@ public final class Camera implements SubsystemBase {
             VisionPortal newportal = new VisionPortal.Builder()
                     .setCamera(cam)
                     .addProcessor(newprocessor)
+                    .enableLiveView(false)
                     .build();
 
             Processors.put(cam, newprocessor);
