@@ -82,7 +82,7 @@ public class Flywheel implements SubsystemBase {
 
 		double currTime = 0;
 		boolean simulationComplete = false;
-		while (simulationComplete) {
+		while (!simulationComplete) {
 			Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
 			Geff = Gravity + RotationalDirection * ballMass * Math.pow(velocityInVacuum, 2) * (verticalDistance - InitialCamHeight) / Spin;
 			BallRPM = BallRPM * Math.pow(Math.E, DecaySpin) * currTime;
