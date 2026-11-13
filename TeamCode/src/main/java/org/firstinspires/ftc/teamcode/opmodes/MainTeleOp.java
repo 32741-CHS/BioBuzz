@@ -47,7 +47,10 @@ public class MainTeleOp extends OpMode {
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
-        camera = new Camera();
+        camera = new Camera(
+                robotHardware.insideCam,
+                robotHardware.vision
+        );
         flywheel = new Flywheel(drivetrain, camera);
         turret = new Turret(drivetrain);
         goaltracker = new GoalTracker(turret, flywheel);
