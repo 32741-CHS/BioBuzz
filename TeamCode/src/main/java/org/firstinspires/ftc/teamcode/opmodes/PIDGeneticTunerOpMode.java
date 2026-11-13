@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class PIDGeneticTunerOpMode extends LinearOpMode {
     private double kD = 0.0;
 
     // Target distance for the PID test.
-    private static final double TARGET_DISTANCE_INCHES = 24.0;
+    private static final double TARGET_RPMS = 24.0;
 
     // Change this to match your wheel diameter, gear ratio, and encoder.
     private static final double TICKS_PER_INCH = 45.0;
@@ -58,20 +60,16 @@ public class PIDGeneticTunerOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
-        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        DcMotor Flywheel = hardwareMap.get(DcMotorEx.class, RobotHardwareGroup.FLYWHEEL_MOTOR_NAME);
 
         // Reverse the left-side motors if needed for your drivetrain.
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        Flywheel.setDirection(DcMotor.Direction.REVERSE);
 
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.addData("Status", "Ready to tune PID");
-        telemetry.addData("Target distance", TARGET_DISTANCE_INCHES + " inches");
+        telemetry.addData("Target RMPS", TARGET_RPMS  + " RPMS");
         telemetry.addData("Press Start", "Run one PID test");
         telemetry.update();
 
@@ -105,7 +103,7 @@ public class PIDGeneticTunerOpMode extends LinearOpMode {
         setDriveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setDriveMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        double targetTicks = TARGET_DISTANCE_INCHES * TICKS_PER_INCH;
+        double targetTicks = TARGET_RPMS  * TICKS_PER_INCH;
 
         double integral = 0;
         double previousError = 0;

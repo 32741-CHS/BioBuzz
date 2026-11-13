@@ -46,7 +46,7 @@ public class PIDGeneticAlgorithm {
      *
      * @return {bestKP, bestKI, bestKD}
      */
-    public double[] dtune() {
+    public double[] tune() {
         List<double[]> population = createInitialPopulation();
 
         double[] bestGenes = population.get(0).clone();
