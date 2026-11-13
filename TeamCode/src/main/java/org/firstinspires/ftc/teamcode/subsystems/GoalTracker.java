@@ -94,6 +94,8 @@ public class GoalTracker implements SubsystemBase {
         zRadians = Math.toRadians(best.ftcPose.elevation);
 
         panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
+        panelsTelemetry.addData("GoalTracker xRadians", xRadians);
+        panelsTelemetry.addData("GoalTracker zRadians", zRadians);
 
         if (turret != null) {
             turret.changeGoal(distanceToGoal, xRadians, zRadians);
