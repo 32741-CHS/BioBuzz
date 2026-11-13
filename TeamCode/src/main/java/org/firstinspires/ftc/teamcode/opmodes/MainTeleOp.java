@@ -41,7 +41,6 @@ public class MainTeleOp extends OpMode {
 
         // Subsystems
         goaltracker = new GoalTracker();
-        feeder = new Feeder(flywheel);
         intake = new Intake();
         pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
@@ -50,6 +49,7 @@ public class MainTeleOp extends OpMode {
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
         camera = new Camera();
         flywheel = new Flywheel(goaltracker, drivetrain, camera);
+        feeder = new Feeder(flywheel);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
