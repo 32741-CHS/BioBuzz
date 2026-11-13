@@ -26,7 +26,8 @@ public class RobotHardwareGroup {
             IMU_NAME = "imu",
             PINPOINT_NAME = "pinpoint",
             SERVO_NAME = "servo",
-            MAIN_WEBCAM_NAME = "webcam";
+            MAIN_WEBCAM_NAME = "webcam",
+            INSIDE_WEBCAM_NAME = "insideCam";
 
     public HardwareMap hardwareMap;
     public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
@@ -47,8 +48,8 @@ public class RobotHardwareGroup {
         feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         imu = hardwareMap.get(IMU.class, IMU_NAME);
-//        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
-//        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
+        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
+        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
         servo = hardwareMap.get(Servo.class, SERVO_NAME);
     }

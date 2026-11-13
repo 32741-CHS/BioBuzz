@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 
@@ -55,14 +57,17 @@ public final class Camera implements SubsystemBase {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
         if ((Color.green(color) + Color.blue(color)) / 2.0f >= Globals.PollenThreshold) {
+            panelsTelemetry.addData("Camera Ball Type", "Small");
             return BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
             if (Color.red(color) >= Globals.NectarThreshold)
+                panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
             if (Color.blue(color) >= Globals.NectarThreshold)
+                panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
         }
 
@@ -82,6 +87,7 @@ public final class Camera implements SubsystemBase {
 
         if (!proc.hasProcessedFrame()) return Color.BLACK;
 
+        panelsTelemetry.addData("Camera Color", proc.getLastColor());
         return proc.getLastColor();
     }
 
