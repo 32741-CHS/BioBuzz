@@ -52,6 +52,10 @@ public class Turret implements SubsystemBase {
         CurrentGoalPosition = new Vector2D(goalX, goalY);
     }
 
+    public void setHasGoal(boolean val) {
+        HasGoal = val;
+    }
+
     public void changeGoal(double distance, double xradians, double zradians) {
         changeGoal(distance, xradians);
     }

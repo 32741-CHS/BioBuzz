@@ -14,6 +14,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 @Configurable
 public class GoalTracker implements SubsystemBase {
+    // config
+    public static long GoalMemoryTimeoutMillisecs = 1500;
 
     private final Turret turret;
     private final Flywheel flywheel;
@@ -22,6 +24,7 @@ public class GoalTracker implements SubsystemBase {
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
+    private long lastSeenGoalTimestampMillisecs = 0;
 
     public GoalTracker(Turret turret, Flywheel flywheel) {
         this.turret = turret;
@@ -84,10 +87,16 @@ public class GoalTracker implements SubsystemBase {
 
         if (best == null) {
             panelsTelemetry.addData("GoalTracker Best", "Not found");
+
+            if (System.currentTimeMillis() - lastSeenGoalTimestampMillisecs > GoalMemoryTimeoutMillisecs) {
+                turret.setHasGoal(false);
+            }
+
             return;
         }
 
         panelsTelemetry.addData("GoalTracker Best", best);
+        lastSeenGoalTimestampMillisecs = System.currentTimeMillis();
 
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
