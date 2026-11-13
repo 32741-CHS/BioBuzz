@@ -133,6 +133,7 @@ public class Flywheel implements SubsystemBase {
 					panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
 					desiredRPS += desiredRPS / 100 * 5;
 				}
+				simulationComplete = true;
 				break;
 			};
 
