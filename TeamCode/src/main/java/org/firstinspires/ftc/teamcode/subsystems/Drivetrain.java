@@ -55,7 +55,7 @@ public class Drivetrain implements SubsystemBase {
         if (driverGamepad != null) { // Runs only if bindToGamepad called
             forwardInput(powerMultiplier * deadband(-driverGamepad.raw.left_stick_y));
             strafeInput(powerMultiplier * deadband(-driverGamepad.raw.left_stick_x));
-            turnInput(powerMultiplier * deadband(driverGamepad.raw.right_stick_x));
+            turnInput(powerMultiplier * deadband(-driverGamepad.raw.right_stick_x));
         }
 
         if (fieldCentricDriving) {
