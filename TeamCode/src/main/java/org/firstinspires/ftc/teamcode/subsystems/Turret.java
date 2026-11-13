@@ -14,6 +14,7 @@ public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     public static boolean AllowAutoRotate = true;
+    public static double IMUHeadingOffset = Math.atan2(428.0 / 2.0, -448.0 / 2.0);
     private final Drivetrain drivetrain;
     private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
     private double CurrentRotation = 0;
@@ -40,7 +41,7 @@ public class Turret implements SubsystemBase {
 
         double robotX = drivetrain.getX();
         double robotY = drivetrain.getY();
-        double robotHeading = drivetrain.getHeading();
+        double robotHeading = drivetrain.getHeading() - IMUHeadingOffset;
 
         // FTC bearing: positive = right (clockwise). Field heading increases counter-clockwise.
         double fieldAngleToGoal = robotHeading - bearingRadians;
@@ -73,7 +74,7 @@ public class Turret implements SubsystemBase {
         if (!HasGoal) return;
         if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
 
-        CurrentRotation = drivetrain.getHeading();
+        CurrentRotation = drivetrain.getHeading() - IMUHeadingOffset;
         panelsTelemetry.addData("Turret Rotation", CurrentRotation);
 
         double dx = CurrentGoalPosition.x - drivetrain.getX();
