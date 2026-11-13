@@ -42,7 +42,6 @@ public class MainTeleOp extends OpMode {
         // Subsystems
         goaltracker = new GoalTracker();
         intake = new Intake();
-        pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
@@ -56,7 +55,6 @@ public class MainTeleOp extends OpMode {
                 flywheel,
                 intake,
                 feeder,
-                pinpointLogger,
                 drivetrain,
                 driverGamepad,
                 shooterGamepad

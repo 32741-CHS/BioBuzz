@@ -78,7 +78,10 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     }
 
     public void tryRunMotorIfReady() {
-        if (flywheel.isReadyForFeed()) desiredPower = reverseMode ? -FEEDER_POWER : FEEDER_POWER;
+        if (flywheel.isReadyForFeed()) {
+            /// Make servo go to correct position based on ball size
+            desiredPower = reverseMode ? -FEEDER_POWER : FEEDER_POWER;
+        }
     }
 
     public void stopMotor() {
