@@ -99,6 +99,11 @@ public class Flywheel implements SubsystemBase {
 			Px = Px + Vx * TimeInterval;
 			Py = Py + Vy * TimeInterval;
 
+			if (Py <= 0.001 || Py >= 0.001) {
+				panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
+				break;
+			}
+
 			if (Px >= horizontalDistance) {
 				panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
 				break;
