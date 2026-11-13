@@ -32,11 +32,14 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
 public class Flywheel implements SubsystemBase {
+	// config
 	public static double desiredFlywheelRPS = 13;
 	public static double maximumFlywheelRPM = 6000;
 	public static double minimumFlywheelRPM = 0;
 	public static boolean useDynamicSpeed = true;
 	public static boolean canSpinFlywheel = false;
+	public static boolean doSimulation = true; // set to false if lag
+
 	private DcMotorEx flywheel;
 	private Camera camera;
 	private Drivetrain drivetrain;
@@ -103,50 +106,55 @@ public class Flywheel implements SubsystemBase {
 		// AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
 		double dragK = AerodynamicDrag * BallGeneralMass / ballMass;
 
-		double currTime = 0;
-		boolean simulationComplete = false;
-		while (!simulationComplete) {
-			double speed = Math.hypot(Vx, Vy);
-			Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
-			// MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
-			// RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
-			Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
-			// MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
-			BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
-			// MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
-			Vx = Vx - dragK * speed * Vx * TimeInterval;
-			Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
-			Px = Px + Vx * TimeInterval;
-			Py = Py + Vy * TimeInterval;
 
-			if (Py <= 0.001) {
-				panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
-				desiredRPS += desiredRPS / 100 * 5;
-				break;
+		if (doSimulation) {
+			double currTime = 0;
+			boolean simulationComplete = false;
+			while (!simulationComplete) {
+				double speed = Math.hypot(Vx, Vy);
+				Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
+				// MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
+				// RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
+				Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
+				// MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
+				BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
+				// MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
+				Vx = Vx - dragK * speed * Vx * TimeInterval;
+				Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
+				Px = Px + Vx * TimeInterval;
+				Py = Py + Vy * TimeInterval;
+
+				if (Py <= 0.001) {
+					panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
+					desiredRPS += desiredRPS / 100 * 5;
+					break;
+				}
+
+				// MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
+				if (Px >= horizontalDistance) {
+					if (Py >= verticalDistance) {
+						panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+					} else {
+						panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
+						desiredRPS += desiredRPS / 100 * 5;
+					}
+					simulationComplete = true;
+					break;
+				}
+
+				if (currTime > SimulationTimeout) {
+					simulationComplete = true;
+					if (!(Px >= horizontalDistance)) {
+						panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
+						panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
+						desiredRPS += desiredRPS / 100 * 5;
+					};
+					break;
+				};
+
+				currTime += TimeInterval;
 			}
 
-			// MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
-			if (Px >= horizontalDistance) {
-				if (Py >= verticalDistance) {
-					panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
-				} else {
-					panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
-					desiredRPS += desiredRPS / 100 * 5;
-				}
-				simulationComplete = true;
-				break;
-			};
-
-			if (currTime > SimulationTimeout) {
-				simulationComplete = true;
-				if (!(Px >= horizontalDistance)) {
-					panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
-					panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
-					desiredRPS += desiredRPS / 100 * 5;
-				};
-				break;
-			};
-			currTime += TimeInterval;
 		}
 
 		desiredFlywheelRPS = desiredRPS;
