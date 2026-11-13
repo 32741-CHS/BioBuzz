@@ -63,6 +63,7 @@ public class Turret implements SubsystemBase {
         double targetHeading = Math.atan2(dy, dx);
 
         double turnPower = calcTurnPower(targetHeading);
+        panelsTelemetry.addData("Turret Turn Power", turnPower);
         drivetrain.turnInput(turnPower);
     }
 
