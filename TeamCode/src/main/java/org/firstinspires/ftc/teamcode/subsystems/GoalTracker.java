@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+
+import com.bylazar.configurables.annotations.Configurable;
+
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -8,17 +12,16 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
+@Configurable
 public class GoalTracker implements SubsystemBase {
 
+    private final Turret turret;
+    private final Flywheel flywheel;
     private AprilTagProcessor aprilTag;
-
     private boolean isRed = true;
-
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
-    private final Turret turret;
-    private final Flywheel flywheel;
 
     public GoalTracker(Turret turret, Flywheel flywheel) {
         this.turret = turret;
@@ -83,6 +86,8 @@ public class GoalTracker implements SubsystemBase {
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
         zRadians = Math.toRadians(best.ftcPose.elevation);
+
+        panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
 
         if (turret != null) {
             turret.changeGoal(distanceToGoal, xRadians, zRadians);
