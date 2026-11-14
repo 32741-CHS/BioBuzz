@@ -53,10 +53,8 @@ public class Flywheel implements SubsystemBase {
      * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
      * referred to the flywheel shaft, in kg*m^2.
      */
-    public static double FLYWHEEL_INERTIA_KG_M2 = 0.00025;
+    public static double FLYWHEEL_INERTIA_KG_M2 = 0.0016800128;
 
-    // Reuse the existing Globals P and F values.
-    // I and D are adjustable here.
     public static int MAX_COEFFICIENT_ITERATIONS = 20;
     public static double COEFFICIENT_SPEED_TOLERANCE_MPS = 0.001;
 
