@@ -1,22 +1,19 @@
 package org.firstinspires.ftc.teamcode.configs;
 
-// ONLY CONSTANTS!! Avoid NonConstants as they are a bit dangerous as we need to wipe them before every match
 
-
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.graph.GraphManager;
 import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
+@Configurable
 public class Globals {
     // Remember Final = no change; static = same var shared across instances, so
     // update one
     // updates all;
+    // REMOVE FINAL TO EDIT VIA PANELS
 
-    // PID Constants
-    public static final double K_PROPORTIONAL = 0; // Error magnifier
-    public static final double K_INTEGRAL = 0; // Anti consistent Error
-    public static final double K_DERIVATIVE = 0; // Anti oscillations
     // Motor Tick Rates
     public static final double GOBILDA_5203_6000RPM = 28;
     public static final double GOBILDA_5203_312RPM = 537.7;
@@ -40,6 +37,25 @@ public class Globals {
     // Panels
     public static final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     public static final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
+    // Flywheel constants
+    public static final double Gravity = 9.81,
+            DecaySpin = 0.223, // Guessed, tweak it ig
+            AerodynamicDrag = 0.00005320098663,
+            AirPressure = 1.225,
+            SlipagePercentage = 0.1,
+            MagnusEffect = 0.019,
+            TimeInterval = 0.01,
+            SimulationTimeout = 2.5,
+            RotationalDirection = -1,
+            FlywheelDiameter = 0.096,
+            BallGeneralMass = 0.03, // should change for nectar / polle,
+            PollenMass = 0.0249,
+            NectarMass = 0.0413,
+            ShootingAngle = 65,
+            InitialCamHeight = 0.37;
+    // 22mm inward = pollen
+    // 0mm inward = nectar
+    // Feeder
     public static boolean fieldCentricDriving = false;
 
     // Ball colors & Detection
@@ -48,29 +64,9 @@ public class Globals {
         Blue
     }
 
-    // Flywheel constants
-    public static final double Gravity = 9.81;
-    private static final double DragCoefficient = 0.4;
-    public static final double DecaySpin = 0.223; // Guessed, tweak it ig
-    public static final double AerodynamicDrag = 0.00005320098663;
-    public static final double AirPressure = 1.225;
-    public static final double SlipagePercentage = 0.1;
-    public static final double MagnusEffect = 0.019;
-    public static final double TimeInterval = 0.01;
-    public static final double SimulationTimeout = 2.5;
-    public static final double RotationalDirection = -1;
-    public static final double FlywheelDiameter = 0.096;
-    public static final double BallGeneralMass = 0.03; // should change for nectar / pollen
-    public static final double PollenMass = 0.0249;
-    public static final double NectarMass = 0.0413;
-    public static final double ShootingAngle = 65;
-    public static final double InitialCamHeight = 0.37;
-
-    // Feeder
-
-    // 22mm inward = pollen
-    // 0mm inward = nectar
-    public static final double PollenInwardAmount = 22;
-    public static final double NectarInwardAmount = 0;
-
+    public enum BallType {
+        Big,
+        Small,
+        None
+    }
 }

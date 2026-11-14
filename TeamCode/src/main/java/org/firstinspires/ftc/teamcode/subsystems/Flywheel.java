@@ -27,7 +27,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.BallType;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
@@ -125,9 +124,9 @@ public class Flywheel implements SubsystemBase {
         Py = InitialCamHeight;
 
         double ballMass = BallGeneralMass;
-        if (colourDetector.getBallType(insideCam) == BallType.Big) {
+        if (colourDetector.getBallType(insideCam) == Globals.BallType.Big) {
             ballMass = NectarMass;
-        } else if (colourDetector.getBallType(insideCam) == BallType.Small) {
+        } else if (colourDetector.getBallType(insideCam) == Globals.BallType.Small) {
             ballMass = PollenMass;
         }
 
