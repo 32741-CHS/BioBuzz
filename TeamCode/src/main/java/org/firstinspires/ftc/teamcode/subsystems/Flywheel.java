@@ -60,8 +60,8 @@ public class Flywheel implements SubsystemBase {
 
     // Nectar uses the Pollen curve provisionally.
     // Nectar's larger radius and its own mass are still used.
-    public static double SHOOTER_KI = 0.001;
-    public static double SHOOTER_KD = 0.0;
+    public static double SHOOTER_KI = 0.00908;
+    public static double SHOOTER_KD = 0.00205;
     private final ColourDetector camera;
     private final Drivetrain drivetrain;
     // Existing hardware dependencies.
