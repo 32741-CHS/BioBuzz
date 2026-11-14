@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
 import static org.firstinspires.ftc.teamcode.opmodes.old.OldMainTeleOp.isRed;
 
