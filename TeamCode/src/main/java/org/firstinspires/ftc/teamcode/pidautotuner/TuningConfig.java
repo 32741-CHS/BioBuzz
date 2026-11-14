@@ -1,23 +1,14 @@
 package org.firstinspires.ftc.teamcode.pidautotuner;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 /**
  * Edit these values for your robot before running either tuner OpMode.
  * Keeping them in one place makes it easy to re-tune a different mechanism
  * just by changing this file.
  */
+@Configurable
 public final class TuningConfig {
-
-    private TuningConfig() {}
-
-    // ---- Hardware ------------------------------------------------------
-
-    /** The name of the motor in your hardware configuration, e.g. "flywheel" or "arm". */
-    public static final String MOTOR_NAME = "motor";
-
-    /** Set true if positive power should move the mechanism toward a *lower* encoder reading. */
-    public static final boolean REVERSED = false;
-
-    // ---- Relay test tuning ---------------------------------------------
 
     /**
      * Magnitude of the relay (bang-bang) output, from 0 to 1. Pick the
@@ -28,23 +19,26 @@ public final class TuningConfig {
      */
     public static final double RELAY_AMPLITUDE = 0.5;
 
-    /** Number of full oscillation cycles to average for the Ku/Tu calculation. */
+    // ---- Hardware ------------------------------------------------------
+    /**
+     * Number of full oscillation cycles to average for the Ku/Tu calculation.
+     */
     public static final int CYCLES_TO_COLLECT = 6;
-
-    /** Number of initial cycles to discard while the oscillation settles. */
+    /**
+     * Number of initial cycles to discard while the oscillation settles.
+     */
     public static final int CYCLES_TO_IGNORE = 2;
 
-    /** Safety timeout for the relay test, in seconds, in case the system never oscillates. */
+    // ---- Relay test tuning ---------------------------------------------
+    /**
+     * Safety timeout for the relay test, in seconds, in case the system never oscillates.
+     */
     public static final double RELAY_TEST_TIMEOUT_S = 15.0;
-
-    // ---- Position tuner specific ----------------------------------------
-
     /**
      * Target position for the position PID tuner, in encoder ticks relative
      * to the position the motor is at when the OpMode starts.
      */
     public static final double POSITION_TARGET_TICKS = 400;
-
     /**
      * Hysteresis band for the position relay test, in encoder ticks. The
      * relay switches once the measured position crosses
@@ -52,9 +46,6 @@ public final class TuningConfig {
      * see rapid chatter instead of a clean oscillation.
      */
     public static final double POSITION_HYSTERESIS_TICKS = 10;
-
-    // ---- Velocity (PIDF) tuner specific -----------------------------------
-
     /**
      * Target velocity for the velocity PIDF tuner, in encoder ticks per second.
      * Pick a value representative of where you'll actually run the mechanism
@@ -62,9 +53,11 @@ public final class TuningConfig {
      */
     public static final double VELOCITY_TARGET_TICKS_PER_SEC = 1500;
 
-    /** Hysteresis band for the velocity relay test, in ticks/sec. */
+    // ---- Position tuner specific ----------------------------------------
+    /**
+     * Hysteresis band for the velocity relay test, in ticks/sec.
+     */
     public static final double VELOCITY_HYSTERESIS_TICKS_PER_SEC = 30;
-
     /**
      * Power levels to use for the feedforward (kF) characterization step.
      * The motor is run open-loop at each of these powers in turn, and the
@@ -72,6 +65,20 @@ public final class TuningConfig {
      */
     public static final double[] FEEDFORWARD_TEST_POWERS = {0.5, 0.75, 1.0};
 
-    /** How long to hold each feedforward test power before sampling, in seconds. */
+    // ---- Velocity (PIDF) tuner specific -----------------------------------
+    /**
+     * How long to hold each feedforward test power before sampling, in seconds.
+     */
     public static final double FEEDFORWARD_SETTLE_TIME_S = 1.5;
+    /**
+     * The name of the motor in your hardware configuration, e.g. "flywheel" or "arm".
+     */
+    public static String MOTOR_NAME = "flywheel";
+    /**
+     * Set true if positive power should move the mechanism toward a *lower* encoder reading.
+     */
+    public static boolean REVERSED = false;
+
+    private TuningConfig() {
+    }
 }
