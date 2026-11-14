@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
@@ -17,13 +18,16 @@ public class RobotHardwareGroup {
             FR_MOTOR_NAME = "frDrive",
             BL_MOTOR_NAME = "blDrive",
             BR_MOTOR_NAME = "brDrive",
-            TURRET_MOTOR_NAME = "turret", /// Archaic for backwards compatibility
-    FLYWHEEL_MOTOR_NAME = "flywheel",
+    /// Archaic for backwards compatibility
+    TURRET_MOTOR_NAME = "turret",
+            FLYWHEEL_MOTOR_NAME = "flywheel",
             FEEDER_MOTOR_NAME = "feeder",
             INTAKE_MOTOR_NAME = "intake",
             IMU_NAME = "imu",
             PINPOINT_NAME = "pinpoint",
-            MAIN_WEBCAM_NAME = "webcam";
+            SERVO_NAME = "servo",
+            MAIN_WEBCAM_NAME = "vision",
+            INSIDE_WEBCAM_NAME = "insideCam";
 
     public HardwareMap hardwareMap;
     public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
@@ -31,6 +35,7 @@ public class RobotHardwareGroup {
     public IMU imu;
     public WebcamName vision, insideCam;
     public GoBildaPinpointDriver pinpoint;
+    public Servo servo;
 
     public void init(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -43,8 +48,9 @@ public class RobotHardwareGroup {
         feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         imu = hardwareMap.get(IMU.class, IMU_NAME);
-//        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
-//        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
+        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
+        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
+        servo = hardwareMap.get(Servo.class, SERVO_NAME);
     }
 }

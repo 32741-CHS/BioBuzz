@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
-@Autonomous(name = "ShootOpmode", group = "Robot")
+@Autonomous(name = "ShootOpmode", group = "Tests")
 public class ShootOpmode extends LinearOpMode {
 
     @Override

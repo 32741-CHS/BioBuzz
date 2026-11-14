@@ -1,26 +1,21 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/** Genetic algorithm used to tune PID gains. Each chromosome contains: [kP, kI, kD]*/
+/**
+ * Genetic algorithm used to tune PID gains. Each chromosome contains: [kP, kI, kD]
+ */
 public class PIDGeneticAlgorithm {
 
-    public interface FitnessFunction {
-        double evaluate(double kP, double kI, double kD);
-    }
-
     private final Random random = new Random();
-
     private final int populationSize;
     private final int generations;
     private final double mutationRate;
     private final double crossoverRate;
-
     private final double[] lowerBounds;
     private final double[] upperBounds;
-
     private final FitnessFunction fitnessFunction;
 
     public PIDGeneticAlgorithm(
@@ -46,7 +41,7 @@ public class PIDGeneticAlgorithm {
      *
      * @return {bestKP, bestKI, bestKD}
      */
-    public double[] dtune() {
+    public double[] tune() {
         List<double[]> population = createInitialPopulation();
 
         double[] bestGenes = population.get(0).clone();
@@ -185,6 +180,10 @@ public class PIDGeneticAlgorithm {
 
     private double randomInRange(double min, double max) {
         return min + random.nextDouble() * (max - min);
+    }
+
+    public interface FitnessFunction {
+        double evaluate(double kP, double kI, double kD);
     }
 
     private static class Individual {

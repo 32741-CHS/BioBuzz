@@ -1,5 +1,7 @@
 @echo off
 
+netsh wlan connect name="32741-RC"
+
 adb disconnect
 
 @REM The line below is to make sure all works fine

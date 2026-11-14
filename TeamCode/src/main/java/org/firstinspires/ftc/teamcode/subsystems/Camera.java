@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.utils;
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -6,6 +8,10 @@ import android.graphics.Color;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.BallType;
+import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Mat;
@@ -13,13 +19,13 @@ import org.opencv.core.Mat;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Camera {
+public final class Camera implements SubsystemBase {
     private final Map<WebcamName, PixelProcessor> Processors = new HashMap<>();
     private final Map<WebcamName, VisionPortal> Portals = new HashMap<>();
 
     // always be sure to call this when possible
     // takes varargs (cam1, cam2, cam3) and not an array
-    public void init(WebcamName... cams) {
+    public Camera(WebcamName... cams) {
         if (cams == null) return;
 
         for (WebcamName cam : cams) {
@@ -29,6 +35,7 @@ public final class Camera {
             VisionPortal newportal = new VisionPortal.Builder()
                     .setCamera(cam)
                     .addProcessor(newprocessor)
+                    .enableLiveView(false)
                     .build();
 
             Processors.put(cam, newprocessor);
@@ -36,19 +43,32 @@ public final class Camera {
         }
     }
 
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+
+    }
+
     // this assumes balls are in the middle of the webcam
     public BallType getBallType(WebcamName insideCam) {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
         if ((Color.green(color) + Color.blue(color)) / 2.0f >= Globals.PollenThreshold) {
+            panelsTelemetry.addData("Camera Ball Type", "Small");
             return BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
             if (Color.red(color) >= Globals.NectarThreshold)
+                panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
             if (Color.blue(color) >= Globals.NectarThreshold)
+                panelsTelemetry.addData("Camera Ball Type", "Big");
                 return BallType.Big;
         }
 
@@ -68,6 +88,7 @@ public final class Camera {
 
         if (!proc.hasProcessedFrame()) return Color.BLACK;
 
+        panelsTelemetry.addData("Camera Color", proc.getLastColor());
         return proc.getLastColor();
     }
 
@@ -78,12 +99,6 @@ public final class Camera {
 
         Portals.clear();
         Processors.clear();
-    }
-
-    public enum BallType {
-        Big,
-        Small,
-        None
     }
 
     private static class PixelProcessor implements VisionProcessor {

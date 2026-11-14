@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "ServoTest")
+@TeleOp(name = "ServoTest", group = "Tests")
 public class ServoTest extends OpMode {
     private Servo servo;
     private DcMotor motor;
@@ -35,12 +35,11 @@ public class ServoTest extends OpMode {
     public void loop() {
         telemetry.addData("MotorEnder", motor.getCurrentPosition());
         if (gamepad1.right_trigger_pressed) {
-            pos += 0.01;
-            servo.setPosition(Math.max(pos, 1));
-        }
-        if (gamepad1.left_trigger_pressed) {
-            pos -= 0.01;
-            servo.setPosition(Math.min(pos, 0));
+            telemetry.addData("Position", 1);
+            servo.setPosition(1);
+        } else {
+            telemetry.addData("Position", 1);
+            servo.setPosition(0);
         }
     }
 

@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems.old;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
-@Configurable
 public class OldIntake implements SubsystemBase {
 
     public static final double desiredPower = 1;

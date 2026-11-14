@@ -8,13 +8,16 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
+import org.firstinspires.ftc.teamcode.subsystems.GoalTracker;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @TeleOp(name = "BioBuzz TeleOp")
 public class MainTeleOp extends OpMode {
@@ -29,6 +32,9 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
+    private Camera camera;
+    private Turret turret;
+    private GoalTracker goaltracker;
 
     @Override
     public void init() {
@@ -36,21 +42,28 @@ public class MainTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
-        flywheel = new Flywheel();
-        feeder = new Feeder(flywheel);
         intake = new Intake();
-        pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(startPose);
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
+        camera = new Camera(
+                robotHardware.insideCam,
+                robotHardware.vision
+        );
+        flywheel = new Flywheel(drivetrain, camera);
+        turret = new Turret(drivetrain);
+        goaltracker = new GoalTracker(turret, flywheel);
+        feeder = new Feeder(flywheel, camera);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
                 flywheel,
+                turret,
+                goaltracker,
+                camera,
                 intake,
                 feeder,
-                pinpointLogger,
                 drivetrain,
                 driverGamepad,
                 shooterGamepad
@@ -60,33 +73,30 @@ public class MainTeleOp extends OpMode {
         allSubsystems.init(robotHardware);
 
         // Key Binds
-        driverGamepad.leftTrigger
+        driverGamepad.leftTrigger /// Robot Speed
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
 //        driverGamepad.btnY
 //                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
-        shooterGamepad.leftTrigger
-                .onPress(intake::run)
-                .onRelease(intake::stopRunning);
+        shooterGamepad.leftTrigger /// Intake
+                .whenHeld(intake::tryRunMotorIfReady)
+                .onRelease(intake::stopMotor);
 
-        shooterGamepad.btnA
-                .onPress(intake::reverse)
-                .onPress(feeder::reverse)
-                .onRelease(intake::unReverse)
-                .onRelease(feeder::unReverse);
+        shooterGamepad.btnA /// Reverse ALL
+                .onPress(intake::reverseMode)
+                .onPress(feeder::reverseMode)
+                .onRelease(intake::deactivateReverseMode)
+                .onRelease(feeder::deactivateReverseMode);
 
-        shooterGamepad.rightTrigger
-                .whenHeld(feeder::tryRun)
-                .onRelease(feeder::stopRunning);
+        shooterGamepad.rightTrigger /// Feed Ball (Shoot)
+                .whenHeld(feeder::tryRunMotorIfReady)
+                .onRelease(feeder::stopMotor);
     }
 
     @Override
     public void loop() {
         allSubsystems.update();
-        feeder.tryRun();
-        intake.run();
-
 
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());

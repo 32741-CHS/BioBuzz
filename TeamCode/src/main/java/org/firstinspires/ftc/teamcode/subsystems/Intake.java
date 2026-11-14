@@ -5,10 +5,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
-public class Intake implements SubsystemBase {
+public class Intake implements SubsystemBase, MotorBasicActions {
 
     private boolean reverseMode = false;
     private DcMotor intake;
@@ -24,19 +25,19 @@ public class Intake implements SubsystemBase {
     public void update() {
     }
 
-    public void run() {
+    public void tryRunMotorIfReady() {
         intake.setPower(reverseMode ? 1 : 0);
     }
 
-    public void stopRunning() {
+    public void stopMotor() {
         intake.setPower(0);
     }
 
-    public void reverse() {
+    public void reverseMode() {
         reverseMode = true;
     }
 
-    public void unReverse() {
+    public void deactivateReverseMode() {
         reverseMode = false;
     }
 
