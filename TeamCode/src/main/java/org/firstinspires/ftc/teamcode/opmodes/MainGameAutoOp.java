@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "mainGameAutoOp", group = "Autonomous")
-public class mainGameAutoOp extends LinearOpMode {
+public class MainGameAutoOp extends LinearOpMode {
 
     private Follower follower;
 
