@@ -14,9 +14,9 @@ public class Globals {
     // updates all;
     // REMOVE FINAL TO EDIT VIA PANELS
 
+
     /// Motor Tick Rates
     public static final double GOBILDA_5203_6000RPM = 28, GOBILDA_5203_312RPM = 537.7;
-
     /// Drive Train
     public static final double WHEEL_DIAMETER = 10.4;
     public static final double STICK_DEADBAND = 0.05;
@@ -54,6 +54,7 @@ public class Globals {
     // 0mm inward = nectar
     // Feeder
     public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
+    public static Boolean isRedAlliance = true;
     public static boolean fieldCentricDriving = false;
     /// Servo
     public static double SERVO_BIG_BALL = 0.9;

@@ -17,12 +17,10 @@ import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 public class SimpleFeederAndFlywheel implements SubsystemBase {
-    public static double desiredFlywheelRPS = 13;
-    public static boolean isFlywheelIdled = false;
+    public boolean isFlywheelIdled = false;
     GoalTrackerSimple goalTrackerSimple;
     private DcMotorEx flywheel;
     private DcMotor feeder;
-    private boolean requestedReverseFeed = false;
     private Servo servo;
 
     public SimpleFeederAndFlywheel(GoalTrackerSimple gts) {
@@ -32,7 +30,7 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
     @Override
     public void init(RobotHardwareGroup robotHardware) {
         flywheel = robotHardware.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -43,15 +41,16 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
         servo = robotHardware.servo;
     }
 
+
     @Override
     public void update() {
-        flywheel.setVelocity((!isFlywheelIdled) ? getRPS() * GOBILDA_5203_6000RPM : 0);
+        flywheel.setVelocity((!isFlywheelIdled) ? desiredRPS() * GOBILDA_5203_6000RPM : 0);
 
         panelsTelemetry.addData("Flywheel RPS", getFlywheelRPS());
         panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }
 
-    double getRPS() {
+    double desiredRPS() {
         return Ballistics.calculateFlywheelRPS(goalTrackerSimple.getDistance());
     }
 
@@ -60,7 +59,7 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
     }
 
     double getFlywheelErrorRPS() {
-        return getFlywheelRPS() - desiredFlywheelRPS;
+        return getFlywheelRPS() - desiredRPS();
     }
 
     public void requestReversedFeed() {
@@ -69,12 +68,16 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
 
     public void requestFeed() {
         if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL)
-            feeder.setPower(requestedReverseFeed ? -FEEDER_POWER : FEEDER_POWER);
+            feeder.setPower(FEEDER_POWER);
+        else feeder.setPower(0);
     }
 
     public void stopFeed() {
         feeder.setPower(0);
-        requestedReverseFeed = false;
+    }
+
+    public void runFlywheel() {
+        isFlywheelIdled = false;
     }
 
     public void idleFlywheel() {

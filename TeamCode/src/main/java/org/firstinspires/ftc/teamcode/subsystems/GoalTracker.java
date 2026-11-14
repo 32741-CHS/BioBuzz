@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -20,7 +21,6 @@ public class GoalTracker implements SubsystemBase {
     private final Turret turret;
     private final Flywheel flywheel;
     private AprilTagProcessor aprilTag;
-    private boolean isRed = true;
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
@@ -65,10 +65,10 @@ public class GoalTracker implements SubsystemBase {
 
             // Alliance filtering if name metadata exists
             if (name != null) {
-                if (isRed && !name.startsWith("RED"))
+                if (isRedAlliance && !name.startsWith("RED"))
                     continue;
 
-                if (!isRed && !name.startsWith("BLUE"))
+                if (!isRedAlliance && !name.startsWith("BLUE"))
                     continue;
             }
 
@@ -126,7 +126,7 @@ public class GoalTracker implements SubsystemBase {
     }
 
     public void setTeam(boolean isRed) {
-        this.isRed = isRed;
+        isRedAlliance = isRed;
     }
 
     public double getDistance() {
