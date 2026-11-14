@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configurable
-public final class Camera implements SubsystemBase {
+public final class ColourDetector implements SubsystemBase {
     // config
     public static double NectarThreshold = 200.0;
     public static double PollenThreshold = 150.0;
@@ -64,18 +64,18 @@ public final class Camera implements SubsystemBase {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
         if ((Color.green(color) + Color.blue(color)) / 2.0f >= PollenThreshold) {
-            panelsTelemetry.addData("Camera Ball Type", "Small");
+            panelsTelemetry.addData("ColourDetector Ball Type", "Small");
             return BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
             if (Color.red(color) >= NectarThreshold) {
-                panelsTelemetry.addData("Camera Ball Type", "Big");
+                panelsTelemetry.addData("ColourDetector Ball Type", "Big");
                 return BallType.Big;
             }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
             if (Color.blue(color) >= NectarThreshold) {
-                panelsTelemetry.addData("Camera Ball Type", "Big");
+                panelsTelemetry.addData("ColourDetector Ball Type", "Big");
                 return BallType.Big;
             }
         }
@@ -96,7 +96,7 @@ public final class Camera implements SubsystemBase {
 
         if (!proc.hasProcessedFrame()) return Color.BLACK;
 
-        panelsTelemetry.addData("Camera Color", proc.getLastColor());
+        panelsTelemetry.addData("ColourDetector Color", proc.getLastColor());
         return proc.getLastColor();
     }
 

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.subsystems.Camera;
+import org.firstinspires.ftc.teamcode.subsystems.ColourDetector;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -28,7 +28,7 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
-    private Camera camera;
+    private ColourDetector colourDetector;
     private Turret turret;
     private GoalTracker goaltracker;
 
@@ -42,15 +42,15 @@ public class MainTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                (camera = new Camera()),
+                (colourDetector = new ColourDetector()),
                 (intake = new Intake()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
                 (drivetrain = new Drivetrain(0, 0, 0)),
 
                 (turret = new Turret(drivetrain)),
-                (flywheel = new Flywheel(drivetrain, camera)),
-                (feeder = new Feeder(flywheel, camera)),
+                (flywheel = new Flywheel(drivetrain, colourDetector)),
+                (feeder = new Feeder(flywheel, colourDetector)),
                 (goaltracker = new GoalTracker(turret, flywheel))
         );
 
