@@ -15,6 +15,8 @@ public class Turret implements SubsystemBase {
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     public static boolean AllowAutoRotate = true;
     public static double IMUHeadingOffset = Math.atan2(428.0 / 2.0, -448.0 / 2.0);
+    public static double CameraOffsetX = 0.0; // inches forward/backward from center
+    public static double CameraOffsetY = 0.0; // inches left/right from center
     private final Drivetrain drivetrain;
     private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
     private double CurrentRotation = 0;
@@ -43,11 +45,15 @@ public class Turret implements SubsystemBase {
         double robotY = drivetrain.getY();
         double robotHeading = drivetrain.getHeading() - IMUHeadingOffset;
 
+        // Calculate camera position on the field accounting for body-frame offset (CameraOffsetX, CameraOffsetY)
+        double camX = robotX + CameraOffsetX * Math.cos(robotHeading) - CameraOffsetY * Math.sin(robotHeading);
+        double camY = robotY + CameraOffsetX * Math.sin(robotHeading) + CameraOffsetY * Math.cos(robotHeading);
+
         // FTC bearing: positive = right (clockwise). Field heading increases counter-clockwise.
         double fieldAngleToGoal = robotHeading - bearingRadians;
 
-        double goalX = robotX + distance * Math.cos(fieldAngleToGoal);
-        double goalY = robotY + distance * Math.sin(fieldAngleToGoal);
+        double goalX = camX + distance * Math.cos(fieldAngleToGoal);
+        double goalY = camY + distance * Math.sin(fieldAngleToGoal);
 
         CurrentGoalPosition = new Vector2D(goalX, goalY);
     }
