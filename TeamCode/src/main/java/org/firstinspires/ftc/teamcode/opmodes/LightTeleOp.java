@@ -18,7 +18,6 @@ public class LightTeleOp extends OpMode {
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
-    private OdometryLogger pinpointLogger;
 
     @Override
     public void init() {
@@ -26,7 +25,6 @@ public class LightTeleOp extends OpMode {
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
         // Subsystems
-        pinpointLogger = new OdometryLogger();
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
         drivetrain = new Drivetrain(0, 0, 0);
@@ -36,8 +34,8 @@ public class LightTeleOp extends OpMode {
         allSubsystems = new SubsystemHandler(
                 driverGamepad,
                 shooterGamepad,
-                pinpointLogger,
-                drivetrain
+                drivetrain,
+                new OdometryLogger()
         );
 
 
