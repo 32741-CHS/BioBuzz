@@ -19,12 +19,11 @@ import org.firstinspires.ftc.teamcode.utils.Ballistics;
 
 @TeleOp(name = "Shooter Light TeleOp")
 public class LightTeleOpWithShooter extends OpMode {
-    GamepadWrapper driverGamepad, shooterGamepad;
+    private GamepadWrapper driverGamepad, shooterGamepad;
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
-    private OdometryLogger pinpointLogger;
-    private GoalTrackerSimple gps;
+    private GoalTrackerSimple goalTrackerSimple;
 
 
     @Override
@@ -32,29 +31,25 @@ public class LightTeleOpWithShooter extends OpMode {
         // Robot Hardware Special Init
         (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
 
-        // Subsystems
-        pinpointLogger = new OdometryLogger();
-        driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
-        shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
-        drivetrain = new Drivetrain(0, 0, 0);
-        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
-        gps = new GoalTrackerSimple();
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                driverGamepad,
-                shooterGamepad,
-                gps,
-                pinpointLogger,
-                drivetrain
+                (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
+                (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
+                (drivetrain = new Drivetrain(0, 0, 0)),
+                (goalTrackerSimple = new GoalTrackerSimple()),
+                new OdometryLogger()
         );
+
+        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
         allSubsystems.init(robotHardware);
 
+        /// Motor Configs
         robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
         robotHardware.flywheel.setPower(0.65);
 
-        // Key Binds
+        /// Key Binds
         driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
@@ -77,11 +72,16 @@ public class LightTeleOpWithShooter extends OpMode {
     @Override
     public void loop() {
         allSubsystems.update();
+
         robotHardware.flywheel.setPIDFCoefficients(
                 DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
 
-        robotHardware.flywheel.setVelocity(Ballistics.calculateFlywheelRPS(gps.getDistance()));
+        robotHardware.flywheel.setVelocity(
+                Ballistics.calculateFlywheelRPS(goalTrackerSimple.getDistance())
+        );
+
+
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
         panelsTelemetry.addData("[drivetrain] Y", drivetrain.getY());
