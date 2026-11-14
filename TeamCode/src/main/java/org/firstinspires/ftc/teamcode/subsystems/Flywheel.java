@@ -49,10 +49,6 @@ public class Flywheel implements SubsystemBase {
     public static double BALL_INERTIA_BETA = 2.0 / 3.0;
     public static double ENERGY_TRANSFER_EFFICIENCY = 0.50;
     public static double MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV = 1.0;
-    /**
-     * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
-     * referred to the flywheel shaft, in kg*m^2.
-     */
     public static double FLYWHEEL_INERTIA_KG_M2 = 0.0016800128;
 
     public static int MAX_COEFFICIENT_ITERATIONS = 20;
