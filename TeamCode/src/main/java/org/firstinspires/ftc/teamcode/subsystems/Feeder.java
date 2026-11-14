@@ -19,7 +19,7 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     public static double NECTAR_SERVO_POS = 0.0;
     public static double POLLEN_SERVO_POS = 0.45;
     private final Flywheel flywheel;
-    private final Camera camera;
+    private final ColourDetector colourDetector;
     private double desiredPower = 0;
     private boolean reverseMode = false;
     private DcMotor feeder;
@@ -27,9 +27,9 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     private WebcamName insideCam;
     private BallType currentBallType = BallType.Big;
 
-    public Feeder(Flywheel flywheel, Camera camera) {
+    public Feeder(Flywheel flywheel, ColourDetector colourDetector) {
         this.flywheel = flywheel;
-        this.camera = camera;
+        this.colourDetector = colourDetector;
     }
 
     @Override
@@ -45,8 +45,8 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
 
     @Override
     public void update() {
-        if (camera == null && insideCam == null) return;
-        BallType detectedType = camera.getBallType(insideCam);
+        if (colourDetector == null && insideCam == null) return;
+        BallType detectedType = colourDetector.getBallType(insideCam);
         if (detectedType != BallType.None) {
             setBallType(detectedType);
         }
@@ -67,14 +67,14 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
         applyServoPosition();
     }
 
-    public BallType getCurrentBallType() {
-        return currentBallType;
-    }
-
     private void applyServoPosition() {
         if (servo == null) return;
         double targetPos = (currentBallType == BallType.Small) ? POLLEN_SERVO_POS : NECTAR_SERVO_POS;
         servo.setPosition(targetPos);
+    }
+
+    public BallType getCurrentBallType() {
+        return currentBallType;
     }
 
     public void tryRunMotorIfReady() {

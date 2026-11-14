@@ -32,177 +32,176 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
 public class Flywheel implements SubsystemBase {
-	// config
-	public static double desiredFlywheelRPS = 13;
-	public static double maximumFlywheelRPM = 6000;
-	public static double minimumFlywheelRPM = 0;
-	public static boolean useDynamicSpeed = true;
-	public static boolean canSpinFlywheel = false;
-	public static boolean doSimulation = true; // set to false if lag
+    private static final double CameraDisplacementX = 0.06;
+    private static final double CameraHeight = 0.37;
+    private static final double HeightFromAprilTag = 0.15; // tweak if not good
+    // NEW: lumped Magnus (spin lift) constant, units 1/m. 0 = Magnus off. Tune on the field.
+    private static final double MagnusCoefficient = 0.019;
+    // config
+    public static double desiredFlywheelRPS = 13;
+    public static double maximumFlywheelRPM = 6000;
+    public static double minimumFlywheelRPM = 0;
+    public static boolean useDynamicSpeed = true;
+    public static boolean canSpinFlywheel = false;
+    public static boolean doSimulation = true; // set to false if lag
+    private final ColourDetector colourDetector;
+    private final Drivetrain drivetrain;
+    private DcMotorEx flywheel;
+    private WebcamName insideCam;
+    // goal stuff
+    private double distance = Double.NaN;
+    private double zRadians = Double.NaN;
 
-	private DcMotorEx flywheel;
-	private Camera camera;
-	private Drivetrain drivetrain;
-	private WebcamName insideCam;
-	private static double CameraDisplacementX = 0.06;
-	private static double CameraHeight = 0.37;
-	private static double HeightFromAprilTag = 0.15; // tweak if not good
-	// NEW: lumped Magnus (spin lift) constant, units 1/m. 0 = Magnus off. Tune on the field.
-	private static double MagnusCoefficient = 0.019;
+    public Flywheel(Drivetrain dt, ColourDetector cam) {
+        this.drivetrain = dt;
+        this.colourDetector = cam;
+    }
 
-	// goal stuff
-	private double distance = Double.NaN;
-	private double zRadians = Double.NaN;
+    public static void setDesiredFlywheelRPS(double rps) {
+        desiredFlywheelRPS = rps;
+    }
 
-	public Flywheel(Drivetrain dt, Camera cam) {
-		this.drivetrain = dt;
-		this.camera = cam;
-	}
+    public void changeGoal(double distance, double zRadians) {
+        this.distance = distance;
+        this.zRadians = zRadians;
+    }
 
-	public void changeGoal(double distance, double zRadians) {
-		this.distance = distance;
-		this.zRadians = zRadians;
-	}
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+        flywheel = robotHardware.flywheel;
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.insideCam = robotHardware.insideCam;
+    }
 
-	private void UpdateDynamicRPS() {
-		if (Double.isNaN(distance) || Double.isNaN(zRadians)) return;
+    @Override
+    public void update() {
+        if (useDynamicSpeed) UpdateDynamicRPS();
 
-		double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
-		double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
+        // apply PIDF every frame so @Configurable changes work
+        flywheel.setPIDFCoefficients(
+                DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
 
-		// MATH FIX 1: standard projectile equation, ball speed needed with NO air resistance
-		// v^2 = g x^2 / (2 cos^2(theta) (x tan(theta) - dy))
-		double heightDiff = verticalDistance - InitialCamHeight;
-		double angleRad = Math.toRadians(ShootingAngle);
-		double denominator = 2 * Math.pow(Math.cos(angleRad), 2)
-				* (horizontalDistance * Math.tan(angleRad) - heightDiff);
-		if (denominator <= 0) return; // target can't be hit at this launch angle (only added line that isn't maths)
-		double velocityInVacuum = Math.sqrt(Gravity * horizontalDistance * horizontalDistance / denominator);
+        flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
-		double flywheelRadius = FlywheelDiameter / 2;
+        panelsGraph.addData("Flywheel Vel", canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
+        panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
+        panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
+    }
 
-		// MATH FIX 2: ball leaves slower than the wheel surface, so DIVIDE by (1 - slip).
-		// MATH FIX 3: RPS = surface speed / circumference (no *60 factors).
-		double desiredRPS = (velocityInVacuum / (1 - SlipagePercentage)) / (Math.PI * FlywheelDiameter);
+    private void UpdateDynamicRPS() {
+        if (Double.isNaN(distance) || Double.isNaN(zRadians)) return;
 
-		// MATH FIX 4: simulation starts from the speed we just calculated, not the old desiredFlywheelRPS
-		double initialVelocityX = Math.cos(angleRad) * velocityInVacuum;
-		double initialVelocityY = Math.sin(angleRad) * velocityInVacuum;
+        double horizontalDistance = CameraDisplacementX + distance * Math.cos(zRadians);
+        double verticalDistance = distance * Math.sin(zRadians) + CameraHeight;
 
-		double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
-		BallRPM = desiredRPS * 60; // MATH FIX 5: spin comes from the wheel speed we are asking for
-		Vx = initialVelocityX;
-		Vy = initialVelocityY;
-		Px = 0; // MATH FIX 6: horizontalDistance is already measured from the launch point
-		Py = InitialCamHeight;
+        // MATH FIX 1: standard projectile equation, ball speed needed with NO air resistance
+        // v^2 = g x^2 / (2 cos^2(theta) (x tan(theta) - dy))
+        double heightDiff = verticalDistance - InitialCamHeight;
+        double angleRad = Math.toRadians(ShootingAngle);
+        double denominator = 2 * Math.pow(Math.cos(angleRad), 2)
+                * (horizontalDistance * Math.tan(angleRad) - heightDiff);
+        if (denominator <= 0)
+            return; // target can't be hit at this launch angle (only added line that isn't maths)
+        double velocityInVacuum = Math.sqrt(Gravity * horizontalDistance * horizontalDistance / denominator);
 
-		double ballMass = BallGeneralMass;
-		if (camera.getBallType(insideCam) == BallType.Big) {
-			ballMass = NectarMass;
-		} else if (camera.getBallType(insideCam) == BallType.Small) {
-			ballMass = PollenMass;
-		}
+        double flywheelRadius = FlywheelDiameter / 2;
 
-		// AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
-		double dragK = AerodynamicDrag * BallGeneralMass / ballMass;
+        // MATH FIX 2: ball leaves slower than the wheel surface, so DIVIDE by (1 - slip).
+        // MATH FIX 3: RPS = surface speed / circumference (no *60 factors).
+        double desiredRPS = (velocityInVacuum / (1 - SlipagePercentage)) / (Math.PI * FlywheelDiameter);
+
+        // MATH FIX 4: simulation starts from the speed we just calculated, not the old desiredFlywheelRPS
+        double initialVelocityX = Math.cos(angleRad) * velocityInVacuum;
+        double initialVelocityY = Math.sin(angleRad) * velocityInVacuum;
+
+        double Spin, Geff, BallRPM, Vx, Vy, Px, Py;
+        BallRPM = desiredRPS * 60; // MATH FIX 5: spin comes from the wheel speed we are asking for
+        Vx = initialVelocityX;
+        Vy = initialVelocityY;
+        Px = 0; // MATH FIX 6: horizontalDistance is already measured from the launch point
+        Py = InitialCamHeight;
+
+        double ballMass = BallGeneralMass;
+        if (colourDetector.getBallType(insideCam) == BallType.Big) {
+            ballMass = NectarMass;
+        } else if (colourDetector.getBallType(insideCam) == BallType.Small) {
+            ballMass = PollenMass;
+        }
+
+        // AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
+        double dragK = AerodynamicDrag * BallGeneralMass / ballMass;
 
 
-		if (doSimulation) {
-			double currTime = 0;
-			boolean simulationComplete = false;
-			while (!simulationComplete) {
-				double speed = Math.hypot(Vx, Vy);
-				Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
-				// MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
-				// RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
-				Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
-				// MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
-				BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
-				// MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
-				Vx = Vx - dragK * speed * Vx * TimeInterval;
-				Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
-				Px = Px + Vx * TimeInterval;
-				Py = Py + Vy * TimeInterval;
+        if (doSimulation) {
+            double currTime = 0;
+            boolean simulationComplete = false;
+            while (!simulationComplete) {
+                double speed = Math.hypot(Vx, Vy);
+                Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
+                // MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
+                // RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
+                Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
+                // MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
+                BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
+                // MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
+                Vx = Vx - dragK * speed * Vx * TimeInterval;
+                Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
+                Px = Px + Vx * TimeInterval;
+                Py = Py + Vy * TimeInterval;
 
-				if (Py <= 0.001) {
-					panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
-					desiredRPS += desiredRPS / 100 * 5;
-					break;
-				}
+                if (Py <= 0.001) {
+                    panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
+                    desiredRPS += desiredRPS / 100 * 5;
+                    break;
+                }
 
-				// MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
-				if (Px >= horizontalDistance) {
-					if (Py >= verticalDistance) {
-						panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
-					} else {
-						panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
-						desiredRPS += desiredRPS / 100 * 5;
-					}
-					simulationComplete = true;
-					break;
-				}
+                // MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
+                if (Px >= horizontalDistance) {
+                    if (Py >= verticalDistance) {
+                        panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+                    } else {
+                        panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
+                        desiredRPS += desiredRPS / 100 * 5;
+                    }
+                    simulationComplete = true;
+                    break;
+                }
 
-				if (currTime > SimulationTimeout) {
-					simulationComplete = true;
-					if (!(Px >= horizontalDistance)) {
-						panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
-						panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
-						desiredRPS += desiredRPS / 100 * 5;
-					};
-					break;
-				};
+                if (currTime > SimulationTimeout) {
+                    simulationComplete = true;
+                    if (!(Px >= horizontalDistance)) {
+                        panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
+                        panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
+                        desiredRPS += desiredRPS / 100 * 5;
+                    }
+                    break;
+                }
 
-				currTime += TimeInterval;
-			}
+                currTime += TimeInterval;
+            }
 
-		}
+        }
 
-		desiredFlywheelRPS = desiredRPS;
-	};
+        desiredFlywheelRPS = desiredRPS;
+    }
 
-	public static void setDesiredFlywheelRPS(double rps) {
-		desiredFlywheelRPS = rps;
-	}
+    public double getFlywheelRPS() {
+        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
+    }
 
-	@Override
-	public void init(RobotHardwareGroup robotHardware) {
-		flywheel = robotHardware.flywheel;
-		flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
-		flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-		flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-		this.insideCam = robotHardware.insideCam;
-	}
+    public double getFlywheelErrorRPS() {
+        return getFlywheelRPS() - desiredFlywheelRPS;
+    }
 
-	@Override
-	public void update() {
-		if (useDynamicSpeed) UpdateDynamicRPS();
+    public void runFlywheel() {
 
-		// apply PIDF every frame so @Configurable changes work
-		flywheel.setPIDFCoefficients(
-				DcMotor.RunMode.RUN_USING_ENCODER,
-				new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
+    }
 
-		flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
-
-		panelsGraph.addData("Flywheel Vel", canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
-		panelsGraph.addData("Flywheel RPS", getFlywheelRPS());
-		panelsGraph.addData("Flywheel Error", getFlywheelErrorRPS());
-	}
-
-	public double getFlywheelRPS() {
-		return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
-	}
-
-	public void runFlywheel() {
-
-	}
-
-	public double getFlywheelErrorRPS() {
-		return getFlywheelRPS() - desiredFlywheelRPS;
-	}
-
-	public boolean isReadyForFeed() {
-		return Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
-	}
+    public boolean isReadyForFeed() {
+        return Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL;
+    }
 
 }
