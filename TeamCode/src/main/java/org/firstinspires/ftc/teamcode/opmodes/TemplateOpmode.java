@@ -1,88 +1,36 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.fieldCentricDriving;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
-import com.pedropathing.api.PoseFactory;
-import com.pedropathing.math.Pose;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
-import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
-
-@Disabled
-@TeleOp(name = "TemplateOpmode", group = "Tests")
+@Autonomous(name = "EncoderOdometry Logger", group = "Tests")
 public class TemplateOpmode extends OpMode {
-    private final PoseFactory poseFactory = PoseFactory.degrees();
-    // EXAMPLE starting position. Replace with your actual position.
-    private final Pose startPose = poseFactory.of(24, 24, 0);
-    GamepadWrapper driverGamepad, shooterGamepad;
-    private RobotHardwareGroup robotHardware;
-    private SubsystemHandler allSubsystems;
-    private Drivetrain drivetrain;
+    private DcMotor motor;
 
     @Override
     public void init() {
-        // Robot Hardware Special Init
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
-
-        // Subsystems
-        driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
-        shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
-        drivetrain = new Drivetrain(startPose);
-        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
-
-        // Pass all subsystems into the handler
-        allSubsystems = new SubsystemHandler(
-                driverGamepad,
-                shooterGamepad,
-                drivetrain
-        );
-
-        allSubsystems.init(robotHardware);
-
-        // Key Binds
-        driverGamepad.leftBumper
-                .onPress(() -> drivetrain.speed(0.5))
-                .onRelease(() -> drivetrain.speed(1));
-        driverGamepad.btnY
-                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
-
-//        shooterGamepad.leftBumper // Manual Flywheel Control
-//                .whenHeld()
-//                .whenNotHeld()
-//        shooterGamepad.leftBumper.whenHeld(intake::eat);
-//        shooterGamepad.btnA.whenHeld(intake::invert);
-//        shooterGamepad.rightTrigger.whenHeld(shooter::feed);
-//        shooterGamepad.btnA.whenHeld(shooter::reverseFeed);
+        motor = hardwareMap.get(DcMotor.class, "frDrive");
     }
 
-    @Override
+    @Override //Optional
     public void init_loop() {
 
     }
 
-    @Override
+    @Override //Optional
     public void start() {
     }
 
     @Override
     public void loop() {
-        allSubsystems.update();
-
-        // Telemetry
-        telemetry.addData("[drivetrain] X", "%.2f", drivetrain.getX());
-        telemetry.addData("[drivetrain] Y", "%.2f", drivetrain.getY());
-
-        telemetry.addData(
-                "[drivetrain] Heading",
-                "%.2f°",
-                Math.toDegrees(drivetrain.getHeading())
-        );
-        telemetry.update();
+        String key = "Thing";
+        double value = 1;
+        panelsTelemetry.addData(key, value);
+        telemetry.addData(key, value);
     }
+
 
 }
