@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
@@ -9,1515 +8,1500 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.BallType;
-import org.firstinspires.ftc.teamcode.utils.Camera;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 
 @Configurable
 public class Flywheel implements SubsystemBase {
 
-	// Existing public controls: retained so the rest of TeamCode still works.
+    // Existing public controls: retained so the rest of TeamCode still works.
+
+    private static final double[][] POLLEN_CFD = new double[][]{
+            // Spin rad/s, Cd, Cl
+            {0.0, 0.586302, 0.101643},
+            {75.0, 0.498444, 0.384987},
+            {150.0, 0.410585, 0.668330},
+            {270.0, 0.982075, 0.869447},
+            {420.0, 1.103894, 1.072725},
+            {600.0, 0.429050, 1.537901},
+            {1500.0, 1.413068, 2.239814}
+    };
+    private static final double INCH_TO_METRE = 0.0254;
+    private static final double TWO_PI = 2.0 * Math.PI;
+    public static double desiredFlywheelRPS = 13.0;
+    public static double maximumFlywheelRPM = 6000.0;
+
+    // Shooter geometry and model constants.
+    public static double minimumFlywheelRPM = 0.0;
+    public static boolean useDynamicSpeed = true;
+    public static boolean canSpinFlywheel = false;
+    public static double CAMERA_HEIGHT_M = 0.37;
+    public static double CAMERA_AHEAD_OF_SHOOTER_M = 0.06;
+    public static double TARGET_POINT_ABOVE_TAG_CENTRE_M = 0.15;
+    public static double POLLEN_RADIUS_M = 0.03556;
+    public static double NECTAR_RADIUS_M = 0.04572;
+    public static double BALL_SPIN_RATIO = 1.0;
+    public static double BALL_INERTIA_BETA = 2.0 / 3.0;
+    public static double ENERGY_TRANSFER_EFFICIENCY = 0.70;
+    public static double MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV = 1.0;
+    /**
+     * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
+     * referred to the flywheel shaft, in kg*m^2.
+     */
+    public static double FLYWHEEL_INERTIA_KG_M2 = 0.00025;
+
+    // Reuse the existing Globals P and F values.
+    // I and D are adjustable here.
+    public static int MAX_COEFFICIENT_ITERATIONS = 20;
+    public static double COEFFICIENT_SPEED_TOLERANCE_MPS = 0.001;
+
+    // Pollen CFD data.
+    // Spin is in rad/s, NOT RPM.
+    public static double TARGET_STALE_SECONDS = 0.35;
+
+    // Nectar uses the Pollen curve provisionally.
+    // Nectar's larger radius and its own mass are still used.
+    public static double SHOOTER_KI = 0.0;
+    public static double SHOOTER_KD = 0.0;
+    private final Camera camera;
+    private final Drivetrain drivetrain;
+    // Existing hardware dependencies.
+    private DcMotorEx flywheel;
+    private WebcamName insideCam;
+
+    private double distanceInput = Double.NaN;
+    private double bearingRadians = 0.0;
+    private double elevationRadians = Double.NaN;
+
+    private boolean inputIsDirectSlantRange = false;
+    private long lastGoalUpdateNanos = 0L;
+
+    private BallType currentBallType = BallType.Big;
+    private boolean hasValidDynamicTarget = false;
+
+    private ShotSolution lastSolution;
+
+    private double lastAppliedP = Double.NaN;
+    private double lastAppliedI = Double.NaN;
+    private double lastAppliedD = Double.NaN;
+    private double lastAppliedF = Double.NaN;
+
+    // Constructor
+    public Flywheel(Drivetrain dt, Camera cam) {
+        this.drivetrain = dt;
+        this.camera = cam;
+    }
+
+    // AprilTag input.
+
+    private static double requiredExitSpeed(
+            double d,
+            double dh,
+            double theta,
+            double massKg,
+            double radiusM,
+            double cd,
+            double cl
+    ) {
+
+        final double D =
+                d * Math.tan(theta) - dh;
+
+        if (!(D > 1.0e-6)) {
+            return Double.NaN;
+        }
+
+        final double area =
+                Math.PI * radiusM * radiusM;
+
+        final double kD =
+                Globals.AirPressure * cd * area
+                        / (2.0 * massKg);
 
-	public static double desiredFlywheelRPS = 13.0;
-	public static double maximumFlywheelRPM = 6000.0;
-	public static double minimumFlywheelRPM = 0.0;
-	public static boolean useDynamicSpeed = true;
-	public static boolean canSpinFlywheel = false;
+        final double kL =
+                Globals.AirPressure * cl * area
+                        / (2.0 * massKg);
 
-	// Shooter geometry and model constants.
+        final double p0 =
+                Math.tan(theta);
 
-	public static double CAMERA_HEIGHT_M = 0.37;
+        final double pd =
+                2.0 * dh / d - p0;
 
-	public static double CAMERA_AHEAD_OF_SHOOTER_M = 0.06;
+        final double a =
+                2.0 * D / (d * d);
 
-	public static double TARGET_POINT_ABOVE_TAG_CENTRE_M = 0.15;
+        if (!finite(a) || Math.abs(a) < 1.0e-10) {
+            return Double.NaN;
+        }
 
-	public static double POLLEN_RADIUS_M = 0.03556;
-	public static double NECTAR_RADIUS_M = 0.04572;
-
-	public static double BALL_SPIN_RATIO = 1.0;
-
-	public static double BALL_INERTIA_BETA = 2.0 / 3.0;
-
-	public static double ENERGY_TRANSFER_EFFICIENCY = 0.70;
-
-	public static double MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV = 1.0;
-
-	/**
-	 * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
-	 * referred to the flywheel shaft, in kg*m^2.
-	 */
-	public static double FLYWHEEL_INERTIA_KG_M2 = 0.00025;
-
-	public static int MAX_COEFFICIENT_ITERATIONS = 20;
-	public static double COEFFICIENT_SPEED_TOLERANCE_MPS = 0.001;
-	public static double TARGET_STALE_SECONDS = 0.35;
-
-	// Reuse the existing Globals P and F values.
-	// I and D are adjustable here.
-
-	public static double SHOOTER_KI = 0.0;
-	public static double SHOOTER_KD = 0.0;
-
-	// Pollen CFD data.
-	// Spin is in rad/s, NOT RPM.
-
-	private static final double[][] POLLEN_CFD = new double[][] {
-			// Spin rad/s, Cd, Cl
-			{   0.0,       0.586302, 0.101643 },
-			{  75.0,       0.498444, 0.384987 },
-			{ 150.0,       0.410585, 0.668330 },
-			{ 270.0,       0.982075, 0.869447 },
-			{ 420.0,       1.103894, 1.072725 },
-			{ 600.0,       0.429050, 1.537901 },
-			{1500.0,       1.413068, 2.239814 }
-	};
-
-	// Nectar uses the Pollen curve provisionally.
-	// Nectar's larger radius and its own mass are still used.
-
-	private static final double INCH_TO_METRE = 0.0254;
-	private static final double TWO_PI = 2.0 * Math.PI;
-
-	// Existing hardware dependencies.
-
-	private DcMotorEx flywheel;
-	private Camera camera;
-	private Drivetrain drivetrain;
-	private WebcamName insideCam;
-
-	private double distanceInput = Double.NaN;
-	private double bearingRadians = 0.0;
-	private double elevationRadians = Double.NaN;
-
-	private boolean inputIsDirectSlantRange = false;
-	private long lastGoalUpdateNanos = 0L;
-
-	private BallType currentBallType = BallType.Big;
-	private boolean hasValidDynamicTarget = false;
-
-	private ShotSolution lastSolution;
-
-	private double lastAppliedP = Double.NaN;
-	private double lastAppliedI = Double.NaN;
-	private double lastAppliedD = Double.NaN;
-	private double lastAppliedF = Double.NaN;
-
-	// Constructor
-	public Flywheel(Drivetrain dt, Camera cam) {
-		this.drivetrain = dt;
-		this.camera = cam;
-	}
+        final double pathLengthTerm =
+                (F(p0) - F(pd)) / (2.0 * a);
 
-	// AprilTag input.
-
-	/**
-	 * Backwards-compatible method used by the existing GoalTracker.
-	 *
-	 * distance = FTC ftcPose.range in inches (horizontal range).
-	 * zRadians = elevation in radians.
-	 */
-	public void changeGoal(double distance, double zRadians) {
-		changeGoal(distance, 0.0, zRadians);
-	}
-
-	/**
-	 * Bearing-aware version.
-	 *
-	 * distance = FTC horizontal range in inches.
-	 * bearing = horizontal bearing in radians.
-	 * elevation = vertical elevation in radians.
-	 */
-	public void changeGoal(
-			double distance,
-			double bearingRad,
-			double elevationRad
-	) {
-		this.distanceInput = distance;
-		this.bearingRadians = bearingRad;
-		this.elevationRadians = elevationRad;
-
-		this.inputIsDirectSlantRange = false;
-		this.lastGoalUpdateNanos = System.nanoTime();
-	}
-
-	/**
-	 * Direct slant-range API.
-	 *
-	 * directSlantRangeM = direct camera-to-tag distance in metres.
-	 */
-	public void changeGoalFromSlantRange(
-			double directSlantRangeM,
-			double bearingRad,
-			double elevationRad
-	) {
-		this.distanceInput = directSlantRangeM;
-		this.bearingRadians = bearingRad;
-		this.elevationRadians = elevationRad;
-
-		this.inputIsDirectSlantRange = true;
-		this.lastGoalUpdateNanos = System.nanoTime();
-	}
-
-	// Dynamic RPM calculation.
-
-	private void updateDynamicRPS() {
-
-		if (!useDynamicSpeed) {
-			hasValidDynamicTarget = true;
-			return;
-		}
-
-		if (lastGoalUpdateNanos == 0L
-				|| (System.nanoTime() - lastGoalUpdateNanos) * 1.0e-9
-				> TARGET_STALE_SECONDS) {
-
-			hasValidDynamicTarget = false;
-
-			panelsTelemetry.addData(
-					"[Flywheel] Dynamic target",
-					"Waiting for a fresh AprilTag"
-			);
-
-			return;
-		}
-
-		if (!finite(distanceInput)
-				|| distanceInput <= 0.0
-				|| !finite(elevationRadians)
-				|| !finite(bearingRadians)) {
-
-			hasValidDynamicTarget = false;
-
-			panelsTelemetry.addData(
-					"[Flywheel] Solver",
-					"Invalid range/bearing/elevation input"
-			);
-
-			return;
-		}
-
-		// Preserve the existing colour-camera selection.
-
-		if (camera != null && insideCam != null) {
-
-			BallType detected = camera.getBallType(insideCam);
-
-			if (detected != null && detected != BallType.None) {
-				currentBallType = detected;
-			}
-		}
-
-		lastSolution = solveShot(
-				distanceInput,
-				bearingRadians,
-				elevationRadians,
-				inputIsDirectSlantRange,
-				currentBallType
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Ball type",
-				currentBallType.name()
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Range input",
-				distanceInput
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Range input unit",
-				inputIsDirectSlantRange
-						? "metres, direct slant range"
-						: "inches, FTC horizontal range"
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Bearing deg",
-				Math.toDegrees(bearingRadians)
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Elevation deg",
-				Math.toDegrees(elevationRadians)
-		);
-
-		if (!lastSolution.valid) {
-
-			hasValidDynamicTarget = false;
-
-			panelsTelemetry.addData(
-					"[Flywheel] Solver status",
-					"INVALID: " + lastSolution.error
-			);
-
-			return;
-		}
-
-		double rpmBeforeLimit = lastSolution.flywheelRPM;
-
-		double rpmLimited = clamp(
-				rpmBeforeLimit,
-				minimumFlywheelRPM,
-				maximumFlywheelRPM
-		);
-
-		desiredFlywheelRPS = rpmLimited / 60.0;
-
-		hasValidDynamicTarget = true;
-
-		// Geometry telemetry.
-
-		panelsTelemetry.addData(
-				"[Flywheel] Direct slant range m",
-				lastSolution.slantRangeM
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Horizontal shot distance m",
-				lastSolution.horizontalDistanceM
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Target height above shooter m",
-				lastSolution.targetHeightM
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Launch angle deg",
-				Math.toDegrees(lastSolution.launchAngleRad)
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Required ball exit speed m/s",
-				lastSolution.exitSpeedMps
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Calculated ball spin rad/s",
-				lastSolution.ballSpinRadPerSec
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Required flywheel rad/s",
-				lastSolution.flywheelRadPerSec
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Calculated flywheel RPM",
-				rpmBeforeLimit
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Applied target RPM",
-				rpmLimited
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] RPM limit active",
-				Math.abs(rpmBeforeLimit - rpmLimited) > 1.0e-6
-		);
-
-		// Aerodynamic telemetry.
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD Cd",
-				lastSolution.cd
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD Cl",
-				lastSolution.cl
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD lower spin rad/s",
-				lastSolution.lowerSpinRadPerSec
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD upper spin rad/s",
-				lastSolution.upperSpinRadPerSec
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD iterations",
-				lastSolution.iterations
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD coefficient convergence",
-				lastSolution.coefficientsConverged
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD 75 estimate used",
-				lastSolution.estimatedPointUsed
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD unconverged run used",
-				lastSolution.unconvergedPointUsed
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD table clamped",
-				lastSolution.tableClamped
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] Nectar Pollen fallback",
-				lastSolution.nectarFallbackUsed
-		);
-
-		panelsTelemetry.addData(
-				"[Flywheel] CFD note",
-				lastSolution.coefficientNote
-		);
-
-		if (Math.abs(rpmBeforeLimit - rpmLimited) > 1.0e-6) {
-
-			panelsTelemetry.addData(
-					"[Flywheel] WARNING",
-					"Calculated RPM exceeded configured motor limit"
-			);
-		}
-	}
-
-	// Physics solver.
-
-	private ShotSolution solveShot(
-			double inputDistance,
-			double bearingRad,
-			double elevationRad,
-			boolean inputIsSlant,
-			BallType ballType
-	) {
+        if (!(pathLengthTerm > 0.0)
+                || !finite(pathLengthTerm)) {
 
-		ShotSolution result = new ShotSolution();
+            return Double.NaN;
+        }
+
+        final double xi =
+                2.0 * kD * pathLengthTerm;
 
-		result.valid = false;
+        if (!finite(xi) || xi > 50.0) {
+            return Double.NaN;
+        }
 
-		if (Math.abs(elevationRad) >= Math.toRadians(85.0)) {
+        final double dragAmplification =
+                expm1MinusXOverX2(xi);
+
+        if (!(dragAmplification > 0.0)
+                || !finite(dragAmplification)) {
+
+            return Double.NaN;
+        }
+
+        final double integralI =
+                (
+                        Math.pow(1.0 + p0 * p0, 2.5)
+                                - Math.pow(1.0 + pd * pd, 2.5)
+                ) / 5.0
+                        - pd * (H(p0) - H(pd));
+
+        final double magnusRise =
+                kL / (a * a)
+                        * (
+                        5.0 / 3.0 * integralI
+                                - Math.pow(
+                                1.0 + p0 * p0,
+                                1.5
+                        ) * (p0 - pd) * (p0 - pd) / 3.0
+                );
 
-			result.error = "Elevation is too close to vertical";
-
-			return result;
-		}
-
-		final double horizontalCameraRangeM;
-		final double slantRangeM;
+        final double denominator =
+                2.0 * (D + magnusRise);
 
-		final double bearingCos = Math.cos(bearingRad);
-		final double elevationTan = Math.tan(elevationRad);
+        if (!(denominator > 1.0e-9)
+                || !finite(denominator)) {
 
-		// Reconstruct horizontal and vertical distances.
+            return Double.NaN;
+        }
 
-		if (inputIsSlant) {
+        final double cosTheta =
+                Math.cos(theta);
 
-			slantRangeM = inputDistance;
+        final double speedSquared =
+                Globals.Gravity * d * d
+                        * dragAmplification
+                        / denominator
+                        / (cosTheta * cosTheta);
 
-			horizontalCameraRangeM = slantRangeM
-					/ Math.sqrt(
-					1.0 + bearingCos * bearingCos
-							* elevationTan * elevationTan
-			);
+        if (!(speedSquared > 0.0)
+                || !finite(speedSquared)) {
 
-		} else {
+            return Double.NaN;
+        }
 
-			horizontalCameraRangeM =
-					inputDistance * INCH_TO_METRE;
+        return Math.sqrt(speedSquared);
+    }
 
-			double forwardFromCameraM =
-					horizontalCameraRangeM * bearingCos;
+    private static AeroResult getCoefficients(
+            BallType ballType,
+            double spinRadPerSec
+    ) {
+
+        final double spin =
+                Math.abs(spinRadPerSec);
+
+        final double firstSpin =
+                POLLEN_CFD[0][0];
+
+        final double lastSpin =
+                POLLEN_CFD[POLLEN_CFD.length - 1][0];
+
+        if (!finite(spin)) {
+
+            return new AeroResult(
+                    Double.NaN,
+                    Double.NaN,
+                    Double.NaN,
+                    Double.NaN,
+                    false,
+                    false,
+                    false,
+                    "Spin value is not finite"
+            );
+        }
+
+        for (int i = 0; i < POLLEN_CFD.length; i++) {
+
+            if (Math.abs(spin - POLLEN_CFD[i][0]) < 1.0e-9) {
+
+                return aeroAtPoint(
+                        i,
+                        spin,
+                        false,
+                        ballType
+                );
+            }
+        }
+
+        if (spin <= firstSpin) {
 
-			double verticalFromCameraM =
-					forwardFromCameraM * elevationTan;
+            return aeroAtPoint(
+                    0,
+                    spin,
+                    spin < firstSpin,
+                    ballType
+            );
+        }
 
-			slantRangeM = Math.hypot(
-					horizontalCameraRangeM,
-					verticalFromCameraM
-			);
-		}
+        if (spin >= lastSpin) {
 
-		if (!positive(horizontalCameraRangeM)
-				|| !positive(slantRangeM)) {
+            return aeroAtPoint(
+                    POLLEN_CFD.length - 1,
+                    spin,
+                    spin > lastSpin,
+                    ballType
+            );
+        }
 
-			result.error = "Range must be positive";
+        for (int i = 0; i < POLLEN_CFD.length - 1; i++) {
 
-			return result;
-		}
+            double[] low = POLLEN_CFD[i];
+            double[] high = POLLEN_CFD[i + 1];
 
-		// Camera-frame target vector.
+            if (spin >= low[0] && spin <= high[0]) {
 
-		final double targetForwardFromCameraM =
-				horizontalCameraRangeM * bearingCos;
+                double t =
+                        (spin - low[0])
+                                / (high[0] - low[0]);
 
-		final double targetLeftFromCameraM =
-				horizontalCameraRangeM * Math.sin(bearingRad);
+                double cd =
+                        low[1] + t * (high[1] - low[1]);
 
-		final double targetForwardFromShooterM =
-				targetForwardFromCameraM
-						+ CAMERA_AHEAD_OF_SHOOTER_M;
+                double cl =
+                        low[2] + t * (high[2] - low[2]);
 
-		final double horizontalDistanceM = Math.hypot(
-				targetForwardFromShooterM,
-				targetLeftFromCameraM
-		);
+                boolean estimated =
+                        (low[0] == 75.0 || high[0] == 75.0);
 
-		// Reconstruct tag-centre height.
+                boolean unconverged =
+                        (low[0] == 150.0 || high[0] == 150.0
+                                || low[0] == 600.0 || high[0] == 600.0);
 
-		final double cameraToTagVerticalM =
-				targetForwardFromCameraM * elevationTan;
+                String note =
+                        "Interpolated between "
+                                + low[0] + " and " + high[0]
+                                + " rad/s. 75 rad/s is estimated; "
+                                + "150 rad/s key is assumed; "
+                                + "150 and 600 rad/s runs have convergence concerns.";
 
-		final double targetHeightAboveShooterM =
-				cameraToTagVerticalM
-						+ CAMERA_HEIGHT_M
-						- Globals.InitialCamHeight
-						+ TARGET_POINT_ABOVE_TAG_CENTRE_M;
+                if (ballType == BallType.Big) {
 
-		// Shooting angle is stored as degrees.
+                    note +=
+                            " Nectar is using provisional Pollen coefficients.";
+                }
 
-		final double launchAngleRad =
-				Math.toRadians(Globals.ShootingAngle);
+                return new AeroResult(
+                        cd,
+                        cl,
+                        low[0],
+                        high[0],
+                        false,
+                        estimated,
+                        unconverged,
+                        note
+                );
+            }
+        }
 
-		if (!positive(horizontalDistanceM)) {
+        return aeroAtPoint(
+                0,
+                spin,
+                true,
+                ballType
+        );
+    }
 
-			result.error = "Horizontal shot distance is invalid";
+    private static AeroResult aeroAtPoint(
+            int index,
+            double requestedSpin,
+            boolean clamped,
+            BallType ballType
+    ) {
 
-			return result;
-		}
+        double[] point = POLLEN_CFD[index];
 
-		if (!finite(targetHeightAboveShooterM)) {
+        boolean estimated = point[0] == 75.0;
 
-			result.error = "Target height is invalid";
+        boolean unconverged =
+                point[0] == 150.0 || point[0] == 600.0;
 
-			return result;
-		}
+        String note;
 
-		if (!positive(Globals.AirPressure)
-				|| !positive(FLYWHEEL_INERTIA_KG_M2)
-				|| !positive(MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV)
-				|| !(ENERGY_TRANSFER_EFFICIENCY > 0.0
-				&& ENERGY_TRANSFER_EFFICIENCY <= 1.0)
-				|| !positive(BALL_SPIN_RATIO)
-				|| !positive(BALL_INERTIA_BETA)) {
+        if (point[0] == 0.0) {
 
-			result.error =
-					"Check air density, inertia, efficiency, spin ratio and beta settings";
+            note = "0 rad/s: final-20-row mean";
 
-			return result;
-		}
+        } else if (point[0] == 75.0) {
 
-		final boolean isPollen = ballType == BallType.Small;
+            note = "75 rad/s: estimated midpoint; CFD file has no Cd/Cl columns";
 
-		final double ballMassKg =
-				isPollen ? Globals.PollenMass : Globals.NectarMass;
+        } else if (point[0] == 150.0) {
 
-		final double ballRadiusM =
-				isPollen ? POLLEN_RADIUS_M : NECTAR_RADIUS_M;
+            note = "150 rad/s: assumed from ambiguous filename; run still drifts";
 
-		final double flywheelRadiusM =
-				Globals.FlywheelDiameter / 2.0;
+        } else if (point[0] == 270.0) {
 
-		if (!positive(ballMassKg)
-				|| !positive(ballRadiusM)
-				|| !positive(flywheelRadiusM)) {
+            note = "270 rad/s: final-20-row mean";
 
-			result.error =
-					"Ball mass/radius or flywheel radius is invalid";
+        } else if (point[0] == 420.0) {
 
-			return result;
-		}
+            note = "420 rad/s: final-20-row mean";
 
-		final double d = horizontalDistanceM;
-		final double dh = targetHeightAboveShooterM;
-		final double theta = launchAngleRad;
+        } else if (point[0] == 600.0) {
 
-		final double D =
-				d * Math.tan(theta) - dh;
+            note = "600 rad/s: Cd still drifts in final rows";
 
-		if (!(D > 1.0e-6)) {
+        } else {
 
-			result.error =
-					"Target is above the reachable launch line at the configured hood angle";
+            note = "1500 rad/s: final-20-row mean";
+        }
 
-			return result;
-		}
+        if (clamped) {
 
-		if (Math.abs(Math.cos(theta)) < 1.0e-6) {
+            note +=
+                    " Requested spin is outside CFD table; coefficient was clamped.";
+        }
 
-			result.error =
-					"Launch angle is too close to vertical";
+        if (ballType == BallType.Big) {
 
-			return result;
-		}
+            note +=
+                    " Nectar is using provisional Pollen coefficients.";
+        }
 
-		double speedGuess =
-				Math.sqrt(Globals.Gravity * d * d / (2.0 * D))
-						/ Math.cos(theta);
+        return new AeroResult(
+                point[1],
+                point[2],
+                point[0],
+                point[0],
+                clamped,
+                estimated,
+                unconverged,
+                note
+        );
+    }
 
-		if (!positive(speedGuess)) {
+    // Dynamic RPM calculation.
 
-			result.error =
-					"Could not calculate initial ball exit speed";
+    private static double expm1MinusXOverX2(double x) {
 
-			return result;
-		}
+        if (Math.abs(x) < 1.0e-4) {
 
-		double exitSpeed = Double.NaN;
-		double spinRadPerSec = Double.NaN;
+            return 1.0
+                    + x / 3.0
+                    + x * x / 12.0
+                    + x * x * x / 60.0;
+        }
 
-		AeroResult aero = null;
+        return 2.0 * (Math.exp(x) - 1.0 - x)
+                / (x * x);
+    }
 
-		boolean converged = false;
+    // Physics solver.
 
-		int iterations = 0;
+    private static double asinh(double x) {
 
-		final int safeIterationLimit =
-				Math.max(1, Math.min(64, MAX_COEFFICIENT_ITERATIONS));
+        return Math.log(
+                x + Math.sqrt(x * x + 1.0)
+        );
+    }
 
-		for (int i = 0; i < safeIterationLimit; i++) {
+    // Closed-form trajectory equation.
 
-			iterations = i + 1;
+    private static double F(double p) {
 
-			spinRadPerSec =
-					BALL_SPIN_RATIO * speedGuess / ballRadiusM;
+        return p * Math.sqrt(1.0 + p * p)
+                + asinh(p);
+    }
 
-			aero = getCoefficients(
-					ballType,
-					spinRadPerSec
-			);
+    // Aerodynamic coefficient interpolation.
 
-			// Original project rotation direction.
+    private static double H(double p) {
 
-			double signedCl =
-					aero.cl * (
-							Globals.RotationalDirection < 0.0
-									? 1.0
-									: -1.0
-					);
+        return p * (2.0 * p * p + 5.0)
+                * Math.sqrt(1.0 + p * p) / 8.0
+                + 3.0 / 8.0 * asinh(p);
+    }
 
-			double candidateSpeed = requiredExitSpeed(
-					d,
-					dh,
-					theta,
-					ballMassKg,
-					ballRadiusM,
-					aero.cd,
-					signedCl
-			);
+    public static void setDesiredFlywheelRPS(double rps) {
 
-			if (!positive(candidateSpeed)) {
+        if (finite(rps)) {
 
-				result.error =
-						"Trajectory equation failed; check launch angle, target height and CFD values";
+            desiredFlywheelRPS =
+                    clamp(
+                            rps,
+                            minimumFlywheelRPM / 60.0,
+                            maximumFlywheelRPM / 60.0
+                    );
+        }
+    }
 
-				return result;
-			}
+    // Mathematical helper functions.
 
-			double error =
-					Math.abs(candidateSpeed - speedGuess);
+    private static boolean finite(double value) {
 
-			exitSpeed = candidateSpeed;
+        return !Double.isNaN(value)
+                && !Double.isInfinite(value);
+    }
 
-			if (error <= COEFFICIENT_SPEED_TOLERANCE_MPS) {
+    private static double clamp(
+            double value,
+            double min,
+            double max
+    ) {
 
-				converged = true;
+        if (max < min) {
+            return min;
+        }
 
-				speedGuess = candidateSpeed;
+        return Math.max(
+                min,
+                Math.min(max, value)
+        );
+    }
 
-				break;
-			}
+    /**
+     * Backwards-compatible method used by the existing GoalTracker.
+     * <p>
+     * distance = FTC ftcPose.range in inches (horizontal range).
+     * zRadians = elevation in radians.
+     */
+    public void changeGoal(double distance, double zRadians) {
+        changeGoal(distance, 0.0, zRadians);
+    }
 
-			// Damping prevents excessive oscillation.
+    /**
+     * Bearing-aware version.
+     * <p>
+     * distance = FTC horizontal range in inches.
+     * bearing = horizontal bearing in radians.
+     * elevation = vertical elevation in radians.
+     */
+    public void changeGoal(
+            double distance,
+            double bearingRad,
+            double elevationRad
+    ) {
+        this.distanceInput = distance;
+        this.bearingRadians = bearingRad;
+        this.elevationRadians = elevationRad;
 
-			speedGuess =
-					0.5 * speedGuess + 0.5 * candidateSpeed;
-		}
+        this.inputIsDirectSlantRange = false;
+        this.lastGoalUpdateNanos = System.nanoTime();
+    }
 
-		// Re-evaluate at final speed.
+    // FTC subsystem implementation.
 
-		spinRadPerSec =
-				BALL_SPIN_RATIO * speedGuess / ballRadiusM;
+    /**
+     * Direct slant-range API.
+     * <p>
+     * directSlantRangeM = direct camera-to-tag distance in metres.
+     */
+    public void changeGoalFromSlantRange(
+            double directSlantRangeM,
+            double bearingRad,
+            double elevationRad
+    ) {
+        this.distanceInput = directSlantRangeM;
+        this.bearingRadians = bearingRad;
+        this.elevationRadians = elevationRad;
 
-		aero = getCoefficients(
-				ballType,
-				spinRadPerSec
-		);
+        this.inputIsDirectSlantRange = true;
+        this.lastGoalUpdateNanos = System.nanoTime();
+    }
 
-		double signedCl =
-				aero.cl * (
-						Globals.RotationalDirection < 0.0
-								? 1.0
-								: -1.0
-				);
+    private void updateDynamicRPS() {
 
-		exitSpeed = requiredExitSpeed(
-				d,
-				dh,
-				theta,
-				ballMassKg,
-				ballRadiusM,
-				aero.cd,
-				signedCl
-		);
+        if (!useDynamicSpeed) {
+            hasValidDynamicTarget = true;
+            return;
+        }
 
-		if (!positive(exitSpeed)) {
+        if (lastGoalUpdateNanos == 0L
+                || (System.nanoTime() - lastGoalUpdateNanos) * 1.0e-9
+                > TARGET_STALE_SECONDS) {
 
-			result.error =
-					"Final trajectory evaluation failed";
+            hasValidDynamicTarget = false;
 
-			return result;
-		}
+            panelsTelemetry.addData(
+                    "[Flywheel] Dynamic target",
+                    "Waiting for a fresh AprilTag"
+            );
 
-		spinRadPerSec =
-				BALL_SPIN_RATIO * exitSpeed / ballRadiusM;
+            return;
+        }
 
-		converged = converged
-				|| Math.abs(exitSpeed - speedGuess)
-				<= COEFFICIENT_SPEED_TOLERANCE_MPS;
+        if (!finite(distanceInput)
+                || distanceInput <= 0.0
+                || !finite(elevationRadians)
+                || !finite(bearingRadians)) {
 
-		// Flywheel energy-transfer equation.
+            hasValidDynamicTarget = false;
 
-		final double S = BALL_SPIN_RATIO;
+            panelsTelemetry.addData(
+                    "[Flywheel] Solver",
+                    "Invalid range/bearing/elevation input"
+            );
 
-		final double wheelRadPerSec =
-				exitSpeed * Math.sqrt(
-						Math.pow(
-								(1.0 + S) / flywheelRadiusM,
-								2.0
-						)
-								+ ballMassKg
-								* (1.0 + BALL_INERTIA_BETA * S * S)
-								/ (
-								ENERGY_TRANSFER_EFFICIENCY
-										* FLYWHEEL_INERTIA_KG_M2
-						)
-				);
+            return;
+        }
 
-		final double wheelRpm =
-				wheelRadPerSec * 60.0 / TWO_PI;
+        // Preserve the existing colour-camera selection.
 
-		if (!positive(wheelRadPerSec)
-				|| !positive(wheelRpm)) {
+        if (camera != null && insideCam != null) {
 
-			result.error =
-					"Flywheel RPM equation returned an invalid value";
+            BallType detected = camera.getBallType(insideCam);
 
-			return result;
-		}
+            if (detected != null && detected != BallType.None) {
+                currentBallType = detected;
+            }
+        }
 
-		result.valid = true;
-		result.error = "";
+        lastSolution = solveShot(
+                distanceInput,
+                bearingRadians,
+                elevationRadians,
+                inputIsDirectSlantRange,
+                currentBallType
+        );
 
-		result.slantRangeM = slantRangeM;
-		result.horizontalDistanceM = horizontalDistanceM;
-		result.targetHeightM = targetHeightAboveShooterM;
+        panelsTelemetry.addData(
+                "[Flywheel] Ball type",
+                currentBallType.name()
+        );
 
-		result.launchAngleRad = launchAngleRad;
+        panelsTelemetry.addData(
+                "[Flywheel] Range input",
+                distanceInput
+        );
 
-		result.exitSpeedMps = exitSpeed;
-		result.ballSpinRadPerSec = spinRadPerSec;
+        panelsTelemetry.addData(
+                "[Flywheel] Range input unit",
+                inputIsDirectSlantRange
+                        ? "metres, direct slant range"
+                        : "inches, FTC horizontal range"
+        );
 
-		result.flywheelRadPerSec = wheelRadPerSec;
-		result.flywheelRPM = wheelRpm;
+        panelsTelemetry.addData(
+                "[Flywheel] Bearing deg",
+                Math.toDegrees(bearingRadians)
+        );
 
-		result.cd = aero.cd;
-		result.cl = aero.cl;
+        panelsTelemetry.addData(
+                "[Flywheel] Elevation deg",
+                Math.toDegrees(elevationRadians)
+        );
 
-		result.lowerSpinRadPerSec =
-				aero.lowerSpinRadPerSec;
+        if (!lastSolution.valid) {
+
+            hasValidDynamicTarget = false;
 
-		result.upperSpinRadPerSec =
-				aero.upperSpinRadPerSec;
+            panelsTelemetry.addData(
+                    "[Flywheel] Solver status",
+                    "INVALID: " + lastSolution.error
+            );
+
+            return;
+        }
+
+        double rpmBeforeLimit = lastSolution.flywheelRPM;
+
+        double rpmLimited = clamp(
+                rpmBeforeLimit,
+                minimumFlywheelRPM,
+                maximumFlywheelRPM
+        );
+
+        desiredFlywheelRPS = rpmLimited / 60.0;
+
+        hasValidDynamicTarget = true;
+
+        // Geometry telemetry.
+
+        panelsTelemetry.addData(
+                "[Flywheel] Direct slant range m",
+                lastSolution.slantRangeM
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Horizontal shot distance m",
+                lastSolution.horizontalDistanceM
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Target height above shooter m",
+                lastSolution.targetHeightM
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Launch angle deg",
+                Math.toDegrees(lastSolution.launchAngleRad)
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Required ball exit speed m/s",
+                lastSolution.exitSpeedMps
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Calculated ball spin rad/s",
+                lastSolution.ballSpinRadPerSec
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Required flywheel rad/s",
+                lastSolution.flywheelRadPerSec
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Calculated flywheel RPM",
+                rpmBeforeLimit
+        );
+
+        panelsTelemetry.addData(
+                "[Flywheel] Applied target RPM",
+                rpmLimited
+        );
 
-		result.iterations = iterations;
+        panelsTelemetry.addData(
+                "[Flywheel] RPM limit active",
+                Math.abs(rpmBeforeLimit - rpmLimited) > 1.0e-6
+        );
 
-		result.coefficientsConverged = converged;
+        // Aerodynamic telemetry.
 
-		result.estimatedPointUsed =
-				aero.estimatedPointUsed;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD Cd",
+                lastSolution.cd
+        );
 
-		result.unconvergedPointUsed =
-				aero.unconvergedPointUsed;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD Cl",
+                lastSolution.cl
+        );
 
-		result.tableClamped = aero.tableClamped;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD lower spin rad/s",
+                lastSolution.lowerSpinRadPerSec
+        );
 
-		result.nectarFallbackUsed = !isPollen;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD upper spin rad/s",
+                lastSolution.upperSpinRadPerSec
+        );
 
-		result.coefficientNote = aero.note;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD iterations",
+                lastSolution.iterations
+        );
 
-		return result;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] CFD coefficient convergence",
+                lastSolution.coefficientsConverged
+        );
 
-	// Closed-form trajectory equation.
+        panelsTelemetry.addData(
+                "[Flywheel] CFD 75 estimate used",
+                lastSolution.estimatedPointUsed
+        );
 
-	private static double requiredExitSpeed(
-			double d,
-			double dh,
-			double theta,
-			double massKg,
-			double radiusM,
-			double cd,
-			double cl
-	) {
+        panelsTelemetry.addData(
+                "[Flywheel] CFD unconverged run used",
+                lastSolution.unconvergedPointUsed
+        );
 
-		final double D =
-				d * Math.tan(theta) - dh;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD table clamped",
+                lastSolution.tableClamped
+        );
 
-		if (!(D > 1.0e-6)) {
-			return Double.NaN;
-		}
+        panelsTelemetry.addData(
+                "[Flywheel] Nectar Pollen fallback",
+                lastSolution.nectarFallbackUsed
+        );
 
-		final double area =
-				Math.PI * radiusM * radiusM;
+        panelsTelemetry.addData(
+                "[Flywheel] CFD note",
+                lastSolution.coefficientNote
+        );
 
-		final double kD =
-				Globals.AirPressure * cd * area
-						/ (2.0 * massKg);
+        if (Math.abs(rpmBeforeLimit - rpmLimited) > 1.0e-6) {
 
-		final double kL =
-				Globals.AirPressure * cl * area
-						/ (2.0 * massKg);
+            panelsTelemetry.addData(
+                    "[Flywheel] WARNING",
+                    "Calculated RPM exceeded configured motor limit"
+            );
+        }
+    }
+    // PIDF configuration.
 
-		final double p0 =
-				Math.tan(theta);
+    private ShotSolution solveShot(
+            double inputDistance,
+            double bearingRad,
+            double elevationRad,
+            boolean inputIsSlant,
+            BallType ballType
+    ) {
 
-		final double pd =
-				2.0 * dh / d - p0;
+        ShotSolution result = new ShotSolution();
 
-		final double a =
-				2.0 * D / (d * d);
+        result.valid = false;
 
-		if (!finite(a) || Math.abs(a) < 1.0e-10) {
-			return Double.NaN;
-		}
+        if (Math.abs(elevationRad) >= Math.toRadians(85.0)) {
 
-		final double pathLengthTerm =
-				(F(p0) - F(pd)) / (2.0 * a);
+            result.error = "Elevation is too close to vertical";
 
-		if (!(pathLengthTerm > 0.0)
-				|| !finite(pathLengthTerm)) {
+            return result;
+        }
 
-			return Double.NaN;
-		}
+        final double horizontalCameraRangeM;
+        final double slantRangeM;
 
-		final double xi =
-				2.0 * kD * pathLengthTerm;
+        final double bearingCos = Math.cos(bearingRad);
+        final double elevationTan = Math.tan(elevationRad);
 
-		if (!finite(xi) || xi > 50.0) {
-			return Double.NaN;
-		}
+        // Reconstruct horizontal and vertical distances.
 
-		final double dragAmplification =
-				expm1MinusXOverX2(xi);
+        if (inputIsSlant) {
 
-		if (!(dragAmplification > 0.0)
-				|| !finite(dragAmplification)) {
+            slantRangeM = inputDistance;
 
-			return Double.NaN;
-		}
+            horizontalCameraRangeM = slantRangeM
+                    / Math.sqrt(
+                    1.0 + bearingCos * bearingCos
+                            * elevationTan * elevationTan
+            );
 
-		final double integralI =
-				(
-						Math.pow(1.0 + p0 * p0, 2.5)
-								- Math.pow(1.0 + pd * pd, 2.5)
-				) / 5.0
-						- pd * (H(p0) - H(pd));
+        } else {
 
-		final double magnusRise =
-				kL / (a * a)
-						* (
-						5.0 / 3.0 * integralI
-								- Math.pow(
-								1.0 + p0 * p0,
-								1.5
-						) * (p0 - pd) * (p0 - pd) / 3.0
-				);
+            horizontalCameraRangeM =
+                    inputDistance * INCH_TO_METRE;
 
-		final double denominator =
-				2.0 * (D + magnusRise);
+            double forwardFromCameraM =
+                    horizontalCameraRangeM * bearingCos;
 
-		if (!(denominator > 1.0e-9)
-				|| !finite(denominator)) {
+            double verticalFromCameraM =
+                    forwardFromCameraM * elevationTan;
 
-			return Double.NaN;
-		}
+            slantRangeM = Math.hypot(
+                    horizontalCameraRangeM,
+                    verticalFromCameraM
+            );
+        }
 
-		final double cosTheta =
-				Math.cos(theta);
+        if (!positive(horizontalCameraRangeM)
+                || !positive(slantRangeM)) {
 
-		final double speedSquared =
-				Globals.Gravity * d * d
-						* dragAmplification
-						/ denominator
-						/ (cosTheta * cosTheta);
+            result.error = "Range must be positive";
 
-		if (!(speedSquared > 0.0)
-				|| !finite(speedSquared)) {
+            return result;
+        }
 
-			return Double.NaN;
-		}
+        // Camera-frame target vector.
 
-		return Math.sqrt(speedSquared);
-	}
+        final double targetForwardFromCameraM =
+                horizontalCameraRangeM * bearingCos;
 
-	// Aerodynamic coefficient interpolation.
+        final double targetLeftFromCameraM =
+                horizontalCameraRangeM * Math.sin(bearingRad);
 
-	private static AeroResult getCoefficients(
-			BallType ballType,
-			double spinRadPerSec
-	) {
+        final double targetForwardFromShooterM =
+                targetForwardFromCameraM
+                        + CAMERA_AHEAD_OF_SHOOTER_M;
 
-		final double spin =
-				Math.abs(spinRadPerSec);
+        final double horizontalDistanceM = Math.hypot(
+                targetForwardFromShooterM,
+                targetLeftFromCameraM
+        );
 
-		final double firstSpin =
-				POLLEN_CFD[0][0];
+        // Reconstruct tag-centre height.
 
-		final double lastSpin =
-				POLLEN_CFD[POLLEN_CFD.length - 1][0];
+        final double cameraToTagVerticalM =
+                targetForwardFromCameraM * elevationTan;
 
-		if (!finite(spin)) {
+        final double targetHeightAboveShooterM =
+                cameraToTagVerticalM
+                        + CAMERA_HEIGHT_M
+                        - Globals.InitialCamHeight
+                        + TARGET_POINT_ABOVE_TAG_CENTRE_M;
 
-			return new AeroResult(
-					Double.NaN,
-					Double.NaN,
-					Double.NaN,
-					Double.NaN,
-					false,
-					false,
-					false,
-					"Spin value is not finite"
-			);
-		}
+        // Shooting angle is stored as degrees.
 
-		for (int i = 0; i < POLLEN_CFD.length; i++) {
+        final double launchAngleRad =
+                Math.toRadians(Globals.ShootingAngle);
 
-			if (Math.abs(spin - POLLEN_CFD[i][0]) < 1.0e-9) {
+        if (!positive(horizontalDistanceM)) {
 
-				return aeroAtPoint(
-						i,
-						spin,
-						false,
-						ballType
-				);
-			}
-		}
+            result.error = "Horizontal shot distance is invalid";
 
-		if (spin <= firstSpin) {
+            return result;
+        }
 
-			return aeroAtPoint(
-					0,
-					spin,
-					spin < firstSpin,
-					ballType
-			);
-		}
+        if (!finite(targetHeightAboveShooterM)) {
 
-		if (spin >= lastSpin) {
+            result.error = "Target height is invalid";
 
-			return aeroAtPoint(
-					POLLEN_CFD.length - 1,
-					spin,
-					spin > lastSpin,
-					ballType
-			);
-		}
+            return result;
+        }
 
-		for (int i = 0; i < POLLEN_CFD.length - 1; i++) {
+        if (!positive(Globals.AirPressure)
+                || !positive(FLYWHEEL_INERTIA_KG_M2)
+                || !positive(MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV)
+                || !(ENERGY_TRANSFER_EFFICIENCY > 0.0
+                && ENERGY_TRANSFER_EFFICIENCY <= 1.0)
+                || !positive(BALL_SPIN_RATIO)
+                || !positive(BALL_INERTIA_BETA)) {
 
-			double[] low = POLLEN_CFD[i];
-			double[] high = POLLEN_CFD[i + 1];
+            result.error =
+                    "Check air density, inertia, efficiency, spin ratio and beta settings";
 
-			if (spin >= low[0] && spin <= high[0]) {
+            return result;
+        }
 
-				double t =
-						(spin - low[0])
-								/ (high[0] - low[0]);
+        final boolean isPollen = ballType == BallType.Small;
 
-				double cd =
-						low[1] + t * (high[1] - low[1]);
+        final double ballMassKg =
+                isPollen ? Globals.PollenMass : Globals.NectarMass;
 
-				double cl =
-						low[2] + t * (high[2] - low[2]);
+        final double ballRadiusM =
+                isPollen ? POLLEN_RADIUS_M : NECTAR_RADIUS_M;
 
-				boolean estimated =
-						(low[0] == 75.0 || high[0] == 75.0);
+        final double flywheelRadiusM =
+                Globals.FlywheelDiameter / 2.0;
 
-				boolean unconverged =
-						(low[0] == 150.0 || high[0] == 150.0
-								|| low[0] == 600.0 || high[0] == 600.0);
+        if (!positive(ballMassKg)
+                || !positive(ballRadiusM)
+                || !positive(flywheelRadiusM)) {
 
-				String note =
-						"Interpolated between "
-								+ low[0] + " and " + high[0]
-								+ " rad/s. 75 rad/s is estimated; "
-								+ "150 rad/s key is assumed; "
-								+ "150 and 600 rad/s runs have convergence concerns.";
+            result.error =
+                    "Ball mass/radius or flywheel radius is invalid";
 
-				if (ballType == BallType.Big) {
+            return result;
+        }
 
-					note +=
-							" Nectar is using provisional Pollen coefficients.";
-				}
+        final double d = horizontalDistanceM;
+        final double dh = targetHeightAboveShooterM;
+        final double theta = launchAngleRad;
 
-				return new AeroResult(
-						cd,
-						cl,
-						low[0],
-						high[0],
-						false,
-						estimated,
-						unconverged,
-						note
-				);
-			}
-		}
+        final double D =
+                d * Math.tan(theta) - dh;
 
-		return aeroAtPoint(
-				0,
-				spin,
-				true,
-				ballType
-		);
-	}
+        if (!(D > 1.0e-6)) {
 
-	private static AeroResult aeroAtPoint(
-			int index,
-			double requestedSpin,
-			boolean clamped,
-			BallType ballType
-	) {
+            result.error =
+                    "Target is above the reachable launch line at the configured hood angle";
 
-		double[] point = POLLEN_CFD[index];
+            return result;
+        }
 
-		boolean estimated = point[0] == 75.0;
+        if (Math.abs(Math.cos(theta)) < 1.0e-6) {
 
-		boolean unconverged =
-				point[0] == 150.0 || point[0] == 600.0;
+            result.error =
+                    "Launch angle is too close to vertical";
 
-		String note;
+            return result;
+        }
 
-		if (point[0] == 0.0) {
+        double speedGuess =
+                Math.sqrt(Globals.Gravity * d * d / (2.0 * D))
+                        / Math.cos(theta);
 
-			note = "0 rad/s: final-20-row mean";
+        if (!positive(speedGuess)) {
 
-		} else if (point[0] == 75.0) {
+            result.error =
+                    "Could not calculate initial ball exit speed";
 
-			note = "75 rad/s: estimated midpoint; CFD file has no Cd/Cl columns";
+            return result;
+        }
 
-		} else if (point[0] == 150.0) {
+        double exitSpeed = Double.NaN;
+        double spinRadPerSec = Double.NaN;
 
-			note = "150 rad/s: assumed from ambiguous filename; run still drifts";
+        AeroResult aero = null;
 
-		} else if (point[0] == 270.0) {
+        boolean converged = false;
 
-			note = "270 rad/s: final-20-row mean";
+        int iterations = 0;
 
-		} else if (point[0] == 420.0) {
+        final int safeIterationLimit =
+                Math.max(1, Math.min(64, MAX_COEFFICIENT_ITERATIONS));
 
-			note = "420 rad/s: final-20-row mean";
+        for (int i = 0; i < safeIterationLimit; i++) {
 
-		} else if (point[0] == 600.0) {
+            iterations = i + 1;
 
-			note = "600 rad/s: Cd still drifts in final rows";
+            spinRadPerSec =
+                    BALL_SPIN_RATIO * speedGuess / ballRadiusM;
 
-		} else {
+            aero = getCoefficients(
+                    ballType,
+                    spinRadPerSec
+            );
 
-			note = "1500 rad/s: final-20-row mean";
-		}
+            // Original project rotation direction.
 
-		if (clamped) {
+            double signedCl =
+                    aero.cl * (
+                            Globals.RotationalDirection < 0.0
+                                    ? 1.0
+                                    : -1.0
+                    );
 
-			note +=
-					" Requested spin is outside CFD table; coefficient was clamped.";
-		}
+            double candidateSpeed = requiredExitSpeed(
+                    d,
+                    dh,
+                    theta,
+                    ballMassKg,
+                    ballRadiusM,
+                    aero.cd,
+                    signedCl
+            );
 
-		if (ballType == BallType.Big) {
+            if (!positive(candidateSpeed)) {
 
-			note +=
-					" Nectar is using provisional Pollen coefficients.";
-		}
+                result.error =
+                        "Trajectory equation failed; check launch angle, target height and CFD values";
 
-		return new AeroResult(
-				point[1],
-				point[2],
-				point[0],
-				point[0],
-				clamped,
-				estimated,
-				unconverged,
-				note
-		);
-	}
+                return result;
+            }
 
-	// Mathematical helper functions.
+            double error =
+                    Math.abs(candidateSpeed - speedGuess);
 
-	private static double expm1MinusXOverX2(double x) {
+            exitSpeed = candidateSpeed;
 
-		if (Math.abs(x) < 1.0e-4) {
+            if (error <= COEFFICIENT_SPEED_TOLERANCE_MPS) {
 
-			return 1.0
-					+ x / 3.0
-					+ x * x / 12.0
-					+ x * x * x / 60.0;
-		}
+                converged = true;
 
-		return 2.0 * (Math.exp(x) - 1.0 - x)
-				/ (x * x);
-	}
+                speedGuess = candidateSpeed;
 
-	private static double asinh(double x) {
+                break;
+            }
 
-		return Math.log(
-				x + Math.sqrt(x * x + 1.0)
-		);
-	}
+            // Damping prevents excessive oscillation.
 
-	private static double F(double p) {
+            speedGuess =
+                    0.5 * speedGuess + 0.5 * candidateSpeed;
+        }
 
-		return p * Math.sqrt(1.0 + p * p)
-				+ asinh(p);
-	}
+        // Re-evaluate at final speed.
 
-	private static double H(double p) {
+        spinRadPerSec =
+                BALL_SPIN_RATIO * speedGuess / ballRadiusM;
 
-		return p * (2.0 * p * p + 5.0)
-				* Math.sqrt(1.0 + p * p) / 8.0
-				+ 3.0 / 8.0 * asinh(p);
-	}
+        aero = getCoefficients(
+                ballType,
+                spinRadPerSec
+        );
 
-	// FTC subsystem implementation.
+        double signedCl =
+                aero.cl * (
+                        Globals.RotationalDirection < 0.0
+                                ? 1.0
+                                : -1.0
+                );
 
-	@Override
-	public void init(RobotHardwareGroup robotHardware) {
+        exitSpeed = requiredExitSpeed(
+                d,
+                dh,
+                theta,
+                ballMassKg,
+                ballRadiusM,
+                aero.cd,
+                signedCl
+        );
 
-		if (robotHardware == null
-				|| robotHardware.flywheel == null) {
+        if (!positive(exitSpeed)) {
 
-			panelsTelemetry.addData(
-					"[Flywheel] INIT ERROR",
-					"Flywheel motor is missing"
-			);
+            result.error =
+                    "Final trajectory evaluation failed";
 
-			return;
-		}
+            return result;
+        }
 
-		flywheel = robotHardware.flywheel;
+        spinRadPerSec =
+                BALL_SPIN_RATIO * exitSpeed / ballRadiusM;
 
-		flywheel.setDirection(
-				DcMotorSimple.Direction.REVERSE
-		);
+        converged = converged
+                || Math.abs(exitSpeed - speedGuess)
+                <= COEFFICIENT_SPEED_TOLERANCE_MPS;
 
-		flywheel.setZeroPowerBehavior(
-				DcMotor.ZeroPowerBehavior.FLOAT
-		);
+        // Flywheel energy-transfer equation.
 
-		flywheel.setMode(
-				DcMotor.RunMode.RUN_USING_ENCODER
-		);
+        final double S = BALL_SPIN_RATIO;
 
-		insideCam = robotHardware.insideCam;
+        final double wheelRadPerSec =
+                exitSpeed * Math.sqrt(
+                        Math.pow(
+                                (1.0 + S) / flywheelRadiusM,
+                                2.0
+                        )
+                                + ballMassKg
+                                * (1.0 + BALL_INERTIA_BETA * S * S)
+                                / (
+                                ENERGY_TRANSFER_EFFICIENCY
+                                        * FLYWHEEL_INERTIA_KG_M2
+                        )
+                );
 
-		applyPIDFCoefficients(true);
+        final double wheelRpm =
+                wheelRadPerSec * 60.0 / TWO_PI;
 
-		flywheel.setVelocity(0.0);
+        if (!positive(wheelRadPerSec)
+                || !positive(wheelRpm)) {
 
-		panelsTelemetry.addData(
-				"[Flywheel] Init",
-				"Ready - motor in RUN_USING_ENCODER"
-		);
+            result.error =
+                    "Flywheel RPM equation returned an invalid value";
 
-		panelsTelemetry.addData(
-				"[Flywheel] Encoder ticks/rev",
-				Globals.GOBILDA_5203_6000RPM
-		);
+            return result;
+        }
 
-		panelsTelemetry.addData(
-				"[Flywheel] Existing P gain",
-				Globals.flywheelKP
-		);
+        result.valid = true;
+        result.error = "";
 
-		panelsTelemetry.addData(
-				"[Flywheel] Existing F gain",
-				Globals.flywheelKF
-		);
-	}
+        result.slantRangeM = slantRangeM;
+        result.horizontalDistanceM = horizontalDistanceM;
+        result.targetHeightM = targetHeightAboveShooterM;
 
-	@Override
-	public void update() {
+        result.launchAngleRad = launchAngleRad;
 
-		if (flywheel == null) {
-			return;
-		}
+        result.exitSpeedMps = exitSpeed;
+        result.ballSpinRadPerSec = spinRadPerSec;
 
-		if (useDynamicSpeed) {
+        result.flywheelRadPerSec = wheelRadPerSec;
+        result.flywheelRPM = wheelRpm;
 
-			updateDynamicRPS();
-		}
+        result.cd = aero.cd;
+        result.cl = aero.cl;
 
-		applyPIDFCoefficients(false);
+        result.lowerSpinRadPerSec =
+                aero.lowerSpinRadPerSec;
 
-		boolean targetAllowed =
-				canSpinFlywheel
-						&& (!useDynamicSpeed || hasValidDynamicTarget);
+        result.upperSpinRadPerSec =
+                aero.upperSpinRadPerSec;
 
-		double commandedRPS =
-				targetAllowed
-						? clamp(
-						desiredFlywheelRPS,
-						minimumFlywheelRPM / 60.0,
-						maximumFlywheelRPM / 60.0
-				)
-						: 0.0;
+        result.iterations = iterations;
 
-		double motorTicksPerSecond =
-				commandedRPS
-						* MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
-						* Globals.GOBILDA_5203_6000RPM;
+        result.coefficientsConverged = converged;
 
-		flywheel.setVelocity(motorTicksPerSecond);
+        result.estimatedPointUsed =
+                aero.estimatedPointUsed;
 
-		double measuredRPS = getFlywheelRPS();
+        result.unconvergedPointUsed =
+                aero.unconvergedPointUsed;
 
-		double measuredRPM = measuredRPS * 60.0;
+        result.tableClamped = aero.tableClamped;
 
-		double targetRPM = commandedRPS * 60.0;
+        result.nectarFallbackUsed = !isPollen;
 
-		double errorRPM = targetRPM - measuredRPM;
+        result.coefficientNote = aero.note;
 
-		double errorRPS = errorRPM / 60.0;
+        return result;
+    }
 
-		// Graph telemetry.
+    // Public methods retained for the rest of RAMO.
 
-		panelsGraph.addData(
-				"Flywheel Target RPM",
-				targetRPM
-		);
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
 
-		panelsGraph.addData(
-				"Flywheel Actual RPM",
-				measuredRPM
-		);
+        if (robotHardware == null
+                || robotHardware.flywheel == null) {
 
-		panelsGraph.addData(
-				"Flywheel Error RPM",
-				errorRPM
-		);
+            panelsTelemetry.addData(
+                    "[Flywheel] INIT ERROR",
+                    "Flywheel motor is missing"
+            );
 
-		panelsGraph.addData(
-				"Flywheel Target RPS",
-				commandedRPS
-		);
+            return;
+        }
 
-		panelsGraph.addData(
-				"Flywheel Actual RPS",
-				measuredRPS
-		);
+        flywheel = robotHardware.flywheel;
 
-		// Detailed telemetry.
+        flywheel.setDirection(
+                DcMotorSimple.Direction.REVERSE
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Enabled",
-				canSpinFlywheel
-		);
+        flywheel.setZeroPowerBehavior(
+                DcMotor.ZeroPowerBehavior.FLOAT
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Dynamic mode",
-				useDynamicSpeed
-		);
+        flywheel.setMode(
+                DcMotor.RunMode.RUN_USING_ENCODER
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Dynamic target valid",
-				hasValidDynamicTarget
-		);
+        insideCam = robotHardware.insideCam;
 
-		panelsTelemetry.addData(
-				"[Flywheel] Commanded target RPM",
-				targetRPM
-		);
+        applyPIDFCoefficients(true);
 
-		panelsTelemetry.addData(
-				"[Flywheel] Measured RPM",
-				measuredRPM
-		);
+        flywheel.setVelocity(0.0);
 
-		panelsTelemetry.addData(
-				"[Flywheel] RPM error (target - actual)",
-				errorRPM
-		);
+        panelsTelemetry.addData(
+                "[Flywheel] Init",
+                "Ready - motor in RUN_USING_ENCODER"
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Error RPS",
-				errorRPS
-		);
+        panelsTelemetry.addData(
+                "[Flywheel] Encoder ticks/rev",
+                Globals.GOBILDA_5203_6000RPM
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Motor power",
-				flywheel.getPower()
-		);
+        panelsTelemetry.addData(
+                "[Flywheel] Existing P gain",
+                Globals.flywheelKP
+        );
 
-		panelsTelemetry.addData(
-				"[Flywheel] Motor target ticks/s",
-				motorTicksPerSecond
-		);
+        panelsTelemetry.addData(
+                "[Flywheel] Existing F gain",
+                Globals.flywheelKF
+        );
+    }
 
-		panelsTelemetry.addData(
-				"[Flywheel] Motor/flywheel ratio",
-				MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
-		);
+    @Override
+    public void update() {
 
-		panelsTelemetry.addData(
-				"[Flywheel] PIDF P",
-				Globals.flywheelKP
-		);
+        if (flywheel == null) {
+            return;
+        }
 
-		panelsTelemetry.addData(
-				"[Flywheel] PIDF I",
-				SHOOTER_KI
-		);
+        if (useDynamicSpeed) {
 
-		panelsTelemetry.addData(
-				"[Flywheel] PIDF D",
-				SHOOTER_KD
-		);
+            updateDynamicRPS();
+        }
 
-		panelsTelemetry.addData(
-				"[Flywheel] PIDF F",
-				Globals.flywheelKF
-		);
+        applyPIDFCoefficients(false);
 
-		panelsTelemetry.addData(
-				"[Flywheel] Ready for feeder",
-				isReadyForFeed()
-		);
-	}
-	// PIDF configuration.
+        boolean targetAllowed =
+                canSpinFlywheel
+                        && (!useDynamicSpeed || hasValidDynamicTarget);
 
-	private void applyPIDFCoefficients(boolean force) {
+        double commandedRPS =
+                targetAllowed
+                        ? clamp(
+                        desiredFlywheelRPS,
+                        minimumFlywheelRPM / 60.0,
+                        maximumFlywheelRPM / 60.0
+                )
+                        : 0.0;
 
-		if (flywheel == null) {
-			return;
-		}
+        double motorTicksPerSecond =
+                commandedRPS
+                        * MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
+                        * Globals.GOBILDA_5203_6000RPM;
 
-		boolean changed =
-				force
-						|| Double.compare(
-						lastAppliedP,
-						Globals.flywheelKP
-				) != 0
-						|| Double.compare(
-						lastAppliedI,
-						SHOOTER_KI
-				) != 0
-						|| Double.compare(
-						lastAppliedD,
-						SHOOTER_KD
-				) != 0
-						|| Double.compare(
-						lastAppliedF,
-						Globals.flywheelKF
-				) != 0;
+        flywheel.setVelocity(motorTicksPerSecond);
 
-		if (!changed) {
-			return;
-		}
+        double measuredRPS = getFlywheelRPS();
 
-		flywheel.setPIDFCoefficients(
-				DcMotor.RunMode.RUN_USING_ENCODER,
-				new PIDFCoefficients(
-						Globals.flywheelKP,
-						SHOOTER_KI,
-						SHOOTER_KD,
-						Globals.flywheelKF
-				)
-		);
+        double measuredRPM = measuredRPS * 60.0;
 
-		lastAppliedP = Globals.flywheelKP;
-		lastAppliedI = SHOOTER_KI;
-		lastAppliedD = SHOOTER_KD;
-		lastAppliedF = Globals.flywheelKF;
-	}
+        double targetRPM = commandedRPS * 60.0;
 
-	// Public methods retained for the rest of RAMO.
+        double errorRPM = targetRPM - measuredRPM;
 
-	public static void setDesiredFlywheelRPS(double rps) {
+        double errorRPS = errorRPM / 60.0;
 
-		if (finite(rps)) {
+        // Graph telemetry.
 
-			desiredFlywheelRPS =
-					clamp(
-							rps,
-							minimumFlywheelRPM / 60.0,
-							maximumFlywheelRPM / 60.0
-					);
-		}
-	}
+        panelsGraph.addData(
+                "Flywheel Target RPM",
+                targetRPM
+        );
 
-	public double getFlywheelRPS() {
+        panelsGraph.addData(
+                "Flywheel Actual RPM",
+                measuredRPM
+        );
 
-		if (flywheel == null
-				|| !(Globals.GOBILDA_5203_6000RPM > 0.0)
-				|| !positive(MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV)) {
+        panelsGraph.addData(
+                "Flywheel Error RPM",
+                errorRPM
+        );
 
-			return 0.0;
-		}
+        panelsGraph.addData(
+                "Flywheel Target RPS",
+                commandedRPS
+        );
 
-		return flywheel.getVelocity()
-				/ (
-				Globals.GOBILDA_5203_6000RPM
-						* MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
-		);
-	}
+        panelsGraph.addData(
+                "Flywheel Actual RPS",
+                measuredRPS
+        );
 
-	public double getFlywheelRPM() {
+        // Detailed telemetry.
 
-		return getFlywheelRPS() * 60.0;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] Enabled",
+                canSpinFlywheel
+        );
 
-	public double getFlywheelErrorRPS() {
+        panelsTelemetry.addData(
+                "[Flywheel] Dynamic mode",
+                useDynamicSpeed
+        );
 
-		return desiredFlywheelRPS - getFlywheelRPS();
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] Dynamic target valid",
+                hasValidDynamicTarget
+        );
 
-	public double getFlywheelErrorRPM() {
+        panelsTelemetry.addData(
+                "[Flywheel] Commanded target RPM",
+                targetRPM
+        );
 
-		return getFlywheelErrorRPS() * 60.0;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] Measured RPM",
+                measuredRPM
+        );
 
-	public boolean isReadyForFeed() {
+        panelsTelemetry.addData(
+                "[Flywheel] RPM error (target - actual)",
+                errorRPM
+        );
 
-		if (flywheel == null || !canSpinFlywheel) {
-			return false;
-		}
+        panelsTelemetry.addData(
+                "[Flywheel] Error RPS",
+                errorRPS
+        );
 
-		if (useDynamicSpeed && !hasValidDynamicTarget) {
-			return false;
-		}
+        panelsTelemetry.addData(
+                "[Flywheel] Motor power",
+                flywheel.getPower()
+        );
 
-		return Math.abs(getFlywheelErrorRPS())
-				<= Globals.FLYWHEEL_ERROR_TOL;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] Motor target ticks/s",
+                motorTicksPerSecond
+        );
 
-	public void runFlywheel() {
+        panelsTelemetry.addData(
+                "[Flywheel] Motor/flywheel ratio",
+                MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
+        );
 
-		canSpinFlywheel = true;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] PIDF P",
+                Globals.flywheelKP
+        );
 
-	public void stopFlywheel() {
+        panelsTelemetry.addData(
+                "[Flywheel] PIDF I",
+                SHOOTER_KI
+        );
 
-		canSpinFlywheel = false;
-	}
+        panelsTelemetry.addData(
+                "[Flywheel] PIDF D",
+                SHOOTER_KD
+        );
 
-	// Internal data classes.
+        panelsTelemetry.addData(
+                "[Flywheel] PIDF F",
+                Globals.flywheelKF
+        );
 
-	private static final class AeroResult {
+        panelsTelemetry.addData(
+                "[Flywheel] Ready for feeder",
+                isReadyForFeed()
+        );
+    }
 
-		final double cd;
-		final double cl;
+    private void applyPIDFCoefficients(boolean force) {
 
-		final double lowerSpinRadPerSec;
-		final double upperSpinRadPerSec;
+        if (flywheel == null) {
+            return;
+        }
 
-		final boolean tableClamped;
-		final boolean estimatedPointUsed;
-		final boolean unconvergedPointUsed;
+        boolean changed =
+                force
+                        || Double.compare(
+                        lastAppliedP,
+                        Globals.flywheelKP
+                ) != 0
+                        || Double.compare(
+                        lastAppliedI,
+                        SHOOTER_KI
+                ) != 0
+                        || Double.compare(
+                        lastAppliedD,
+                        SHOOTER_KD
+                ) != 0
+                        || Double.compare(
+                        lastAppliedF,
+                        Globals.flywheelKF
+                ) != 0;
 
-		final String note;
+        if (!changed) {
+            return;
+        }
 
-		AeroResult(
-				double cd,
-				double cl,
-				double low,
-				double high,
-				boolean clamped,
-				boolean estimated,
-				boolean unconverged,
-				String note
-		) {
+        flywheel.setPIDFCoefficients(
+                DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(
+                        Globals.flywheelKP,
+                        SHOOTER_KI,
+                        SHOOTER_KD,
+                        Globals.flywheelKF
+                )
+        );
 
-			this.cd = cd;
-			this.cl = cl;
+        lastAppliedP = Globals.flywheelKP;
+        lastAppliedI = SHOOTER_KI;
+        lastAppliedD = SHOOTER_KD;
+        lastAppliedF = Globals.flywheelKF;
+    }
 
-			this.lowerSpinRadPerSec = low;
-			this.upperSpinRadPerSec = high;
+    public double getFlywheelRPM() {
 
-			this.tableClamped = clamped;
-			this.estimatedPointUsed = estimated;
-			this.unconvergedPointUsed = unconverged;
+        return getFlywheelRPS() * 60.0;
+    }
 
-			this.note = note;
-		}
-	}
+    public double getFlywheelRPS() {
 
-	private static final class ShotSolution {
+        if (flywheel == null
+                || !(Globals.GOBILDA_5203_6000RPM > 0.0)
+                || !positive(MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV)) {
 
-		boolean valid;
-		boolean coefficientsConverged;
+            return 0.0;
+        }
 
-		String error = "Unknown solver error";
+        return flywheel.getVelocity()
+                / (
+                Globals.GOBILDA_5203_6000RPM
+                        * MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV
+        );
+    }
 
-		double slantRangeM = Double.NaN;
-		double horizontalDistanceM = Double.NaN;
-		double targetHeightM = Double.NaN;
+    private static boolean positive(double value) {
 
-		double launchAngleRad = Double.NaN;
+        return finite(value) && value > 0.0;
+    }
 
-		double exitSpeedMps = Double.NaN;
-		double ballSpinRadPerSec = Double.NaN;
+    public double getFlywheelErrorRPM() {
 
-		double flywheelRadPerSec = Double.NaN;
-		double flywheelRPM = Double.NaN;
+        return getFlywheelErrorRPS() * 60.0;
+    }
 
-		double cd = Double.NaN;
-		double cl = Double.NaN;
+    public double getFlywheelErrorRPS() {
 
-		double lowerSpinRadPerSec = Double.NaN;
-		double upperSpinRadPerSec = Double.NaN;
+        return desiredFlywheelRPS - getFlywheelRPS();
+    }
 
-		int iterations;
+    // Internal data classes.
 
-		boolean estimatedPointUsed;
-		boolean unconvergedPointUsed;
-		boolean tableClamped;
-		boolean nectarFallbackUsed;
+    public boolean isReadyForFeed() {
 
-		String coefficientNote = "No coefficient lookup";
-	}
+        if (flywheel == null || !canSpinFlywheel) {
+            return false;
+        }
 
-	// General mathematical utilities.
+        if (useDynamicSpeed && !hasValidDynamicTarget) {
+            return false;
+        }
 
-	private static boolean positive(double value) {
+        return Math.abs(getFlywheelErrorRPS())
+                <= Globals.FLYWHEEL_ERROR_TOL;
+    }
 
-		return finite(value) && value > 0.0;
-	}
+    public void runFlywheel() {
 
-	private static boolean finite(double value) {
+        canSpinFlywheel = true;
+    }
 
-		return !Double.isNaN(value)
-				&& !Double.isInfinite(value);
-	}
+    // General mathematical utilities.
 
-	private static double clamp(
-			double value,
-			double min,
-			double max
-	) {
+    public void stopFlywheel() {
 
-		if (max < min) {
-			return min;
-		}
+        canSpinFlywheel = false;
+    }
 
-		return Math.max(
-				min,
-				Math.min(max, value)
-		);
-	}
+    private static final class AeroResult {
+
+        final double cd;
+        final double cl;
+
+        final double lowerSpinRadPerSec;
+        final double upperSpinRadPerSec;
+
+        final boolean tableClamped;
+        final boolean estimatedPointUsed;
+        final boolean unconvergedPointUsed;
+
+        final String note;
+
+        AeroResult(
+                double cd,
+                double cl,
+                double low,
+                double high,
+                boolean clamped,
+                boolean estimated,
+                boolean unconverged,
+                String note
+        ) {
+
+            this.cd = cd;
+            this.cl = cl;
+
+            this.lowerSpinRadPerSec = low;
+            this.upperSpinRadPerSec = high;
+
+            this.tableClamped = clamped;
+            this.estimatedPointUsed = estimated;
+            this.unconvergedPointUsed = unconverged;
+
+            this.note = note;
+        }
+    }
+
+    private static final class ShotSolution {
+
+        boolean valid;
+        boolean coefficientsConverged;
+
+        String error = "Unknown solver error";
+
+        double slantRangeM = Double.NaN;
+        double horizontalDistanceM = Double.NaN;
+        double targetHeightM = Double.NaN;
+
+        double launchAngleRad = Double.NaN;
+
+        double exitSpeedMps = Double.NaN;
+        double ballSpinRadPerSec = Double.NaN;
+
+        double flywheelRadPerSec = Double.NaN;
+        double flywheelRPM = Double.NaN;
+
+        double cd = Double.NaN;
+        double cl = Double.NaN;
+
+        double lowerSpinRadPerSec = Double.NaN;
+        double upperSpinRadPerSec = Double.NaN;
+
+        int iterations;
+
+        boolean estimatedPointUsed;
+        boolean unconvergedPointUsed;
+        boolean tableClamped;
+        boolean nectarFallbackUsed;
+
+        String coefficientNote = "No coefficient lookup";
+    }
 }
