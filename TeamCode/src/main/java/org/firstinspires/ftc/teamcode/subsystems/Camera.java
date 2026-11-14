@@ -31,7 +31,11 @@ public final class Camera implements SubsystemBase {
 
     // always be sure to call this when possible
     // takes varargs (cam1, cam2, cam3) and not an array
-    public Camera(WebcamName... cams) {
+
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+        WebcamName[] cams = {robotHardware.vision, robotHardware.insideCam};
+
         if (cams == null) return;
 
         for (WebcamName cam : cams) {
@@ -47,15 +51,11 @@ public final class Camera implements SubsystemBase {
             Processors.put(cam, newprocessor);
             Portals.put(cam, newportal);
         }
+
     }
 
     @Override
     public void update() {
-
-    }
-
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
 
     }
 
