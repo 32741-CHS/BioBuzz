@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
-import static org.firstinspires.ftc.teamcode.opmodes.old.OldMainTeleOp.isRed;
+import static java.lang.Math.round;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Autonomous(name = "ShootOpmode", group = "Tests")
@@ -17,8 +18,7 @@ public class ShootOpmode extends LinearOpMode {
         // config.
         while (opModeInInit()) {
 
-            telemetry.addData("Team", isRed ? "RED" : "BLUE");
-            telemetry.addData("Switch", "Square = Red, X = Blue");
+            telemetry.addData("state", "init");
             telemetry.update();
         }
 
@@ -28,6 +28,8 @@ public class ShootOpmode extends LinearOpMode {
         DcMotor feeder = hardwareMap.get(DcMotor.class, "feeder");
         DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotor shooter = hardwareMap.get(DcMotor.class, "flywheel");
+        Servo servo = hardwareMap.get(Servo.class, "servo");
+
         feeder.setDirection(DcMotorSimple.Direction.REVERSE);
         feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -38,6 +40,7 @@ public class ShootOpmode extends LinearOpMode {
             feeder.setPower((gamepad1.left_stick_y + 1) / 2);
             intake.setPower((gamepad1.left_stick_y + 1) / 2);
             shooter.setPower((gamepad1.left_stick_y + 1) / 2);
+            servo.setPosition(round(time / 10) % 2 == 0 ? Servo.MIN_POSITION : Servo.MAX_POSITION);
             telemetry.addData("Running", true);
         }
     }
