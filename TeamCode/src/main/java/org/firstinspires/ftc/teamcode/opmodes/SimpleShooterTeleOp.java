@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_BIG_BALL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_SMALL_BALL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
@@ -16,7 +15,6 @@ import org.firstinspires.ftc.teamcode.subsystems.GoalTrackerSimple;
 import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SimpleFeederAndFlywheel;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
-import org.firstinspires.ftc.teamcode.utils.Ballistics;
 
 @TeleOp(name = "Simple Shooter Light TeleOp")
 public class SimpleShooterTeleOp extends OpMode {
@@ -49,8 +47,6 @@ public class SimpleShooterTeleOp extends OpMode {
 
         /// Motor Configs
         robotHardware.intake.setDirection(DcMotorSimple.Direction.FORWARD);
-        robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-
         /// Key Binds
         driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
@@ -65,18 +61,14 @@ public class SimpleShooterTeleOp extends OpMode {
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
         shooterGamepad.leftBumper
-                .onPress(() -> robotHardware.servo.setPosition(SERVO_BIG_BALL))
-                .onRelease(() -> robotHardware.servo.setPosition(SERVO_SMALL_BALL));
+                .onPress(() -> robotHardware.servo.setPosition(SERVO_SMALL_BALL))
+                .onRelease(() -> robotHardware.servo.setPosition(SERVO_BIG_BALL));
 
     }
 
     @Override
     public void loop() {
         allSubsystems.update();
-        robotHardware.flywheel.setVelocity(
-                Ballistics.calculateFlywheelRPS(goalTrackerSimple.getDistance()) * GOBILDA_5203_6000RPM
-        );
-
 
         // Telemetry
         panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
@@ -87,6 +79,5 @@ public class SimpleShooterTeleOp extends OpMode {
                 Math.toDegrees(drivetrain.getHeading())
         );
 
-        panelsTelemetry.update();
     }
 }
