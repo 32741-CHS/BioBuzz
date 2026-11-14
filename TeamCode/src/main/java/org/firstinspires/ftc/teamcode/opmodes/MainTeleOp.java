@@ -42,10 +42,7 @@ public class MainTeleOp extends OpMode {
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                camera = new Camera(
-                        robotHardware.insideCam,
-                        robotHardware.vision
-                ),
+                (camera = new Camera()),
                 (intake = new Intake()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),

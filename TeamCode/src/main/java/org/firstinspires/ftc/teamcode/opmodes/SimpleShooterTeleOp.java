@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 import org.firstinspires.ftc.teamcode.utils.Ballistics;
 
-@TeleOp(name = "Shooter Light TeleOp")
-public class LightTeleOpWithShooter extends OpMode {
+@TeleOp(name = "Simple Shooter Light TeleOp")
+public class SimpleShooterTeleOp extends OpMode {
     private GamepadWrapper driverGamepad, shooterGamepad;
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
