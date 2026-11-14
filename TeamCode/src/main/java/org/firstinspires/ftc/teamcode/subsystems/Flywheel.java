@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.BallType;
+import org.firstinspires.ftc.teamcode.utils.BallTypes;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 
@@ -62,7 +62,7 @@ public class Flywheel implements SubsystemBase {
     // Nectar's larger radius and its own mass are still used.
     public static double SHOOTER_KI = 0.001;
     public static double SHOOTER_KD = 0.0;
-    private final Camera camera;
+    private final ColourDetector camera;
     private final Drivetrain drivetrain;
     // Existing hardware dependencies.
     private DcMotorEx flywheel;
@@ -75,7 +75,7 @@ public class Flywheel implements SubsystemBase {
     private boolean inputIsDirectSlantRange = false;
     private long lastGoalUpdateNanos = 0L;
 
-    private BallType currentBallType = BallType.Big;
+    private BallTypes currentBallType = BallTypes.Big;
     private boolean hasValidDynamicTarget = false;
 
     private ShotSolution lastSolution;
@@ -86,7 +86,7 @@ public class Flywheel implements SubsystemBase {
     private double lastAppliedF = Double.NaN;
 
     // Constructor
-    public Flywheel(Drivetrain dt, Camera cam) {
+    public Flywheel(Drivetrain dt, ColourDetector cam) {
         this.drivetrain = dt;
         this.camera = cam;
     }
@@ -204,7 +204,7 @@ public class Flywheel implements SubsystemBase {
     }
 
     private static AeroResult getCoefficients(
-            BallType ballType,
+            BallTypes ballType,
             double spinRadPerSec
     ) {
 
@@ -295,7 +295,7 @@ public class Flywheel implements SubsystemBase {
                                 + "150 rad/s key is assumed; "
                                 + "150 and 600 rad/s runs have convergence concerns.";
 
-                if (ballType == BallType.Big) {
+                if (ballType == BallTypes.Big) {
 
                     note +=
                             " Nectar is using provisional Pollen coefficients.";
@@ -326,7 +326,7 @@ public class Flywheel implements SubsystemBase {
             int index,
             double requestedSpin,
             boolean clamped,
-            BallType ballType
+            BallTypes ballType
     ) {
 
         double[] point = POLLEN_CFD[index];
@@ -373,7 +373,7 @@ public class Flywheel implements SubsystemBase {
                     " Requested spin is outside CFD table; coefficient was clamped.";
         }
 
-        if (ballType == BallType.Big) {
+        if (ballType == BallTypes.Big) {
 
             note +=
                     " Nectar is using provisional Pollen coefficients.";
@@ -560,9 +560,9 @@ public class Flywheel implements SubsystemBase {
 
         if (camera != null && insideCam != null) {
 
-            BallType detected = camera.getBallType(insideCam);
+            BallTypes detected = camera.getBallType(insideCam);
 
-            if (detected != null && detected != BallType.None) {
+            if (detected != null && detected != BallTypes.None) {
                 currentBallType = detected;
             }
         }
@@ -750,7 +750,7 @@ public class Flywheel implements SubsystemBase {
             double bearingRad,
             double elevationRad,
             boolean inputIsSlant,
-            BallType ballType
+            BallTypes ballType
     ) {
 
         ShotSolution result = new ShotSolution();
@@ -868,7 +868,7 @@ public class Flywheel implements SubsystemBase {
             return result;
         }
 
-        final boolean isPollen = ballType == BallType.Small;
+        final boolean isPollen = ballType == BallTypes.Small;
 
         final double ballMassKg =
                 isPollen ? Globals.PollenMass : Globals.NectarMass;

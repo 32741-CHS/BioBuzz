@@ -67,10 +67,4 @@ public class Globals {
         Blue
     }
 
-    public enum BallType {
-        Big,
-        Small,
-        None
-    }
-
 }

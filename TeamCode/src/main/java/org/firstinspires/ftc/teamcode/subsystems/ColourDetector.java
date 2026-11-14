@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.BallTypes;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -59,27 +60,27 @@ public final class ColourDetector implements SubsystemBase {
     }
 
     // this assumes balls are in the middle of the webcam
-    public Globals.BallType getBallType(WebcamName insideCam) {
+    public BallTypes getBallType(WebcamName insideCam) {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
         if ((Color.green(color) + Color.blue(color)) / 2.0f >= PollenThreshold) {
             panelsTelemetry.addData("ColourDetector Ball Type", "Small");
-            return Globals.BallType.Small;
+            return BallTypes.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
             if (Color.red(color) >= NectarThreshold) {
                 panelsTelemetry.addData("ColourDetector Ball Type", "Big");
-                return Globals.BallType.Big;
+                return BallTypes.Big;
             }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
             if (Color.blue(color) >= NectarThreshold) {
                 panelsTelemetry.addData("ColourDetector Ball Type", "Big");
-                return Globals.BallType.Big;
+                return BallTypes.Big;
             }
         }
 
-        return Globals.BallType.None;
+        return BallTypes.None;
     }
 
     // coord should be from (1, 1) to (0, 0) aka it takes percentages

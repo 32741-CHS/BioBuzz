@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-public enum BallType {
+public enum BallTypes {
     Big,
     Small,
     None

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.BallTypes;
 import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
@@ -25,7 +26,7 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     private DcMotor feeder;
     private Servo servo;
     private WebcamName insideCam;
-    private Globals.BallType currentBallType = Globals.BallType.Big;
+    private BallTypes currentBallType = BallTypes.Big;
 
     public Feeder(Flywheel flywheel, ColourDetector colourDetector) {
         this.flywheel = flywheel;
@@ -46,8 +47,8 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     @Override
     public void update() {
         if (colourDetector == null && insideCam == null) return;
-        Globals.BallType detectedType = colourDetector.getBallType(insideCam);
-        if (detectedType != Globals.BallType.None) {
+        BallTypes detectedType = colourDetector.getBallType(insideCam);
+        if (detectedType != BallTypes.None) {
             setBallType(detectedType);
         }
 
@@ -62,18 +63,18 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
         }
     }
 
-    public void setBallType(Globals.BallType type) {
+    public void setBallType(BallTypes type) {
         this.currentBallType = type;
         applyServoPosition();
     }
 
     private void applyServoPosition() {
         if (servo == null) return;
-        double targetPos = (currentBallType == Globals.BallType.Small) ? POLLEN_SERVO_POS : NECTAR_SERVO_POS;
+        double targetPos = (currentBallType == BallTypes.Small) ? POLLEN_SERVO_POS : NECTAR_SERVO_POS;
         servo.setPosition(targetPos);
     }
 
-    public Globals.BallType getCurrentBallType() {
+    public BallTypes getCurrentBallType() {
         return currentBallType;
     }
 
