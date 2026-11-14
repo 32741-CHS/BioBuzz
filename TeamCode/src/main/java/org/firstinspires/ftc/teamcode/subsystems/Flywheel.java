@@ -45,9 +45,9 @@ public class Flywheel implements SubsystemBase {
     public static double TARGET_POINT_ABOVE_TAG_CENTRE_M = 0.15;
     public static double POLLEN_RADIUS_M = 0.03556;
     public static double NECTAR_RADIUS_M = 0.04572;
-    public static double BALL_SPIN_RATIO = 1.0;
+    public static double BALL_SPIN_RATIO = 0.8;
     public static double BALL_INERTIA_BETA = 2.0 / 3.0;
-    public static double ENERGY_TRANSFER_EFFICIENCY = 0.70;
+    public static double ENERGY_TRANSFER_EFFICIENCY = 0.50;
     public static double MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV = 1.0;
     /**
      * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
@@ -66,7 +66,7 @@ public class Flywheel implements SubsystemBase {
 
     // Nectar uses the Pollen curve provisionally.
     // Nectar's larger radius and its own mass are still used.
-    public static double SHOOTER_KI = 0.0;
+    public static double SHOOTER_KI = 0.001;
     public static double SHOOTER_KD = 0.0;
     private final Camera camera;
     private final Drivetrain drivetrain;
