@@ -68,7 +68,7 @@ public class Flywheel implements SubsystemBase {
     @Override
     public void init(RobotHardwareGroup robotHardware) {
         flywheel = robotHardware.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.insideCam = robotHardware.insideCam;
