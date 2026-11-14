@@ -14,30 +14,27 @@ public class Globals {
     // updates all;
     // REMOVE FINAL TO EDIT VIA PANELS
 
-    // Motor Tick Rates
-    public static final double GOBILDA_5203_6000RPM = 28;
-    public static final double GOBILDA_5203_312RPM = 537.7;
+    /// Motor Tick Rates
+    public static final double GOBILDA_5203_6000RPM = 28, GOBILDA_5203_312RPM = 537.7;
 
-    // Drive Train
+    /// Drive Train
     public static final double WHEEL_DIAMETER = 10.4;
     public static final double STICK_DEADBAND = 0.05;
     public static final int BLUE_GOAL = 20;
     public static final int RED_GOAL = 24;
     public static final int MAX_FPS = 15;
-
-    // OldShooter
+    /// Shooter
     public static final double
             FLYWHEEL_ERROR_TOL = 1.0,
             TRIGGER_THRESHOLD = 0.5,
             flywheelKP = 16.5,
             flywheelKF = 13.5;
-    public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
-    // FEEDER
+    /// FEEDER
     public static final double FEEDER_POWER = 0.7;
     // Panels
     public static final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
     public static final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
-    // Flywheel constants
+    /// Flywheel constants
     public static final double Gravity = 9.81,
             DecaySpin = 0.223, // Guessed, tweak it ig
             AerodynamicDrag = 0.00005320098663,
@@ -56,7 +53,12 @@ public class Globals {
     // 22mm inward = pollen
     // 0mm inward = nectar
     // Feeder
+    public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
     public static boolean fieldCentricDriving = false;
+    /// Servo
+    public static double SERVO_BIG_BALL = 0.9;
+    public static double SERVO_SMALL_BALL = 0.7;
+
 
     // Ball colors & Detection
     public enum NectarColorEnum {
@@ -69,4 +71,5 @@ public class Globals {
         Small,
         None
     }
+
 }

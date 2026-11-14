@@ -64,14 +64,22 @@ public class LightTeleOp extends OpMode {
         allSubsystems.update();
 
         // Telemetry
-        panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
-        panelsTelemetry.addData("[drivetrain] Y", drivetrain.getY());
+        log("[drivetrain] X", drivetrain.getX());
+        log("[drivetrain] Y", drivetrain.getY());
 
-        panelsTelemetry.addData(
+        log(
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
+        
+        log("Servo Pos", robotHardware.servo.getPosition());
 
         panelsTelemetry.update();
+        telemetry.update();
+    }
+
+    void log(String key, double value) {
+        panelsTelemetry.addData(key, value);
+        telemetry.addData(key, value);
     }
 }

@@ -1,40 +1,92 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-// TODO Finish
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.FEEDER_POWER;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_BIG_BALL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_SMALL_BALL;
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.utils.Ballistics;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
-@Configurable
 public class SimpleFeederAndFlywheel implements SubsystemBase {
-
-    private DcMotorEx feeder;
-    private DcMotor intake;
+    public static double desiredFlywheelRPS = 13;
+    public static boolean isFlywheelIdled = false;
+    GoalTrackerSimple goalTrackerSimple;
     private DcMotorEx flywheel;
+    private DcMotor feeder;
+    private boolean requestedReverseFeed = false;
+    private Servo servo;
+
+    public SimpleFeederAndFlywheel(GoalTrackerSimple gts) {
+        goalTrackerSimple = gts;
+    }
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
-        feeder = (DcMotorEx) robotHardware.intake;
-        feeder.setDirection(DcMotorSimple.Direction.FORWARD);
-        feeder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        feeder.setPower(1);
-
-        flywheel = (DcMotorEx) robotHardware.intake;
-        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel = robotHardware.flywheel;
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        feeder = robotHardware.feeder;
+        feeder.setDirection(DcMotorSimple.Direction.FORWARD);
+        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        servo = robotHardware.servo;
     }
 
     @Override
     public void update() {
-        feeder.setPositionPIDFCoefficients((int) Math.round(GOBILDA_5203_6000RPM / 2.0));
-    }
-}
+        flywheel.setVelocity((!isFlywheelIdled) ? getRPS() * GOBILDA_5203_6000RPM : 0);
 
+        panelsTelemetry.addData("Flywheel RPS", getFlywheelRPS());
+        panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
+    }
+
+    double getRPS() {
+        return Ballistics.calculateFlywheelRPS(goalTrackerSimple.getDistance());
+    }
+
+    double getFlywheelRPS() {
+        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
+    }
+
+    double getFlywheelErrorRPS() {
+        return getFlywheelRPS() - desiredFlywheelRPS;
+    }
+
+    public void requestReversedFeed() {
+        feeder.setPower(-1);
+    }
+
+    public void requestFeed() {
+        if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOL)
+            feeder.setPower(requestedReverseFeed ? -FEEDER_POWER : FEEDER_POWER);
+    }
+
+    public void stopFeed() {
+        feeder.setPower(0);
+        requestedReverseFeed = false;
+    }
+
+    public void idleFlywheel() {
+        isFlywheelIdled = true;
+    }
+
+    public void servoToBigBall() {
+        servo.setPosition(SERVO_BIG_BALL);
+    }
+
+    public void servoToSmallBall() {
+        servo.setPosition(SERVO_SMALL_BALL);
+    }
+
+}
