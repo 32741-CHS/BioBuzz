@@ -8,8 +8,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.FlywheelDiameter;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.Gravity;
 import static org.firstinspires.ftc.teamcode.configs.Globals.InitialCamHeight;
-import static org.firstinspires.ftc.teamcode.configs.Globals.NectarMass;
-import static org.firstinspires.ftc.teamcode.configs.Globals.PollenMass;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RotationalDirection;
 import static org.firstinspires.ftc.teamcode.configs.Globals.ShootingAngle;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
@@ -24,7 +22,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
@@ -43,17 +40,17 @@ public class Flywheel implements SubsystemBase {
     public static boolean useDynamicSpeed = true;
     public static boolean canSpinFlywheel = false;
     public static boolean doSimulation = true; // set to false if lag
-    private final ColourDetector colourDetector;
+    // private final ColourDetector colourDetector;
     private final Drivetrain drivetrain;
     private DcMotorEx flywheel;
-    private WebcamName insideCam;
+    // private WebcamName insideCam;
     // goal stuff
     private double distance = Double.NaN;
     private double zRadians = Double.NaN;
 
-    public Flywheel(Drivetrain dt, ColourDetector cam) {
+    public Flywheel(Drivetrain dt/*, ColourDetector cam*/) {
         this.drivetrain = dt;
-        this.colourDetector = cam;
+        // this.colourDetector = cam;
     }
 
     public static void setDesiredFlywheelRPS(double rps) {
@@ -71,7 +68,7 @@ public class Flywheel implements SubsystemBase {
         flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.insideCam = robotHardware.insideCam;
+        // this.insideCam = robotHardware.insideCam;
     }
 
     @Override
@@ -124,11 +121,13 @@ public class Flywheel implements SubsystemBase {
         Py = InitialCamHeight;
 
         double ballMass = BallGeneralMass;
+        /*
         if (colourDetector.getBallType(insideCam) == Globals.BallType.Big) {
             ballMass = NectarMass;
         } else if (colourDetector.getBallType(insideCam) == Globals.BallType.Small) {
             ballMass = PollenMass;
         }
+        */
 
         // AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
         double dragK = AerodynamicDrag * BallGeneralMass / ballMass;

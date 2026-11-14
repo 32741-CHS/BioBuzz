@@ -39,18 +39,17 @@ public class MainTeleOp extends OpMode {
 
         // Subsystems
 
-
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                (colourDetector = new ColourDetector()),
+                // (colourDetector = new ColourDetector()),
                 (intake = new Intake()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
                 (drivetrain = new Drivetrain(0, 0, 0)),
 
                 (turret = new Turret(drivetrain)),
-                (flywheel = new Flywheel(drivetrain, colourDetector)),
-                (feeder = new Feeder(flywheel, colourDetector)),
+                (flywheel = new Flywheel(drivetrain/*, colourDetector*/)),
+                (feeder = new Feeder(flywheel/*, colourDetector*/)),
                 (goaltracker = new GoalTracker(turret, flywheel))
         );
 
@@ -66,11 +65,15 @@ public class MainTeleOp extends OpMode {
 //        driverGamepad.btnY
 //                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
-        shooterGamepad.leftTrigger /// Intake
-                .whenHeld(intake::tryRunMotorIfReady)
-                .onRelease(intake::stopMotor);
+        shooterGamepad.leftTrigger
+                .onPress(() -> robotHardware.intake.setPower(1))
+                .onRelease(() -> robotHardware.intake.setPower(0));
 
-        shooterGamepad.btnA /// Reverse ALL
+        shooterGamepad.rightTrigger
+                .onPress(() -> robotHardware.intake.setPower(-1))
+                .onRelease(() -> robotHardware.intake.setPower(0));
+
+        shooterGamepad.btnA /// Reverse
                 .onPress(intake::reverseMode)
                 .onPress(feeder::reverseMode)
                 .onRelease(intake::deactivateReverseMode)
