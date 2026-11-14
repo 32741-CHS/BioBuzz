@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "AutoPath", group = "Autonomous")
+@Autonomous(name = "GameAutoOpTest2", group = "Autonomous")
 public class GameAutoOpTest2 extends LinearOpMode {
 
     private Follower follower;
