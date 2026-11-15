@@ -18,16 +18,15 @@ import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "3. Through, shoot, park", group = "Autonomous")
 public class JayRoundFieldShooterAutoOp extends LinearOpMode {
-
     private Follower follower;
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(77.225, 9.5722, 90);
-    private final Pose path1 = poseFactory.of(77.4215, 130.1368, 90);
+    private final Pose start = poseFactory.of(72.9014, 8.1965, 90);
+    private final Pose path1 = poseFactory.of(72.7049, 129.9403, 90);
     private final Pose point2 = poseFactory.of(83.7635, 130.1425, 270);
-    private final Pose point3 = poseFactory.of(127.0143, 130.0881, 179.928);
-    private final Pose point4 = poseFactory.of(127.6717, 27.2953, 90.3664);
+    private final Pose point3 = poseFactory.of(116.4018, 129.6951, 179.2146);
+    private final Pose point4 = poseFactory.of(131.4057, 27.6883, 98.3675);
 
     // Autonomous routine
     public Command autoRoutine() {
