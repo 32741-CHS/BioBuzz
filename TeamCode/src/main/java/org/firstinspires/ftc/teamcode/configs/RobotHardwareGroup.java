@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -31,7 +32,15 @@ public class RobotHardwareGroup {
             INSIDE_WEBCAM_NAME = "insideCam";
 
     public final HardwareMap hardwareMap;
-    public final @Nullable DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake, turret, flywheel;
+    public final @Nullable DcMotor
+            flDrive,
+            frDrive,
+            blDrive,
+            brDrive,
+            feeder,
+            intake,
+            turret,
+            flywheel;
     public final @Nullable IMU imu;
     public final @Nullable WebcamName vision, insideCam;
     public final @Nullable GoBildaPinpointDriver pinpoint;
@@ -52,6 +61,40 @@ public class RobotHardwareGroup {
         insideCam = safeGet(WebcamName.class, INSIDE_WEBCAM_NAME);
         pinpoint = safeGet(GoBildaPinpointDriver.class, PINPOINT_NAME);
         servo = safeGet(Servo.class, SERVO_NAME);
+
+        /// ToDo: Too lazy to do this properly
+        flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        flDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) flDrive).setPIDFCoefficients();
+        frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        frDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) frDrive).setPIDFCoefficients();
+        blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        blDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) blDrive).setPIDFCoefficients();
+        brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) brDrive).setPIDFCoefficients();
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setDirection(DcMotorSimple.Direction.FORWARD);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) turret).setPIDFCoefficients();
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
+        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) flywheel).setPIDFCoefficients();
+        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+        feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) feeder).setPIDFCoefficients();
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        ((DcMotorEx) intake).setPIDFCoefficients();
     }
 
     private <T> T safeGet(Class<? extends T> classOrInterface, String name) {
