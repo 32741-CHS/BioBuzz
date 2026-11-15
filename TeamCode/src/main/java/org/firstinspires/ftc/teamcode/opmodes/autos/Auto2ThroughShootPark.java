@@ -1,42 +1,30 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.autos;
 
-import com.pedropathing.api.Paths;
-
-import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.math.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.ivy.Command;
-import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
+import com.pedropathing.api.Paths;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "3. Through, shoot, park", group = "Autonomous")
-public class JayRoundFieldShooterAutoOp extends LinearOpMode {
-    private Follower follower;
-
+@Autonomous(name = "Auto2ThroughShootPark", group = "Pedro")
+public class Auto2ThroughShootPark extends LinearOpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
-
     private final Pose start = poseFactory.of(72.9014, 8.1965, 90);
     private final Pose path1 = poseFactory.of(72.7049, 129.9403, 90);
     private final Pose point2 = poseFactory.of(83.7635, 130.1425, 270);
     private final Pose point3 = poseFactory.of(116.4018, 129.6951, 179.2146);
     private final Pose point4 = poseFactory.of(131.4057, 27.6883, 98.3675);
-
-    // Autonomous routine
-    public Command autoRoutine() {
-        return sequential(
-                follow(follower, path1()),
-                follow(follower, path2()),
-                follow(follower, path3()),
-                follow(follower, path4())
-        );
-    }
+    private Follower follower;
 
     @Override
     public void runOpMode() {
@@ -63,6 +51,16 @@ public class JayRoundFieldShooterAutoOp extends LinearOpMode {
 
             telemetry.update();
         }
+    }
+
+    // Autonomous routine
+    public Command autoRoutine() {
+        return sequential(
+                follow(follower, path1()),
+                follow(follower, path2()),
+                follow(follower, path3()),
+                follow(follower, path4())
+        );
     }
 
     public Path path1() {

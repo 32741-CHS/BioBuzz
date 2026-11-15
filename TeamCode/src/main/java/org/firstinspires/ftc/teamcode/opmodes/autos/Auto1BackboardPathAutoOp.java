@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.autos;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.instant;
@@ -19,13 +19,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "LongStraightPathAutoOp", group = "Autonomous")
-public class LongStraightPathAutoOp extends LinearOpMode {
+@Autonomous(name = "Auto1BackboardPathAutoOp", group = "Autonomous")
+public class Auto1BackboardPathAutoOp extends LinearOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
-    private final Pose start = poseFactory.of(56, 8, 90);
-    private final Pose path1 = poseFactory.of(54.2329, 8.2639, 180);
-    private final Pose point2 = poseFactory.of(7.7865, 8.7187, 179.439);
+    private final Pose start = poseFactory.of(132.0946, 8.7228, 90);
+    private final Pose path1 = poseFactory.of(106.3001, 132.7247, 90.4734);
+    private final Pose path1Control1 = poseFactory.of(133.8959, 49.1291, 0);
+    private final Pose path1Control2 = poseFactory.of(106.5948, 97.0636, 0);
     private Follower follower;
 
     @Override
@@ -37,10 +38,12 @@ public class LongStraightPathAutoOp extends LinearOpMode {
 
         waitForStart();
         schedule(autoRoutine());
+
         RobotHardwareGroup robotHardware = new RobotHardwareGroup(hardwareMap);
         instant(() -> {
             robotHardware.flywheel.setPower(FLYWHEEL_POWER);
         });
+
         while (opModeIsActive()) {
             follower.update();
             Scheduler.execute();
@@ -61,16 +64,11 @@ public class LongStraightPathAutoOp extends LinearOpMode {
     // Autonomous routine
     public Command autoRoutine() {
         return sequential(
-                follow(follower, path1()),
-                follow(follower, path2())
+                follow(follower, path1())
         );
     }
 
     public Path path1() {
-        return Paths.line(start, path1).linear(start, path1);
-    }
-
-    public Path path2() {
-        return Paths.line(path1, point2).tangent();
+        return Paths.curve(start, path1Control1, path1Control2, path1).tangent();
     }
 }
