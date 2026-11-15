@@ -47,6 +47,7 @@ public class GoalTracker implements SubsystemBase {
 
     @Override
     public void update() {
+        panelsTelemetry.addData("GoalTracker AprilTagProcessor", aprilTag != null);
         if (aprilTag == null) return;
 
         distanceToGoal = Double.NaN;

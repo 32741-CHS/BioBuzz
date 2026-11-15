@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.subsystems.ColourDetector;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -28,7 +27,7 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
-    private ColourDetector colourDetector;
+    // private ColourDetector colourDetector;
     private Turret turret;
     private GoalTracker goaltracker;
 
@@ -73,6 +72,7 @@ public class MainTeleOp extends OpMode {
                 .onPress(() -> robotHardware.intake.setPower(-1))
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
+        /*
         shooterGamepad.btnA /// Reverse
                 .onPress(intake::reverseMode)
                 .onPress(feeder::reverseMode)
@@ -82,6 +82,7 @@ public class MainTeleOp extends OpMode {
         shooterGamepad.rightTrigger /// Feed Ball (Shoot)
                 .whenHeld(feeder::tryRunMotorIfReady)
                 .onRelease(feeder::stopMotor);
+         */
     }
 
     @Override

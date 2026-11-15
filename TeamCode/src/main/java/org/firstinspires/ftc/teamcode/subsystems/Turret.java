@@ -14,7 +14,7 @@ public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     public static boolean AllowAutoRotate = true;
-    public static double IMUHeadingOffset = Math.atan2(428.0 / 2.0, -448.0 / 2.0);
+    public static double IMUHeadingOffset = 0.0;
     public static double CameraOffsetX = 0.0; // inches forward/backward from center
     public static double CameraOffsetY = 0.0; // inches left/right from center
     private final Drivetrain drivetrain;
