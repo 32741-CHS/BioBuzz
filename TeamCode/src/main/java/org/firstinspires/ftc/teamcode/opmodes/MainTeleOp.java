@@ -33,7 +33,7 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void init() {
-        // Robot Hardware Special Init
+        simpleTelemetry.registerFtcTelemetry(telemetry);
         robotHardware = new RobotHardwareGroup(hardwareMap);
 
         // Subsystems
@@ -41,7 +41,6 @@ public class MainTeleOp extends OpMode {
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
                 // (colourDetector = new ColourDetector()),
-                (intake = new Intake()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
                 (drivetrain = new Drivetrain(0, 0, 0)),
@@ -69,16 +68,15 @@ public class MainTeleOp extends OpMode {
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
         shooterGamepad.rightTrigger
-                .onPress(() -> robotHardware.intake.setPower(-1))
-                .onRelease(() -> robotHardware.intake.setPower(0));
+                .onPress(() -> robotHardware.feeder.setPower(1))
+                .onRelease(() -> robotHardware.feeder.setPower(0));
 
-        /*
         shooterGamepad.btnA /// Reverse
-                .onPress(intake::reverseMode)
-                .onPress(feeder::reverseMode)
-                .onRelease(intake::deactivateReverseMode)
-                .onRelease(feeder::deactivateReverseMode);
-
+                .onPress(() -> robotHardware.intake.setPower(-1))
+                .onPress(() -> robotHardware.intake.setPower(-1))
+                .onRelease(() -> robotHardware.feeder.setPower(0))
+                .onRelease(() -> robotHardware.feeder.setPower(0));
+        /*
         shooterGamepad.rightTrigger /// Feed Ball (Shoot)
                 .whenHeld(feeder::tryRunMotorIfReady)
                 .onRelease(feeder::stopMotor);

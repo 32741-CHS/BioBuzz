@@ -29,6 +29,7 @@ public class SimpleShooterTeleOp extends OpMode {
     @Override
     public void init() {
         // Robot Hardware Special Init
+        simpleTelemetry.registerFtcTelemetry(telemetry);
         robotHardware = new RobotHardwareGroup(hardwareMap);
 
         // Pass all subsystems into the handler

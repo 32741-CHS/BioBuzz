@@ -22,7 +22,7 @@ public class LightTeleOp extends OpMode {
 
     @Override
     public void init() {
-        // Robot Hardware Special Init
+        simpleTelemetry.registerFtcTelemetry(telemetry);
         robotHardware = new RobotHardwareGroup(hardwareMap);
 
         // Pass all subsystems into the handler
@@ -37,7 +37,6 @@ public class LightTeleOp extends OpMode {
         allSubsystems.init(robotHardware);
 
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-
         // Key Binds
         driverGamepad.leftTrigger /// Speed Modifier
                 .onPress(() -> drivetrain.speed(0.5))
@@ -70,20 +69,15 @@ public class LightTeleOp extends OpMode {
         allSubsystems.update();
 
         // Telemetry
-        log("[drivetrain] X", drivetrain.getX());
-        log("[drivetrain] Y", drivetrain.getY());
+        simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
+        simpleTelemetry.addData("[drivetrain] Y", drivetrain.getY());
 
-        log("[drivetrain] Heading DEGREES", Math.toDegrees(drivetrain.getHeading()));
-        log("FLYWHEEL_POWER", Globals.FLYWHEEL_POWER);
+        simpleTelemetry.addData("[drivetrain] Heading DEGREES", Math.toDegrees(drivetrain.getHeading()));
+        simpleTelemetry.addData("FLYWHEEL_POWER", Globals.FLYWHEEL_POWER);
 
-        log("Servo Pos", robotHardware.servo.getPosition());
+        simpleTelemetry.addData("Servo Pos", robotHardware.servo.getPosition());
 
         simpleTelemetry.update();
-        telemetry.update();
     }
 
-    void log(String key, double value) {
-        simpleTelemetry.addData(key, value);
-        telemetry.addData(key, value);
-    }
 }

@@ -9,11 +9,12 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 
 @Autonomous(name = "TemplateOpmode", group = "Tests")
 public class TemplateOpmode extends OpMode {
-    private RobotHardwareGroup robotHardwareGroup;
+    private RobotHardwareGroup robotHardware;
 
     @Override
     public void init() {
-        robotHardwareGroup = new RobotHardwareGroup(hardwareMap);
+        simpleTelemetry.registerFtcTelemetry(telemetry);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
     }
 
     @Override //Optional
@@ -29,17 +30,8 @@ public class TemplateOpmode extends OpMode {
     public void loop() {
         String key = "Thing";
         double value = 1;
-        log(key, value);
+        simpleTelemetry.addData(key, value);
     }
 
-    private void log(String key, double value) {
-        simpleTelemetry.addData(key, value);
-        telemetry.addData(key, value);
-    }
-
-    private void log(String key, Object value) {
-        simpleTelemetry.addData(key, value);
-        telemetry.addData(key, value);
-    }
 
 }

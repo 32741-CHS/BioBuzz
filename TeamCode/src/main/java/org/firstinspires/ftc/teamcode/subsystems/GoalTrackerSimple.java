@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
+import com.bylazar.camerastream.PanelsCameraStream;
 import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
@@ -36,6 +37,8 @@ public class GoalTrackerSimple implements SubsystemBase {
                 .addProcessor(aprilTag)
                 .enableLiveView(false)
                 .build();
+
+        PanelsCameraStream.INSTANCE.startStream(visionPortal, 15);
     }
 
     @Override
