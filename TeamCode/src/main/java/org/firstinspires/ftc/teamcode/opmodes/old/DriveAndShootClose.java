@@ -61,7 +61,7 @@ public class DriveAndShootClose extends LinearOpMode {
         }
 
         waitForStart();
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
         robotHardware.intake.setPower(1);
 
         OldShooter.canSpinFlywheel = true;

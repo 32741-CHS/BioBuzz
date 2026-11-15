@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.configs;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static java.util.Objects.isNull;
+
 import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -36,18 +39,29 @@ public class RobotHardwareGroup {
 
     public RobotHardwareGroup(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        flDrive = hardwareMap.tryGet(DcMotor.class, FL_MOTOR_NAME);
-        frDrive = hardwareMap.tryGet(DcMotor.class, FR_MOTOR_NAME);
-        blDrive = hardwareMap.tryGet(DcMotor.class, BL_MOTOR_NAME);
-        brDrive = hardwareMap.tryGet(DcMotor.class, BR_MOTOR_NAME);
-        turret = hardwareMap.tryGet(DcMotor.class, TURRET_MOTOR_NAME);
-        flywheel = hardwareMap.tryGet(DcMotor.class, FLYWHEEL_MOTOR_NAME);
-        feeder = hardwareMap.tryGet(DcMotor.class, FEEDER_MOTOR_NAME);
-        intake = hardwareMap.tryGet(DcMotor.class, INTAKE_MOTOR_NAME);
-        imu = hardwareMap.tryGet(IMU.class, IMU_NAME);
-        vision = hardwareMap.tryGet(WebcamName.class, MAIN_WEBCAM_NAME);
-        insideCam = hardwareMap.tryGet(WebcamName.class, INSIDE_WEBCAM_NAME);
-        pinpoint = hardwareMap.tryGet(GoBildaPinpointDriver.class, PINPOINT_NAME);
-        servo = hardwareMap.tryGet(Servo.class, SERVO_NAME);
+        flDrive = safeGet(DcMotor.class, FL_MOTOR_NAME);
+        frDrive = safeGet(DcMotor.class, FR_MOTOR_NAME);
+        blDrive = safeGet(DcMotor.class, BL_MOTOR_NAME);
+        brDrive = safeGet(DcMotor.class, BR_MOTOR_NAME);
+        turret = safeGet(DcMotor.class, TURRET_MOTOR_NAME);
+        flywheel = safeGet(DcMotor.class, FLYWHEEL_MOTOR_NAME);
+        feeder = safeGet(DcMotor.class, FEEDER_MOTOR_NAME);
+        intake = safeGet(DcMotor.class, INTAKE_MOTOR_NAME);
+        imu = safeGet(IMU.class, IMU_NAME);
+        vision = safeGet(WebcamName.class, MAIN_WEBCAM_NAME);
+        insideCam = safeGet(WebcamName.class, INSIDE_WEBCAM_NAME);
+        pinpoint = safeGet(GoBildaPinpointDriver.class, PINPOINT_NAME);
+        servo = safeGet(Servo.class, SERVO_NAME);
+    }
+
+    private <T> T safeGet(Class<? extends T> classOrInterface, String name) {
+        T obj = hardwareMap.tryGet(classOrInterface, name);
+        if (isNull(obj))
+            panelsTelemetry.addData(
+                    "[ERROR] " + name,
+                    "FAILED TO FIND  HARDWARE (Ignoring)" +
+                            " \n Try Checking if the wire is connected firmly, or the driver hub hardware config name matches: " + name
+            );
+        return obj;
     }
 }

@@ -23,7 +23,8 @@ public class LightTeleOp extends OpMode {
     @Override
     public void init() {
         // Robot Hardware Special Init
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
+
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),

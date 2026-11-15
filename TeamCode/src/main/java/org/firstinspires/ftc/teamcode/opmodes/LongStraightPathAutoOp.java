@@ -37,8 +37,7 @@ public class LongStraightPathAutoOp extends LinearOpMode {
 
         waitForStart();
         schedule(autoRoutine());
-        RobotHardwareGroup robotHardware;
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        RobotHardwareGroup robotHardware = new RobotHardwareGroup(hardwareMap);
         instant(() -> {
             robotHardware.flywheel.setPower(FLYWHEEL_POWER);
         });

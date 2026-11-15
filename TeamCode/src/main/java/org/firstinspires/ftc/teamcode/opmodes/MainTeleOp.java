@@ -34,7 +34,7 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init() {
         // Robot Hardware Special Init
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
 
         // Subsystems
 

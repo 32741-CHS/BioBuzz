@@ -26,8 +26,7 @@ public class DriveForTime extends LinearOpMode {
     public void runOpMode() {
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
-        robotHardware = new RobotHardwareGroup();
-        robotHardware.init(hardwareMap);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
         (oldDrivetrain = new OldDrivetrain()).init(robotHardware);
 
         waitForStart();
