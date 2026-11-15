@@ -75,7 +75,6 @@ public class Flywheel implements SubsystemBase {
      */
     public static double BALL_SPIN_RATIO = 1.0;
 
-    /** Thin-shell approximation for a hollow ball: I = beta * m * r^2. */
     public static double BALL_INERTIA_BETA = 2.0 / 3.0;
 
     /** Fraction of wheel energy transferred to the ball; initial estimate only. */
@@ -84,11 +83,6 @@ public class Flywheel implements SubsystemBase {
     /** Motor revolutions per flywheel revolution; default preserves old 1:1 code. */
     public static double MOTOR_REVOLUTIONS_PER_FLYWHEEL_REV = 1.0;
 
-    /**
-     * PLACEHOLDER: replace with flywheel + reflected motor inertia from CAD,
-     * referred to the flywheel shaft, in kg*m^2. The project ZIP did not include
-     * this value. The value below is only a starting estimate, not a measurement.
-     */
     public static double FLYWHEEL_INERTIA_KG_M2 = 0.00025;
 
     /** Solver configuration. */
