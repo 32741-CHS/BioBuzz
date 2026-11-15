@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "Auto1BackboardPathAutoOp", group = "Autonomous")
+@Autonomous(name = "Auto1BackboardPathAutoOp", group = "Pedro")
 public class Auto1BackboardPathAutoOp extends LinearOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();

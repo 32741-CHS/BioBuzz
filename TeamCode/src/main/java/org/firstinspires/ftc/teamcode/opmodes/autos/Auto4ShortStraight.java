@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "Auto4ShortStraight", group = "Autonomous")
+@Autonomous(name = "Auto4ShortStraight", group = "Pedro")
 public class Auto4ShortStraight extends LinearOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
