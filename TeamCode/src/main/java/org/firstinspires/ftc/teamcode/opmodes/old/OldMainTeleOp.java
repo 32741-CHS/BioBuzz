@@ -47,6 +47,8 @@ public class OldMainTeleOp extends OpMode {
 
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
+        simpleTelemetry.registerFtcTelemetry(telemetry);
+        
         robotHardware = new RobotHardwareGroup(hardwareMap);
         driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
         operatorGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
@@ -183,6 +185,5 @@ public class OldMainTeleOp extends OpMode {
         simpleTelemetry.addData("intakePower", oldIntake.getPower());
 
         simpleTelemetry.update();
-        simpleTelemetry.update(telemetry);
     }
 }
