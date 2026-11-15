@@ -52,6 +52,13 @@ public class LightTeleOp extends OpMode {
                 .onPress(() -> robotHardware.intake.setPower(-1))
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
+        shooterGamepad.btnB
+                .onPress(() -> Globals.FLYWHEEL_POWER += 0.01);
+
+        shooterGamepad.btnX
+                .onRelease(() -> Globals.FLYWHEEL_POWER -= 0.01);
+
+
         shooterGamepad.leftBumper
                 .whenHeld(() -> robotHardware.servo.setPosition(Math.max(robotHardware.servo.getPosition() - 0.01, 0)));
 
@@ -73,6 +80,8 @@ public class LightTeleOp extends OpMode {
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
+        log("FLYWHEEL_POWER", Globals.FLYWHEEL_POWER);
+
 
         log("Servo Pos", robotHardware.servo.getPosition());
 

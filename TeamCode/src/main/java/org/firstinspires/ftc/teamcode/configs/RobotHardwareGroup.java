@@ -43,7 +43,6 @@ public class RobotHardwareGroup {
         frDrive = hardwareMap.get(DcMotor.class, FR_MOTOR_NAME);
         blDrive = hardwareMap.get(DcMotor.class, BL_MOTOR_NAME);
         brDrive = hardwareMap.get(DcMotor.class, BR_MOTOR_NAME);
-//        turret = hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
         flywheel = hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
         feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);

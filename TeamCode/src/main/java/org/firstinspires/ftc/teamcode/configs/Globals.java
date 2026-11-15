@@ -54,7 +54,7 @@ public class Globals {
     // Feeder
     public static final NectarColorEnum NectarColor = NectarColorEnum.Red;
     /// Light Op Mode
-    public static double FLYWHEEL_POWER = 0.58;
+    public static double FLYWHEEL_POWER = 0.588;
 
     public static Boolean isRedAlliance = true;
     public static boolean fieldCentricDriving = false;
