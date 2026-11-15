@@ -4,15 +4,16 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "Template Logger", group = "Tests")
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+
+@Autonomous(name = "TemplateOpmode", group = "Tests")
 public class TemplateOpmode extends OpMode {
-    private DcMotor motor;
+    private RobotHardwareGroup robotHardwareGroup;
 
     @Override
     public void init() {
-        motor = hardwareMap.get(DcMotor.class, "frDrive");
+        robotHardwareGroup = new RobotHardwareGroup(hardwareMap);
     }
 
     @Override //Optional
@@ -28,9 +29,17 @@ public class TemplateOpmode extends OpMode {
     public void loop() {
         String key = "Thing";
         double value = 1;
+        log(key, value);
+    }
+
+    private void log(String key, double value) {
         panelsTelemetry.addData(key, value);
         telemetry.addData(key, value);
     }
 
+    private void log(String key, Object value) {
+        panelsTelemetry.addData(key, value);
+        telemetry.addData(key, value);
+    }
 
 }

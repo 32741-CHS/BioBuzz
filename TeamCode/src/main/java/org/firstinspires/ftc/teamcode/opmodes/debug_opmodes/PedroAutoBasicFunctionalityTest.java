@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "GenericTestOpMode", group = "Tests")
-public class GenericTestOpMode extends OpMode {
+@Autonomous(name = "PedroAutoBasicFunctionalityTest", group = "Tests")
+public class PedroAutoBasicFunctionalityTest extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(56, 8, 90);
