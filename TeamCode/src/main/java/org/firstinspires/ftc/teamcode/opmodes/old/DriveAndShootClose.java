@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.opmodes.old.OldMainTeleOp.isRed;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,7 +20,6 @@ import org.firstinspires.ftc.teamcode.utils.old.OldVision;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Disabled
-@Configurable
 @Autonomous(name = "Drive and shoot close", group = "Robot")
 public class DriveAndShootClose extends LinearOpMode {
     public static final double DRIVE_TIME = 2;
@@ -44,8 +42,6 @@ public class DriveAndShootClose extends LinearOpMode {
     public void runOpMode() {
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
-        robotHardware = new RobotHardwareGroup();
-        robotHardware.init(hardwareMap);
         (oldDrivetrain = new OldDrivetrain()).init(robotHardware);
         (oldShooter = new OldShooter()).init(robotHardware);
         (oldIntake = new OldIntake()).init(robotHardware);
@@ -65,6 +61,8 @@ public class DriveAndShootClose extends LinearOpMode {
         }
 
         waitForStart();
+        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        robotHardware.intake.setPower(1);
 
         OldShooter.canSpinFlywheel = true;
         lastGoalTagTime = getRuntime();

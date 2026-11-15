@@ -1,39 +1,32 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.pedropathing.api.Paths;
-
-import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.math.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.ivy.Command;
-import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_POWER;
+
+import com.pedropathing.api.Paths;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "LongStraightPathAutoOp", group = "Autonomous")
 public class LongStraightPathAutoOp extends LinearOpMode {
 
-    private Follower follower;
-
     private final PoseFactory poseFactory = PoseFactory.degrees();
-
     private final Pose start = poseFactory.of(56, 8, 90);
     private final Pose path1 = poseFactory.of(54.2329, 8.2639, 180);
     private final Pose point2 = poseFactory.of(7.7865, 8.7187, 179.439);
-
-    // Autonomous routine
-    public Command autoRoutine() {
-        return sequential(
-                follow(follower, path1()),
-                follow(follower, path2())
-        );
-    }
+    private Follower follower;
 
     @Override
     public void runOpMode() {
@@ -44,7 +37,11 @@ public class LongStraightPathAutoOp extends LinearOpMode {
 
         waitForStart();
         schedule(autoRoutine());
-
+        RobotHardwareGroup robotHardware;
+        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        instant(() -> {
+            robotHardware.flywheel.setPower(FLYWHEEL_POWER);
+        });
         while (opModeIsActive()) {
             follower.update();
             Scheduler.execute();
@@ -60,6 +57,14 @@ public class LongStraightPathAutoOp extends LinearOpMode {
 
             telemetry.update();
         }
+    }
+
+    // Autonomous routine
+    public Command autoRoutine() {
+        return sequential(
+                follow(follower, path1()),
+                follow(follower, path2())
+        );
     }
 
     public Path path1() {
