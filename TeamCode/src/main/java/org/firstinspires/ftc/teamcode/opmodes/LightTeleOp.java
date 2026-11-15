@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -34,37 +34,33 @@ public class LightTeleOp extends OpMode {
         );
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
-
         allSubsystems.init(robotHardware);
 
-        robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Key Binds
-        driverGamepad.leftTrigger
+        driverGamepad.leftTrigger /// Speed Modifier
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
 
-        shooterGamepad.leftTrigger
+        shooterGamepad.leftTrigger /// Feeder Toggle
                 .onPress(() -> robotHardware.feeder.setPower(1))
                 .onRelease(() -> robotHardware.feeder.setPower(0));
 
-        shooterGamepad.rightTrigger
-                .onPress(() -> robotHardware.intake.setPower(-1))
+        shooterGamepad.rightTrigger /// Intake Toggle
+                .onPress(() -> robotHardware.intake.setPower(1))
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
-        shooterGamepad.btnB
+        shooterGamepad.btnB /// Flywheel Manual Power Modifier
                 .onPress(() -> Globals.FLYWHEEL_POWER += 0.01);
-
         shooterGamepad.btnX
                 .onRelease(() -> Globals.FLYWHEEL_POWER -= 0.01);
 
+        shooterGamepad.leftBumper /// Servo Position
+                .onPress(() -> robotHardware.servo.setPosition(
+                        robotHardware.servo.getPosition() == Globals.SERVO_BIG_BALL ?
+                                Globals.SERVO_SMALL_BALL : Globals.SERVO_BIG_BALL));
 
-        shooterGamepad.leftBumper
-                .whenHeld(() -> robotHardware.servo.setPosition(Math.max(robotHardware.servo.getPosition() - 0.01, 0)));
-
-        shooterGamepad.rightBumper
-                .whenHeld(() -> robotHardware.servo.setPosition(Math.min(robotHardware.servo.getPosition() + 0.01, 1)));
     }
 
     @Override
@@ -77,21 +73,17 @@ public class LightTeleOp extends OpMode {
         log("[drivetrain] X", drivetrain.getX());
         log("[drivetrain] Y", drivetrain.getY());
 
-        log(
-                "[drivetrain] Heading",
-                Math.toDegrees(drivetrain.getHeading())
-        );
+        log("[drivetrain] Heading DEGREES", Math.toDegrees(drivetrain.getHeading()));
         log("FLYWHEEL_POWER", Globals.FLYWHEEL_POWER);
-
 
         log("Servo Pos", robotHardware.servo.getPosition());
 
-        panelsTelemetry.update();
+        simpleTelemetry.update();
         telemetry.update();
     }
 
     void log(String key, double value) {
-        panelsTelemetry.addData(key, value);
+        simpleTelemetry.addData(key, value);
         telemetry.addData(key, value);
     }
 }

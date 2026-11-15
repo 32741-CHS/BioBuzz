@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FEEDER_POWER;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -55,23 +55,23 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
         feeder.setPower(desiredPower);
         applyServoPosition();
 
-        panelsTelemetry.addData("Feeder Power", reverseMode ? -FEEDER_POWER : FEEDER_POWER);
-        panelsTelemetry.addData("Flywheel ready to feed?", flywheel.isReadyForFeed());
-        panelsTelemetry.addData("Ball Type", currentBallType.name());
+        simpleTelemetry.addData("Feeder Power", reverseMode ? -FEEDER_POWER : FEEDER_POWER);
+        simpleTelemetry.addData("Flywheel ready to feed?", flywheel.isReadyForFeed());
+        simpleTelemetry.addData("Ball Type", currentBallType.name());
         if (servo != null) {
-            panelsTelemetry.addData("Pusher Servo Position", servo.getPosition());
+            simpleTelemetry.addData("Pusher Servo Position", servo.getPosition());
         }
-    }
-
-    public void setBallType(Globals.BallType type) {
-        this.currentBallType = type;
-        applyServoPosition();
     }
 
     private void applyServoPosition() {
         if (servo == null) return;
         double targetPos = (currentBallType == Globals.BallType.Small) ? POLLEN_SERVO_POS : NECTAR_SERVO_POS;
         servo.setPosition(targetPos);
+    }
+
+    public void setBallType(Globals.BallType type) {
+        this.currentBallType = type;
+        applyServoPosition();
     }
 
     public Globals.BallType getCurrentBallType() {

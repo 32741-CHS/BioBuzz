@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -18,9 +18,9 @@ public class OdometerTest extends OpMode {
 
     @Override
     public void init() {
-        log("HOW TO USE", "Move the robot and see the readings");
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.registerFtcTelemetry(telemetry);
+        simpleTelemetry.addData("HOW TO USE", "Move the robot and see the readings");
+        simpleTelemetry.update();
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, RobotHardwareGroup.PINPOINT_NAME);
         pinpoint.recalibrateIMU();
         pinpoint.resetPosAndIMU();
@@ -31,17 +31,11 @@ public class OdometerTest extends OpMode {
     public void loop() {
         Pose2D pos = pinpoint.getPosition();
 
-        log("X INCH", pos.getX(DistanceUnit.INCH));
-        log("Y INCH", pos.getY(DistanceUnit.INCH));
-        log("Heading RADIANS", pos.getHeading(AngleUnit.RADIANS));
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.addData("X INCH", pos.getX(DistanceUnit.INCH));
+        simpleTelemetry.addData("Y INCH", pos.getY(DistanceUnit.INCH));
+        simpleTelemetry.addData("Heading RADIANS", pos.getHeading(AngleUnit.RADIANS));
+        simpleTelemetry.update();
 
-    }
-
-    private void log(String key, Object value) {
-        panelsTelemetry.addData(key, value);
-        telemetry.addData(key, value);
     }
 
 

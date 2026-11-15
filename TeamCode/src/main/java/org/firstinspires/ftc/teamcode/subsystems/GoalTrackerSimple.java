@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -24,7 +24,7 @@ public class GoalTrackerSimple implements SubsystemBase {
     @Override
     public void init(RobotHardwareGroup robotHardware) {
         if (robotHardware == null || robotHardware.vision == null) {
-            panelsTelemetry.addData("SIMPLE SHOOTER ERROR NO VISION ", 1);
+            simpleTelemetry.addData("SIMPLE SHOOTER ERROR NO VISION ", 1);
             return;
         }
 
@@ -73,7 +73,7 @@ public class GoalTrackerSimple implements SubsystemBase {
         xHeading = Math.toRadians(best.ftcPose.bearing);
         zHeading = Math.toRadians(best.ftcPose.elevation);
 
-        panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
+        simpleTelemetry.addData("GoalTracker Distance", distanceToGoal);
     }
 
     private String getTagName(AprilTagDetection detection) {

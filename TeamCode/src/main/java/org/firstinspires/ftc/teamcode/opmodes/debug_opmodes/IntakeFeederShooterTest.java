@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -20,15 +20,14 @@ public class IntakeFeederShooterTest extends LinearOpMode {
     public void runOpMode() {
         // New robotHardware To make force fresh init and reduce risk of improper motor
         // config.
+        simpleTelemetry.registerFtcTelemetry(telemetry);
 
-        log("HOW TO USE", "Controller/Gamepad 1 right stick changes flywheel speed/power");
-        panelsTelemetry.update();
-        telemetry.update();
-
+        simpleTelemetry.addData("HOW TO USE", "Controller/Gamepad 1 right stick changes flywheel speed/power");
+        simpleTelemetry.update();
 
         while (opModeInInit()) {
-            telemetry.addData("state", "init");
-            telemetry.update();
+            simpleTelemetry.addData("state", "init");
+            simpleTelemetry.update();
         }
 
         waitForStart();
@@ -41,18 +40,12 @@ public class IntakeFeederShooterTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             shooter.setPower(requestedRPS = Math.clamp(requestedRPS - gamepad1.left_stick_y / 10, -1, 1));
-            log("Shooter Requested RMP", requestedRPS);
-            log("feeder Approx. RPS (assumed 312RPM config)", feeder.getVelocity() * GOBILDA_5203_312RPM);
-            log("intake Approx. RPS (assumed 312RPM config)", intake.getVelocity() * GOBILDA_5203_312RPM);
-            log("shooter Approx. RPS (assumed 6000RPM config)", shooter.getVelocity() * GOBILDA_5203_6000RPM);
-            panelsTelemetry.update();
-            telemetry.update();
+            simpleTelemetry.addData("Shooter Requested RMP", requestedRPS);
+            simpleTelemetry.addData("feeder Approx. RPS (assumed 312RPM config)", feeder.getVelocity() * GOBILDA_5203_312RPM);
+            simpleTelemetry.addData("intake Approx. RPS (assumed 312RPM config)", intake.getVelocity() * GOBILDA_5203_312RPM);
+            simpleTelemetry.addData("shooter Approx. RPS (assumed 6000RPM config)", shooter.getVelocity() * GOBILDA_5203_6000RPM);
+            simpleTelemetry.update();
         }
-    }
-
-    private void log(String key, Object value) {
-        panelsTelemetry.addData(key, value);
-        telemetry.addData(key, value);
     }
 
 }

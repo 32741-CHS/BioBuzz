@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -31,6 +31,14 @@ public class Turret implements SubsystemBase {
         CurrentRotation = rotation;
     }
 
+    public void setHasGoal(boolean val) {
+        HasGoal = val;
+    }
+
+    public void changeGoal(double distance, double xradians, double zradians) {
+        changeGoal(distance, xradians);
+    }
+
     /**
      * Calculates absolute field coordinates from camera relative distance and bearing.
      *
@@ -58,14 +66,6 @@ public class Turret implements SubsystemBase {
         CurrentGoalPosition = new Vector2D(goalX, goalY);
     }
 
-    public void setHasGoal(boolean val) {
-        HasGoal = val;
-    }
-
-    public void changeGoal(double distance, double xradians, double zradians) {
-        changeGoal(distance, xradians);
-    }
-
     public void changeGoal(Vector2D fieldPosition) {
         if (fieldPosition == null)
             return;
@@ -82,10 +82,11 @@ public class Turret implements SubsystemBase {
     public void update() {
         if (!AllowAutoRotate) return;
         if (!HasGoal) return;
-        if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
+        if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null)
+            return;
 
         CurrentRotation = drivetrain.getHeading() - IMUHeadingOffset;
-        panelsTelemetry.addData("Turret Rotation", CurrentRotation);
+        simpleTelemetry.addData("Turret Rotation", CurrentRotation);
 
         double dx = CurrentGoalPosition.x - drivetrain.getX();
         double dy = CurrentGoalPosition.y - drivetrain.getY();

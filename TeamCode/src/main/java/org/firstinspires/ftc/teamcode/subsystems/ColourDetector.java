@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -63,18 +63,18 @@ public final class ColourDetector implements SubsystemBase {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
         if ((Color.green(color) + Color.blue(color)) / 2.0f >= PollenThreshold) {
-            panelsTelemetry.addData("ColourDetector Ball Type", "Small");
+            simpleTelemetry.addData("ColourDetector Ball Type", "Small");
             return Globals.BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
             if (Color.red(color) >= NectarThreshold) {
-                panelsTelemetry.addData("ColourDetector Ball Type", "Big");
+                simpleTelemetry.addData("ColourDetector Ball Type", "Big");
                 return Globals.BallType.Big;
             }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
             if (Color.blue(color) >= NectarThreshold) {
-                panelsTelemetry.addData("ColourDetector Ball Type", "Big");
+                simpleTelemetry.addData("ColourDetector Ball Type", "Big");
                 return Globals.BallType.Big;
             }
         }
@@ -95,7 +95,7 @@ public final class ColourDetector implements SubsystemBase {
 
         if (!proc.hasProcessedFrame()) return Color.BLACK;
 
-        panelsTelemetry.addData("ColourDetector Color", proc.getLastColor());
+        simpleTelemetry.addData("ColourDetector Color", proc.getLastColor());
         return proc.getLastColor();
     }
 

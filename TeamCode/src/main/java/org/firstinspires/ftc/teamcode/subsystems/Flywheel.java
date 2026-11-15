@@ -14,7 +14,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SlipagePercentage;
 import static org.firstinspires.ftc.teamcode.configs.Globals.TimeInterval;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -151,7 +151,7 @@ public class Flywheel implements SubsystemBase {
                 Py = Py + Vy * TimeInterval;
 
                 if (Py <= 0.001) {
-                    panelsTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
+                    simpleTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
                     desiredRPS += desiredRPS / 100 * 5;
                     break;
                 }
@@ -159,9 +159,9 @@ public class Flywheel implements SubsystemBase {
                 // MATH FIX 10: "reached" now means crossing the goal distance AT or ABOVE the goal height
                 if (Px >= horizontalDistance) {
                     if (Py >= verticalDistance) {
-                        panelsTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
+                        simpleTelemetry.addData("Flywheel Simulation", "Ball reached simulated position.");
                     } else {
-                        panelsTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
+                        simpleTelemetry.addData("Flywheel Simulation", "Ball arrived below target, desiredRPS increased by 5%.");
                         desiredRPS += desiredRPS / 100 * 5;
                     }
                     simulationComplete = true;
@@ -171,8 +171,8 @@ public class Flywheel implements SubsystemBase {
                 if (currTime > SimulationTimeout) {
                     simulationComplete = true;
                     if (!(Px >= horizontalDistance)) {
-                        panelsTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
-                        panelsTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
+                        simpleTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
+                        simpleTelemetry.addData("Flywheel Simulation", "desiredRPS increased by 5% to account for failure.");
                         desiredRPS += desiredRPS / 100 * 5;
                     }
                     break;

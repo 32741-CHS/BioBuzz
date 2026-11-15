@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.old;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -57,8 +57,8 @@ public class OldShooter implements SubsystemBase {
         requestedFeed = false;
         requestedReverseFeed = false;
 
-        panelsTelemetry.addData("Flywheel RPS", getFlywheelRPS());
-        panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
+        simpleTelemetry.addData("Flywheel RPS", getFlywheelRPS());
+        simpleTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }
 
     public double getFlywheelErrorRPS() {

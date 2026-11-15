@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_BIG_BALL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_SMALL_BALL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -71,10 +71,10 @@ public class SimpleShooterTeleOp extends OpMode {
         allSubsystems.update();
 
         // Telemetry
-        panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
-        panelsTelemetry.addData("[drivetrain] Y", drivetrain.getY());
+        simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
+        simpleTelemetry.addData("[drivetrain] Y", drivetrain.getY());
 
-        panelsTelemetry.addData(
+        simpleTelemetry.addData(
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_312RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -18,9 +18,9 @@ public class MotorTest extends OpMode {
 
     @Override
     public void init() {
-        log("HOW TO USE", "Controller/Gamepad 1 right stick changes requestedPower");
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.registerFtcTelemetry(telemetry);
+        simpleTelemetry.addData("HOW TO USE", "Controller/Gamepad 1 right stick changes requestedPower");
+        simpleTelemetry.update();
     }
 
 
@@ -32,18 +32,12 @@ public class MotorTest extends OpMode {
         requestedPower = Math.clamp(requestedPower - gamepad1.left_stick_y / 10, -1, 1);
 
         motor.setPower(requestedPower);
-        log("Motor Name", motorName);
-        log("Requested Power", requestedPower);
-        log("Approx Velocity (6000 RMP motor)", motor.getVelocity() * GOBILDA_5203_6000RPM);
-        log("Approx Velocity (312 RMP motor)", motor.getVelocity() * GOBILDA_5203_312RPM);
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.addData("Motor Name", motorName);
+        simpleTelemetry.addData("Requested Power", requestedPower);
+        simpleTelemetry.addData("Approx Velocity (6000 RMP motor)", motor.getVelocity() * GOBILDA_5203_6000RPM);
+        simpleTelemetry.addData("Approx Velocity (312 RMP motor)", motor.getVelocity() * GOBILDA_5203_312RPM);
+        simpleTelemetry.update();
 
-    }
-
-    private void log(String key, Object value) {
-        panelsTelemetry.addData(key, value);
-        telemetry.addData(key, value);
     }
 
 

@@ -5,6 +5,8 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
+import org.firstinspires.ftc.teamcode.utils.SimpleTelemetry;
+
 @Configurable
 public class Globals {
     // Remember Final = no change; static = same var shared across instances, so
@@ -29,7 +31,7 @@ public class Globals {
     /// FEEDER
     public static final double FEEDER_POWER = 0.7;
     // Panels
-    public static final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    public static final SimpleTelemetry simpleTelemetry = new SimpleTelemetry();
     public static final TelemetryManager panelsGraph = PanelsTelemetry.INSTANCE.getTelemetry();
     /// Flywheel constants
     public static final double Gravity = 9.81,

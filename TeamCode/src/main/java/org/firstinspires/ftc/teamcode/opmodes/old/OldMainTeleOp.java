@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.old;
 import static org.firstinspires.ftc.teamcode.configs.Globals.BLUE_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.RED_GOAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.STICK_DEADBAND;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -151,38 +151,38 @@ public class OldMainTeleOp extends OpMode {
         oldTurret.update();
 
         // Telemetry
-        panelsTelemetry.addData("OldIntake power", oldIntake.getPower());
-        panelsTelemetry.addData("Feeder power", oldShooter.getFeederPower());
-        panelsTelemetry.addData("Flywheel rps", oldShooter.getFlywheelRPS());
-        panelsTelemetry.addData("Flywheel error", oldShooter.getFlywheelErrorRPS());
-        panelsTelemetry.addData("OldDrivetrain speed", oldDrivetrain.getSpeedMultiplier());
-        panelsTelemetry.addData("OldTurret angle", oldTurret.getCurrentAngle());
-        panelsTelemetry.addData("OldTurret error", oldTurret.getErrorAngle());
-        panelsTelemetry.addData("OldTurret mode", turretManualMode ? "MANUAL" : "AUTO");
-        panelsTelemetry.addData("Field Centric", isFieldDriving);
-        panelsTelemetry.addData("Use lookups", useFlywheelLookups);
+        simpleTelemetry.addData("OldIntake power", oldIntake.getPower());
+        simpleTelemetry.addData("Feeder power", oldShooter.getFeederPower());
+        simpleTelemetry.addData("Flywheel rps", oldShooter.getFlywheelRPS());
+        simpleTelemetry.addData("Flywheel error", oldShooter.getFlywheelErrorRPS());
+        simpleTelemetry.addData("OldDrivetrain speed", oldDrivetrain.getSpeedMultiplier());
+        simpleTelemetry.addData("OldTurret angle", oldTurret.getCurrentAngle());
+        simpleTelemetry.addData("OldTurret error", oldTurret.getErrorAngle());
+        simpleTelemetry.addData("OldTurret mode", turretManualMode ? "MANUAL" : "AUTO");
+        simpleTelemetry.addData("Field Centric", isFieldDriving);
+        simpleTelemetry.addData("Use lookups", useFlywheelLookups);
 
         if (goalTag != null) {
             // Locale.US means use the 12.22 every time instead of 12,22 because some
             // countries use
             // the "," instead of the "." why I do not know.
-            panelsTelemetry.addData(
+            simpleTelemetry.addData(
                     "Tag distance", String.format(Locale.US, "%.2f m", goalTag.ftcPose.range));
-            panelsTelemetry.addData(
+            simpleTelemetry.addData(
                     "Tag bearing",
                     String.format(Locale.US, "%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
         } else {
-            panelsTelemetry.addData("Tag distance", "no tag");
+            simpleTelemetry.addData("Tag distance", "no tag");
         }
 
         // panels graph feed
-        panelsTelemetry.addData("flywheelRPS", oldShooter.getFlywheelRPS());
-        panelsTelemetry.addData("flywheelTarget", OldShooter.desiredFlywheelRPS);
-        panelsTelemetry.addData("flywheelError", oldShooter.getFlywheelErrorRPS());
-        panelsTelemetry.addData("feederPower", oldShooter.getFeederPower());
-        panelsTelemetry.addData("intakePower", oldIntake.getPower());
+        simpleTelemetry.addData("flywheelRPS", oldShooter.getFlywheelRPS());
+        simpleTelemetry.addData("flywheelTarget", OldShooter.desiredFlywheelRPS);
+        simpleTelemetry.addData("flywheelError", oldShooter.getFlywheelErrorRPS());
+        simpleTelemetry.addData("feederPower", oldShooter.getFeederPower());
+        simpleTelemetry.addData("intakePower", oldIntake.getPower());
 
-        panelsTelemetry.update();
-        panelsTelemetry.update(telemetry);
+        simpleTelemetry.update();
+        simpleTelemetry.update(telemetry);
     }
 }

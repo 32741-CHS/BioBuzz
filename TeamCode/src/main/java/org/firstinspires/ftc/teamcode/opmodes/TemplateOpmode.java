@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -33,12 +33,12 @@ public class TemplateOpmode extends OpMode {
     }
 
     private void log(String key, double value) {
-        panelsTelemetry.addData(key, value);
+        simpleTelemetry.addData(key, value);
         telemetry.addData(key, value);
     }
 
     private void log(String key, Object value) {
-        panelsTelemetry.addData(key, value);
+        simpleTelemetry.addData(key, value);
         telemetry.addData(key, value);
     }
 

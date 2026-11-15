@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.configs;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 import static java.util.Objects.isNull;
 
 import androidx.annotation.Nullable;
@@ -57,7 +57,7 @@ public class RobotHardwareGroup {
     private <T> T safeGet(Class<? extends T> classOrInterface, String name) {
         T obj = hardwareMap.tryGet(classOrInterface, name);
         if (isNull(obj))
-            panelsTelemetry.addData(
+            simpleTelemetry.addData(
                     "[ERROR] " + name,
                     "FAILED TO FIND  HARDWARE (Ignoring)" +
                             " \n Try Checking if the wire is connected firmly, or the driver hub hardware config name matches: " + name

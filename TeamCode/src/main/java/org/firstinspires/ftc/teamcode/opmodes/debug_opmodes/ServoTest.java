@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,30 +15,24 @@ public class ServoTest extends OpMode {
 
     @Override
     public void init() {
-        log("HOW TO USE", "Controller/Gamepad 1 right stick changes requestedPower");
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.addData("HOW TO USE", "Controller/Gamepad 1 right stick changes requestedPower");
+        simpleTelemetry.update();
     }
 
 
     @Override
     public void loop() {
+        simpleTelemetry.registerFtcTelemetry(telemetry);
         Servo servo = hardwareMap.get(Servo.class, servoName);
 
         /// If Panels doesn't work
         requestedPos = Math.clamp(requestedPos - gamepad1.left_stick_y / 10, -1, 1);
 
         servo.setPosition(requestedPos);
-        log("Servo Name", servoName);
-        log("Requested Position", requestedPos);
-        panelsTelemetry.update();
-        telemetry.update();
+        simpleTelemetry.addData("Servo Name", servoName);
+        simpleTelemetry.addData("Requested Position", requestedPos);
+        simpleTelemetry.update();
 
-    }
-
-    private void log(String key, Object value) {
-        panelsTelemetry.addData(key, value);
-        telemetry.addData(key, value);
     }
 
 

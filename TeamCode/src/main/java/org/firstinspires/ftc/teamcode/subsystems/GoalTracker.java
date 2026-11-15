@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -47,7 +47,7 @@ public class GoalTracker implements SubsystemBase {
 
     @Override
     public void update() {
-        panelsTelemetry.addData("GoalTracker AprilTagProcessor", aprilTag != null);
+        simpleTelemetry.addData("GoalTracker AprilTagProcessor", aprilTag != null);
         if (aprilTag == null) return;
 
         distanceToGoal = Double.NaN;
@@ -56,7 +56,7 @@ public class GoalTracker implements SubsystemBase {
 
         AprilTagDetection best = null;
 
-        panelsTelemetry.addData("GoalTracker Detections", aprilTag.getDetections());
+        simpleTelemetry.addData("GoalTracker Detections", aprilTag.getDetections());
 
         for (AprilTagDetection detection : aprilTag.getDetections()) {
             if (detection == null || detection.ftcPose == null)
@@ -87,7 +87,7 @@ public class GoalTracker implements SubsystemBase {
         }
 
         if (best == null) {
-            panelsTelemetry.addData("GoalTracker Best", "Not found");
+            simpleTelemetry.addData("GoalTracker Best", "Not found");
 
             if (System.currentTimeMillis() - lastSeenGoalTimestampMillisecs > GoalMemoryTimeoutMillisecs) {
                 turret.setHasGoal(false);
@@ -96,16 +96,16 @@ public class GoalTracker implements SubsystemBase {
             return;
         }
 
-        panelsTelemetry.addData("GoalTracker Best", best);
+        simpleTelemetry.addData("GoalTracker Best", best);
         lastSeenGoalTimestampMillisecs = System.currentTimeMillis();
 
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
         zRadians = Math.toRadians(best.ftcPose.elevation);
 
-        panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
-        panelsTelemetry.addData("GoalTracker xRadians", xRadians);
-        panelsTelemetry.addData("GoalTracker zRadians", zRadians);
+        simpleTelemetry.addData("GoalTracker Distance", distanceToGoal);
+        simpleTelemetry.addData("GoalTracker xRadians", xRadians);
+        simpleTelemetry.addData("GoalTracker zRadians", zRadians);
 
         if (turret != null) {
             turret.changeGoal(distanceToGoal, xRadians, zRadians);

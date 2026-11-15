@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_BIG_BALL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_SMALL_BALL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -46,8 +46,8 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
     public void update() {
         flywheel.setVelocity((!isFlywheelIdled) ? desiredRPS() * GOBILDA_5203_6000RPM : 0);
 
-        panelsTelemetry.addData("Flywheel RPS", getFlywheelRPS());
-        panelsTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
+        simpleTelemetry.addData("Flywheel RPS", getFlywheelRPS());
+        simpleTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }
 
     double desiredRPS() {
