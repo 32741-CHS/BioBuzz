@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "MainShooterAutoOp", group = "Autonomous")
+@Autonomous(name = "2. Go around and shoot", group = "Autonomous")
 public class MainShooterAutoOp extends LinearOpMode {
 
     private Follower follower;

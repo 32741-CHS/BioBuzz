@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
-@Autonomous(name = "ShortStraightPathAutoOp", group = "Autonomous")
+@Autonomous(name = "1. ShortStraight", group = "Autonomous")
 public class ShortStraightPathAutoOp extends LinearOpMode {
 
     private Follower follower;
@@ -24,7 +24,7 @@ public class ShortStraightPathAutoOp extends LinearOpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     private final Pose start = poseFactory.of(132.0946, 8.7228, 90);
-    private final Pose path1 = poseFactory.of(132.1506, 35.0206, 180);
+    private final Pose path1 = poseFactory.of(132.1506, 35.0206, 90);
 
     // Autonomous routine
     public Command autoRoutine() {
