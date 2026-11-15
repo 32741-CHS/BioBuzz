@@ -29,7 +29,7 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
-        flywheel = robotHardware.flywheel;
+        flywheel = (DcMotorEx) robotHardware.flywheel;
         flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

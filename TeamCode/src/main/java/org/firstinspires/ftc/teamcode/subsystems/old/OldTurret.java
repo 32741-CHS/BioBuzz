@@ -19,7 +19,7 @@ public class OldTurret {
     private double lastPower = 0;
 
     public void init(RobotHardwareGroup robotHardware) {
-        turret = robotHardware.turret;
+        turret = (DcMotorEx) robotHardware.turret;
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
