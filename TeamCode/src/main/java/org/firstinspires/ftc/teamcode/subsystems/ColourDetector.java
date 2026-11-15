@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import com.bylazar.camerastream.PanelsCameraStream;
 import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -25,20 +26,20 @@ public final class ColourDetector implements SubsystemBase {
     // config
     public static double NectarThreshold = 200.0;
     public static double PollenThreshold = 150.0;
-    private final Map<WebcamName, PixelProcessor> Processors = new HashMap<>();
-    private final Map<WebcamName, VisionPortal> Portals = new HashMap<>();
+    private final Map<WebcamName, PixelProcessor> processors = new HashMap<>();
+    private final Map<WebcamName, VisionPortal> portals = new HashMap<>();
 
     // always be sure to call this when possible
     // takes varargs (cam1, cam2, cam3) and not an array
 
     @Override
     public void init(RobotHardwareGroup robotHardware) {
-        WebcamName[] cams = {robotHardware.vision, robotHardware.insideCam};
+        WebcamName[] cams = {robotHardware.insideCam};
 
         if (cams == null) return;
 
         for (WebcamName cam : cams) {
-            if (cam == null || Portals.containsKey(cam)) continue;
+            if (cam == null || portals.containsKey(cam)) continue;
 
             PixelProcessor newprocessor = new PixelProcessor();
             VisionPortal newportal = new VisionPortal.Builder()
@@ -47,9 +48,11 @@ public final class ColourDetector implements SubsystemBase {
                     .enableLiveView(false)
                     .build();
 
-            Processors.put(cam, newprocessor);
-            Portals.put(cam, newportal);
+            processors.put(cam, newprocessor);
+            portals.put(cam, newportal);
         }
+        PanelsCameraStream.INSTANCE.startStream(portals.get(cams[0]), 15);
+
 
     }
 
@@ -88,7 +91,7 @@ public final class ColourDetector implements SubsystemBase {
             return Color.BLACK;
         }
 
-        PixelProcessor proc = Processors.get(cam);
+        PixelProcessor proc = processors.get(cam);
         if (proc == null) return Color.BLACK;
 
         proc.setCoordinates(coord.x, coord.y);
@@ -100,12 +103,12 @@ public final class ColourDetector implements SubsystemBase {
     }
 
     public void close() {
-        for (VisionPortal portal : Portals.values()) {
+        for (VisionPortal portal : portals.values()) {
             portal.close();
         }
 
-        Portals.clear();
-        Processors.clear();
+        portals.clear();
+        processors.clear();
     }
 
     private static class PixelProcessor implements VisionProcessor {
