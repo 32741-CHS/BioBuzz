@@ -1,28 +1,28 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.pedropathing.api.Paths;
-
-import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.math.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.ivy.Command;
-import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_POWER;
+
+import com.pedropathing.api.Paths;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "GameAutoOpTest2", group = "Autonomous")
 public class GameAutoOpTest2 extends LinearOpMode {
 
-    private Follower follower;
-
     private final PoseFactory poseFactory = PoseFactory.degrees();
-
     private final Pose start = poseFactory.of(56, 8, 90);
     private final Pose path1 = poseFactory.of(12.7861, 8.2996, -90);
     private final Pose path1Control1 = poseFactory.of(58.824, 31.9218, 0);
@@ -32,18 +32,11 @@ public class GameAutoOpTest2 extends LinearOpMode {
     private final Pose point2Control1 = poseFactory.of(12.4485, 34.4132, 0);
     private final Pose point2Control2 = poseFactory.of(56.8479, 47.5044, 0);
     private final Pose point3 = poseFactory.of(57.3088, 27.5634, 91.4289);
-
-    // Autonomous routine
-    public Command autoRoutine() {
-        return sequential(
-                follow(follower, path1()),
-                follow(follower, path2()),
-                follow(follower, path3())
-        );
-    }
+    private Follower follower;
 
     @Override
     public void runOpMode() {
+
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
@@ -51,6 +44,12 @@ public class GameAutoOpTest2 extends LinearOpMode {
 
         waitForStart();
         schedule(autoRoutine());
+
+        RobotHardwareGroup robotHardware;
+        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
+        instant(() -> {
+            robotHardware.flywheel.setPower(FLYWHEEL_POWER);
+        });
 
         while (opModeIsActive()) {
             follower.update();
@@ -67,6 +66,15 @@ public class GameAutoOpTest2 extends LinearOpMode {
 
             telemetry.update();
         }
+    }
+
+    // Autonomous routine
+    public Command autoRoutine() {
+        return sequential(
+                follow(follower, path1()),
+                follow(follower, path2()),
+                follow(follower, path3())
+        );
     }
 
     public Path path1() {

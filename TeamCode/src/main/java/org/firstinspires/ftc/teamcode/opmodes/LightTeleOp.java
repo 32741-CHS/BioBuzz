@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
@@ -37,7 +38,6 @@ public class LightTeleOp extends OpMode {
 
         robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-        robotHardware.flywheel.setPower(0.65);
 
         // Key Binds
         driverGamepad.leftTrigger
@@ -61,6 +61,8 @@ public class LightTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        robotHardware.flywheel.setPower(Globals.FLYWHEEL_POWER);
+
         allSubsystems.update();
 
         // Telemetry
@@ -71,7 +73,7 @@ public class LightTeleOp extends OpMode {
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
-        
+
         log("Servo Pos", robotHardware.servo.getPosition());
 
         panelsTelemetry.update();

@@ -48,8 +48,8 @@ public class RobotHardwareGroup {
         feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
         imu = hardwareMap.get(IMU.class, IMU_NAME);
-        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
-        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
+        vision = hardwareMap.tryGet(WebcamName.class, MAIN_WEBCAM_NAME);
+        insideCam = hardwareMap.tryGet(WebcamName.class, INSIDE_WEBCAM_NAME);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
         servo = hardwareMap.get(Servo.class, SERVO_NAME);
     }
