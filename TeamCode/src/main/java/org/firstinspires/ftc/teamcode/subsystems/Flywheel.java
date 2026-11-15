@@ -38,7 +38,7 @@ public class Flywheel implements SubsystemBase {
     public static double maximumFlywheelRPM = 6000;
     public static double minimumFlywheelRPM = 0;
     public static boolean useDynamicSpeed = true;
-    public static boolean canSpinFlywheel = false;
+    public static boolean canSpinFlywheel = true;
     public static boolean doSimulation = true; // set to false if lag
     // private final ColourDetector colourDetector;
     private final Drivetrain drivetrain;
