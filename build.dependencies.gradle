@@ -20,11 +20,11 @@ dependencies {
     // Stuff For Panels -- Eric
     // Don't update fullpanels yet as we use legacy code that needs to be updated.
     // I no want to handle that...
-    implementation 'com.bylazar:fullpanels:1.0.0'
-    implementation 'com.bylazar:camerastream:1.0.2'
+    implementation 'com.bylazar:fullpanels:1.0.18'
+//    implementation 'com.bylazar:camerastream:1.0.2'
 
     // Stuff for pedro pathing
-    implementation 'com.pedropathing:tuning:1.0.0'
+    implementation 'com.pedropathing:tuning:1.0.3'
     implementation 'com.pedropathing:revhub:3.0.2'
     implementation 'com.pedropathing.ivy:pedro:1.1.1'
 }

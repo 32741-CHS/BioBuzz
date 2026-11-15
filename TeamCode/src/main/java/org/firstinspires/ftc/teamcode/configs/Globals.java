@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.configs;
 
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.graph.GraphManager;
-import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
@@ -32,7 +30,7 @@ public class Globals {
     public static final double FEEDER_POWER = 0.7;
     // Panels
     public static final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    public static final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
+    public static final TelemetryManager panelsGraph = PanelsTelemetry.INSTANCE.getTelemetry();
     /// Flywheel constants
     public static final double Gravity = 9.81,
             DecaySpin = 0.223, // Guessed, tweak it ig
