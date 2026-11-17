@@ -63,41 +63,57 @@ public class RobotHardwareGroup {
         servo = safeGet(Servo.class, SERVO_NAME);
 
         /// ToDo: Too lazy to do this properly
-        flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        flDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        flDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) flDrive).setPIDFCoefficients();
-        frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        frDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) frDrive).setPIDFCoefficients();
-        blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        blDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) blDrive).setPIDFCoefficients();
-        brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) brDrive).setPIDFCoefficients();
-        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turret.setDirection(DcMotorSimple.Direction.FORWARD);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) turret).setPIDFCoefficients();
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) flywheel).setPIDFCoefficients();
-        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-        feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) feeder).setPIDFCoefficients();
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        ((DcMotorEx) intake).setPIDFCoefficients();
+        if (flDrive != null) {
+            flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            flDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            flDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) flDrive).setPIDFCoefficients();
+        }
+        if (frDrive != null) {
+            frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            frDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            frDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) frDrive).setPIDFCoefficients();
+        }
+        if (blDrive != null) {
+            blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            blDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) blDrive).setPIDFCoefficients();
+        }
+        if (brDrive != null) {
+            brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) brDrive).setPIDFCoefficients();
+        }
+        if (turret != null) {
+            turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            turret.setDirection(DcMotorSimple.Direction.FORWARD);
+            turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) turret).setPIDFCoefficients();
+        }
+        if (flywheel != null) {
+            flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
+            flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) flywheel).setPIDFCoefficients();
+        }
+        if (feeder != null) {
+            feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+            feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) feeder).setPIDFCoefficients();
+        }
+        if (intake != null) {
+            intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            intake.setDirection(DcMotorSimple.Direction.FORWARD);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) intake).setPIDFCoefficients();
+        }
     }
 
-    private <T> T safeGet(Class<? extends T> classOrInterface, String name) {
+    private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
         T obj = hardwareMap.tryGet(classOrInterface, name);
         if (isNull(obj))
             simpleTelemetry.addData(
