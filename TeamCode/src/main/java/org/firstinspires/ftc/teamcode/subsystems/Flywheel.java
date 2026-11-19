@@ -33,25 +33,16 @@ import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 @Configurable
 public class Flywheel implements SubsystemBase {
 
-    // -------------------------------------------------------------------------
-    // Existing public controls: retained so the rest of TeamCode still works.
-    // -------------------------------------------------------------------------
+    // Existing public controls
     public static double desiredFlywheelRPS = 13.0;
     public static double maximumFlywheelRPM = 6000.0;
     public static double minimumFlywheelRPM = 0.0;
     public static boolean useDynamicSpeed = true;
     public static boolean canSpinFlywheel = false;
 
-    // -------------------------------------------------------------------------
-    // Easy-to-adjust shooter geometry and model constants.
     // Distances are metres. Angles are degrees unless the name says "Rad".
-    // -------------------------------------------------------------------------
     public static double CAMERA_HEIGHT_M = 0.37;
 
-    /**
-     * Reference-sensor height above the ground in metres. This is geometry only;
-     * no camera hardware is required by this subsystem.
-     */
     public static double CAMERA_AHEAD_OF_SHOOTER_M = 0.06;
 
     /**
@@ -68,12 +59,7 @@ public class Flywheel implements SubsystemBase {
     public static double POLLEN_RADIUS_M = 0.03556;
     public static double NECTAR_RADIUS_M = 0.04572;
 
-    /**
-     * The model defines S = ballRadius * ballAngularSpeed / ballExitSpeed.
-     * S approximately 1 is a starting estimate for a single driven wheel and
-     * fixed hood; measure it from high-speed video or a spin test.
-     */
-    public static double BALL_SPIN_RATIO = 1.0;
+    public static double BALL_SPIN_RATIO = 1.1;
 
     public static double BALL_INERTIA_BETA = 2.0 / 3.0;
 
@@ -96,33 +82,28 @@ public class Flywheel implements SubsystemBase {
     public static double SHOOTER_KI = 0.0;
     public static double SHOOTER_KD = 0.0;
 
-    // -------------------------------------------------------------------------
     // Pollen CFD table. Spin labels are angular velocity in rad/s, NOT RPM.
     // Cd and Cl are means of the final 20 rows from the supplied CSV files.
     // The 75 point is interpolated because that CSV contains Ux,Uy,Uz,p only.
     // The 150 point assumes the ambiguous "1,50" filename means 150 rad/s.
-    // -------------------------------------------------------------------------
     private static final double[][] POLLEN_CFD = new double[][] {
             // spin rad/s,       Cd,        Cl
             {   0.0,          0.586302,  0.101643 },
-            {  75.0,          0.498444,  0.384987 }, // estimated midpoint
-            { 150.0,          0.410585,  0.668330 }, // ambiguous filename / drifting run
+            {  75.0,          0.498444,  0.384987 },
+            { 150.0,          0.410585,  0.668330 },
             { 270.0,          0.982075,  0.869447 },
             { 420.0,          1.103894,  1.072725 },
-            { 600.0,          0.429050,  1.537901 }, // Cd still drifting
+            { 600.0,          0.429050,  1.537901 },
             {1500.0,          1.413068,  2.239814 }
     };
 
-    // Nectar has no CFD coefficient CSV in the uploaded data. Per the request,
     // it uses the Pollen curve provisionally; its larger radius and different
     // measured mass are still used in the physical calculation below.
 
     private static final double INCH_TO_METRE = 0.0254;
     private static final double TWO_PI = 2.0 * Math.PI;
 
-    // -------------------------------------------------------------------------
     // Existing hardware/subsystem dependencies.
-    // -------------------------------------------------------------------------
     private DcMotorEx flywheel;
     private Drivetrain drivetrain;
 
@@ -158,12 +139,6 @@ public class Flywheel implements SubsystemBase {
         return currentBallType;
     }
 
-    /**
-     * Backwards-compatible method used by the current GoalTracker.
-     *
-     * distance is best.ftcPose.range in inches (horizontal range), and
-     * zRadians is best.ftcPose.elevation converted to radians.
-     */
     public void changeGoal(double distance, double zRadians) {
         changeGoal(distance, 0.0, zRadians);
     }
@@ -396,7 +371,6 @@ public class Flywheel implements SubsystemBase {
                 speedGuess = candidateSpeed;
                 break;
             }
-            // Damping reduces oscillation when Cd/Cl changes between CFD rows.
             speedGuess = 0.5 * speedGuess + 0.5 * candidateSpeed;
         }
 
@@ -572,10 +546,7 @@ public class Flywheel implements SubsystemBase {
         return p * (2.0 * p * p + 5.0) * Math.sqrt(1.0 + p * p) / 8.0
                 + 3.0 / 8.0 * asinh(p);
     }
-
-    // -------------------------------------------------------------------------
     // FTC SubsystemBase implementation and existing motor control interfaces.
-    // -------------------------------------------------------------------------
     @Override
     public void init(RobotHardwareGroup robotHardware) {
         if (robotHardware == null || robotHardware.flywheel == null) {
@@ -647,7 +618,6 @@ public class Flywheel implements SubsystemBase {
         panelsTelemetry.addData("[Flywheel] Ready for feeder", isReadyForFeed());
     }
 
-    /** Apply Hub velocity PIDF. P and F reuse the existing team Globals. */
     private void applyPIDFCoefficients(boolean force) {
         if (flywheel == null) return;
         boolean changed = force
@@ -698,7 +668,6 @@ public class Flywheel implements SubsystemBase {
         return Math.abs(getFlywheelErrorRPS()) <= Globals.FLYWHEEL_ERROR_TOL;
     }
 
-    /** Existing method name retained; call this to enable the flywheel. */
     public void runFlywheel() {
         canSpinFlywheel = true;
     }
@@ -706,10 +675,6 @@ public class Flywheel implements SubsystemBase {
     public void stopFlywheel() {
         canSpinFlywheel = false;
     }
-
-    // -------------------------------------------------------------------------
-    // Small internal result classes keep this implementation in ONE Java file.
-    // -------------------------------------------------------------------------
     private static final class AeroResult {
         final double cd;
         final double cl;
