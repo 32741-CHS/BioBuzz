@@ -114,7 +114,7 @@ public class RobotHardwareGroup {
     }
 
     private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
-        T obj = hardwareMap.tryGet(classOrInterface, name);
+        T obj = hardwareMap.get(classOrInterface, name);
         if (isNull(obj))
             simpleTelemetry.addData(
                     "[ERROR] " + name,
