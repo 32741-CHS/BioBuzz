@@ -18,8 +18,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
     // Stuff For Panels -- Eric
-    // Don't update fullpanels yet as we use legacy code that needs to be updated.
-    // I no want to handle that...
+    // Updated and safe. Note, no sloth version of panels because panels
+    // is now sloth ready.
     implementation 'com.bylazar:fullpanels:1.0.18'
 //    implementation 'com.bylazar:camerastream:1.0.2'
 
