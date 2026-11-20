@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -14,14 +15,16 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 @Configurable
 public class GoalTracker implements SubsystemBase {
+    // config
+    public static long GoalMemoryTimeoutMillisecs = 1500;
 
     private final Turret turret;
     private final Flywheel flywheel;
     private AprilTagProcessor aprilTag;
-    private boolean isRed = true;
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
+    private long lastSeenGoalTimestampMillisecs = 0;
 
     public GoalTracker(Turret turret, Flywheel flywheel) {
         this.turret = turret;
@@ -44,6 +47,7 @@ public class GoalTracker implements SubsystemBase {
 
     @Override
     public void update() {
+        simpleTelemetry.addData("GoalTracker AprilTagProcessor", aprilTag != null);
         if (aprilTag == null) return;
 
         distanceToGoal = Double.NaN;
@@ -52,7 +56,7 @@ public class GoalTracker implements SubsystemBase {
 
         AprilTagDetection best = null;
 
-        panelsTelemetry.addData("GoalTracker Detections", aprilTag.getDetections());
+        simpleTelemetry.addData("GoalTracker Detections", aprilTag.getDetections());
 
         for (AprilTagDetection detection : aprilTag.getDetections()) {
             if (detection == null || detection.ftcPose == null)
@@ -62,10 +66,10 @@ public class GoalTracker implements SubsystemBase {
 
             // Alliance filtering if name metadata exists
             if (name != null) {
-                if (isRed && !name.startsWith("RED"))
+                if (isRedAlliance && !name.startsWith("RED"))
                     continue;
 
-                if (!isRed && !name.startsWith("BLUE"))
+                if (!isRedAlliance && !name.startsWith("BLUE"))
                     continue;
             }
 
@@ -83,19 +87,25 @@ public class GoalTracker implements SubsystemBase {
         }
 
         if (best == null) {
-            panelsTelemetry.addData("GoalTracker Best", "Not found");
+            simpleTelemetry.addData("GoalTracker Best", "Not found");
+
+            if (System.currentTimeMillis() - lastSeenGoalTimestampMillisecs > GoalMemoryTimeoutMillisecs) {
+                turret.setHasGoal(false);
+            }
+
             return;
         }
 
-        panelsTelemetry.addData("GoalTracker Best", best);
+        simpleTelemetry.addData("GoalTracker Best", best);
+        lastSeenGoalTimestampMillisecs = System.currentTimeMillis();
 
         distanceToGoal = best.ftcPose.range;
         xRadians = Math.toRadians(best.ftcPose.bearing);
         zRadians = Math.toRadians(best.ftcPose.elevation);
 
-        panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
-        panelsTelemetry.addData("GoalTracker xRadians", xRadians);
-        panelsTelemetry.addData("GoalTracker zRadians", zRadians);
+        simpleTelemetry.addData("GoalTracker Distance", distanceToGoal);
+        simpleTelemetry.addData("GoalTracker xRadians", xRadians);
+        simpleTelemetry.addData("GoalTracker zRadians", zRadians);
 
         if (turret != null) {
             turret.changeGoal(distanceToGoal, xRadians, zRadians);
@@ -117,7 +127,7 @@ public class GoalTracker implements SubsystemBase {
     }
 
     public void setTeam(boolean isRed) {
-        this.isRed = isRed;
+        isRedAlliance = isRed;
     }
 
     public double getDistance() {

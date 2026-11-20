@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.configs;
 
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
+import static java.util.Objects.isNull;
+
+import androidx.annotation.Nullable;
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,15 +16,12 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
 public class RobotHardwareGroup {
-
-
     public final static String
             FL_MOTOR_NAME = "flDrive",
             FR_MOTOR_NAME = "frDrive",
             BL_MOTOR_NAME = "blDrive",
             BR_MOTOR_NAME = "brDrive",
-    /// Archaic for backwards compatibility
-    TURRET_MOTOR_NAME = "turret",
+            TURRET_MOTOR_NAME = "turret",
             FLYWHEEL_MOTOR_NAME = "flywheel",
             FEEDER_MOTOR_NAME = "feeder",
             INTAKE_MOTOR_NAME = "intake",
@@ -29,28 +31,96 @@ public class RobotHardwareGroup {
             MAIN_WEBCAM_NAME = "vision",
             INSIDE_WEBCAM_NAME = "insideCam";
 
-    public HardwareMap hardwareMap;
-    public DcMotor flDrive, frDrive, blDrive, brDrive, feeder, intake;
-    public DcMotorEx turret, flywheel;
-    public IMU imu;
-    public WebcamName vision, insideCam;
-    public GoBildaPinpointDriver pinpoint;
-    public Servo servo;
+    public final HardwareMap hardwareMap;
+    public final @Nullable DcMotor
+            flDrive,
+            frDrive,
+            blDrive,
+            brDrive,
+            feeder,
+            intake,
+    //            turret,
+    flywheel;
+    public final @Nullable IMU imu;
+    public final @Nullable WebcamName vision, insideCam;
+    public final @Nullable GoBildaPinpointDriver pinpoint;
+    public final @Nullable Servo servo;
 
-    public void init(HardwareMap hardwareMap) {
+    public RobotHardwareGroup(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        flDrive = hardwareMap.get(DcMotor.class, FL_MOTOR_NAME);
-        frDrive = hardwareMap.get(DcMotor.class, FR_MOTOR_NAME);
-        blDrive = hardwareMap.get(DcMotor.class, BL_MOTOR_NAME);
-        brDrive = hardwareMap.get(DcMotor.class, BR_MOTOR_NAME);
-//        turret = hardwareMap.get(DcMotorEx.class, TURRET_MOTOR_NAME);
-        flywheel = hardwareMap.get(DcMotorEx.class, FLYWHEEL_MOTOR_NAME);
-        feeder = hardwareMap.get(DcMotor.class, FEEDER_MOTOR_NAME);
-        intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR_NAME);
-        imu = hardwareMap.get(IMU.class, IMU_NAME);
-        vision = hardwareMap.get(WebcamName.class, MAIN_WEBCAM_NAME);
-        insideCam = hardwareMap.get(WebcamName.class, INSIDE_WEBCAM_NAME);
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
-        servo = hardwareMap.get(Servo.class, SERVO_NAME);
+        flDrive = safeGet(DcMotor.class, FL_MOTOR_NAME);
+        frDrive = safeGet(DcMotor.class, FR_MOTOR_NAME);
+        blDrive = safeGet(DcMotor.class, BL_MOTOR_NAME);
+        brDrive = safeGet(DcMotor.class, BR_MOTOR_NAME);
+//        turret = safeGet(DcMotor.class, TURRET_MOTOR_NAME);
+        flywheel = safeGet(DcMotor.class, FLYWHEEL_MOTOR_NAME);
+        feeder = safeGet(DcMotor.class, FEEDER_MOTOR_NAME);
+        intake = safeGet(DcMotor.class, INTAKE_MOTOR_NAME);
+        imu = safeGet(IMU.class, IMU_NAME);
+        vision = safeGet(WebcamName.class, MAIN_WEBCAM_NAME);
+        insideCam = safeGet(WebcamName.class, INSIDE_WEBCAM_NAME);
+        pinpoint = safeGet(GoBildaPinpointDriver.class, PINPOINT_NAME);
+        servo = safeGet(Servo.class, SERVO_NAME);
+
+        /// ToDo: Too lazy to do this properly
+        if (flDrive != null) {
+            flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            flDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            flDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) flDrive).setPIDFCoefficients();
+        }
+        if (frDrive != null) {
+            frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            frDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            frDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) frDrive).setPIDFCoefficients();
+        }
+        if (blDrive != null) {
+            blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            blDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) blDrive).setPIDFCoefficients();
+        }
+        if (brDrive != null) {
+            brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+            brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) brDrive).setPIDFCoefficients();
+        }
+//        if (turret != null) {
+//            turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            turret.setDirection(DcMotorSimple.Direction.FORWARD);
+//            turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) turret).setPIDFCoefficients();
+//        }
+        if (flywheel != null) {
+            flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
+            flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) flywheel).setPIDFCoefficients();
+        }
+        if (feeder != null) {
+            feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+            feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) feeder).setPIDFCoefficients();
+        }
+        if (intake != null) {
+            intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            intake.setDirection(DcMotorSimple.Direction.FORWARD);
+            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//            ((DcMotorEx) intake).setPIDFCoefficients();
+        }
+    }
+
+    private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
+        T obj = hardwareMap.get(classOrInterface, name);
+        if (isNull(obj))
+            simpleTelemetry.addData(
+                    "[ERROR] " + name,
+                    "FAILED TO FIND  HARDWARE (Ignoring)" +
+                            " \n Try Checking if the wire is connected firmly, or the driver hub hardware config name matches: " + name
+            );
+        return obj;
     }
 }

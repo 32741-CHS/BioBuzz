@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
+import com.bylazar.camerastream.PanelsCameraStream;
 import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
@@ -16,7 +18,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 public class GoalTrackerSimple implements SubsystemBase {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    private boolean isRed = true;
     private double distanceToGoal = Double.NaN;
     private double xHeading = Double.NaN;
     private double zHeading = Double.NaN;
@@ -24,7 +25,7 @@ public class GoalTrackerSimple implements SubsystemBase {
     @Override
     public void init(RobotHardwareGroup robotHardware) {
         if (robotHardware == null || robotHardware.vision == null) {
-            panelsTelemetry.addData("SIMPLE SHOOTER ERROR NO VISION ", 1);
+            simpleTelemetry.addData("SIMPLE SHOOTER ERROR NO VISION ", 1);
             return;
         }
 
@@ -36,6 +37,8 @@ public class GoalTrackerSimple implements SubsystemBase {
                 .addProcessor(aprilTag)
                 .enableLiveView(false)
                 .build();
+
+        PanelsCameraStream.INSTANCE.startStream(visionPortal, 15);
     }
 
     @Override
@@ -51,8 +54,8 @@ public class GoalTrackerSimple implements SubsystemBase {
 
             // Alliance filtering if name metadata exists
             if (name != null) {
-                if (isRed && !name.startsWith("RED")) continue;
-                if (!isRed && !name.startsWith("BLUE")) continue;
+                if (isRedAlliance && !name.startsWith("RED")) continue;
+                if (!isRedAlliance && !name.startsWith("BLUE")) continue;
             }
 
             // Reject upside-down tags
@@ -73,7 +76,7 @@ public class GoalTrackerSimple implements SubsystemBase {
         xHeading = Math.toRadians(best.ftcPose.bearing);
         zHeading = Math.toRadians(best.ftcPose.elevation);
 
-        panelsTelemetry.addData("GoalTracker Distance", distanceToGoal);
+        simpleTelemetry.addData("GoalTracker Distance", distanceToGoal);
     }
 
     private String getTagName(AprilTagDetection detection) {
@@ -88,7 +91,7 @@ public class GoalTrackerSimple implements SubsystemBase {
     }
 
     public void setIsTeamRed(boolean isRed) {
-        this.isRed = isRed;
+        isRedAlliance = isRed;
     }
 
     public double getDistance() {

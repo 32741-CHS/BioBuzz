@@ -1,6 +1,23 @@
+buildscript { // For Sloth
+    repositories {
+        mavenCentral()
+        google()
+        maven {
+            url 'https://repo.dairy.foundation/releases'
+        }
+    }
+
+    dependencies {
+        classpath 'dev.frozenmilk:Load:0.3.2'
+    }
+}
+
+
 apply plugin: 'com.android.application'
 
-//
+// Sloth hot reload
+apply plugin: 'dev.frozenmilk.sinister.sloth.load'//
+
 // build.gradle in TeamCode
 //
 // Most of the definitions for building your module reside in a common, shared

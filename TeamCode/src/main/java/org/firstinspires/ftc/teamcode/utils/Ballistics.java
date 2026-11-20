@@ -19,6 +19,9 @@ public class Ballistics {
     }
 
     public static double calculateFlywheelRPS(double distance) {
+        if (Double.isNaN(distance) || Double.isInfinite(distance)) {
+            return 0.0;
+        }
         return speedToDistanceLookUp.interpolate(distance);
     }
 }

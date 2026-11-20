@@ -1,15 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+
+import com.bylazar.camerastream.PanelsCameraStream;
+import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
-import org.firstinspires.ftc.teamcode.utils.BallType;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -19,17 +21,25 @@ import org.opencv.core.Mat;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Camera implements SubsystemBase {
-    private final Map<WebcamName, PixelProcessor> Processors = new HashMap<>();
-    private final Map<WebcamName, VisionPortal> Portals = new HashMap<>();
+@Configurable
+public final class ColourDetector implements SubsystemBase {
+    // config
+    public static double NectarThreshold = 200.0;
+    public static double PollenThreshold = 150.0;
+    private final Map<WebcamName, PixelProcessor> processors = new HashMap<>();
+    private final Map<WebcamName, VisionPortal> portals = new HashMap<>();
 
     // always be sure to call this when possible
     // takes varargs (cam1, cam2, cam3) and not an array
-    public Camera(WebcamName... cams) {
+
+    @Override
+    public void init(RobotHardwareGroup robotHardware) {
+        WebcamName[] cams = {robotHardware.insideCam};
+
         if (cams == null) return;
 
         for (WebcamName cam : cams) {
-            if (cam == null || Portals.containsKey(cam)) continue;
+            if (cam == null || portals.containsKey(cam)) continue;
 
             PixelProcessor newprocessor = new PixelProcessor();
             VisionPortal newportal = new VisionPortal.Builder()
@@ -38,9 +48,12 @@ public final class Camera implements SubsystemBase {
                     .enableLiveView(false)
                     .build();
 
-            Processors.put(cam, newprocessor);
-            Portals.put(cam, newportal);
+            processors.put(cam, newprocessor);
+            portals.put(cam, newportal);
         }
+        PanelsCameraStream.INSTANCE.startStream(portals.get(cams[0]), 15);
+
+
     }
 
     @Override
@@ -48,31 +61,28 @@ public final class Camera implements SubsystemBase {
 
     }
 
-    @Override
-    public void init(RobotHardwareGroup robotHardware) {
-
-    }
-
     // this assumes balls are in the middle of the webcam
-    public BallType getBallType(WebcamName insideCam) {
+    public Globals.BallType getBallType(WebcamName insideCam) {
         Vector2D coord = new Vector2D(0.5, 0.5);
         int color = getRGB(insideCam, coord);
-        if ((Color.green(color) + Color.blue(color)) / 2.0f >= Globals.PollenThreshold) {
-            panelsTelemetry.addData("Camera Ball Type", "Small");
-            return BallType.Small;
+        if ((Color.green(color) + Color.blue(color)) / 2.0f >= PollenThreshold) {
+            simpleTelemetry.addData("ColourDetector Ball Type", "Small");
+            return Globals.BallType.Small;
         }
 
         if (Globals.NectarColor == Globals.NectarColorEnum.Red) {
-            if (Color.red(color) >= Globals.NectarThreshold)
-                panelsTelemetry.addData("Camera Ball Type", "Big");
-                return BallType.Big;
+            if (Color.red(color) >= NectarThreshold) {
+                simpleTelemetry.addData("ColourDetector Ball Type", "Big");
+                return Globals.BallType.Big;
+            }
         } else if (Globals.NectarColor == Globals.NectarColorEnum.Blue) {
-            if (Color.blue(color) >= Globals.NectarThreshold)
-                panelsTelemetry.addData("Camera Ball Type", "Big");
-                return BallType.Big;
+            if (Color.blue(color) >= NectarThreshold) {
+                simpleTelemetry.addData("ColourDetector Ball Type", "Big");
+                return Globals.BallType.Big;
+            }
         }
 
-        return BallType.None;
+        return Globals.BallType.None;
     }
 
     // coord should be from (1, 1) to (0, 0) aka it takes percentages
@@ -81,24 +91,24 @@ public final class Camera implements SubsystemBase {
             return Color.BLACK;
         }
 
-        PixelProcessor proc = Processors.get(cam);
+        PixelProcessor proc = processors.get(cam);
         if (proc == null) return Color.BLACK;
 
         proc.setCoordinates(coord.x, coord.y);
 
         if (!proc.hasProcessedFrame()) return Color.BLACK;
 
-        panelsTelemetry.addData("Camera Color", proc.getLastColor());
+        simpleTelemetry.addData("ColourDetector Color", proc.getLastColor());
         return proc.getLastColor();
     }
 
     public void close() {
-        for (VisionPortal portal : Portals.values()) {
+        for (VisionPortal portal : portals.values()) {
             portal.close();
         }
 
-        Portals.clear();
-        Processors.clear();
+        portals.clear();
+        processors.clear();
     }
 
     private static class PixelProcessor implements VisionProcessor {

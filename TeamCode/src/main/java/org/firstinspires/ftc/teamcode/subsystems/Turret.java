@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -14,6 +14,9 @@ public class Turret implements SubsystemBase {
     // Config
     public static double ANGLE_TOLERANCE = Math.toRadians(1.0);
     public static boolean AllowAutoRotate = true;
+    public static double IMUHeadingOffset = 0.0;
+    public static double CameraOffsetX = 0.0; // inches forward/backward from center
+    public static double CameraOffsetY = 0.0; // inches left/right from center
     private final Drivetrain drivetrain;
     private final PID_and_KalmanFilter pid = new PID_and_KalmanFilter();
     private double CurrentRotation = 0;
@@ -28,6 +31,14 @@ public class Turret implements SubsystemBase {
         CurrentRotation = rotation;
     }
 
+    public void setHasGoal(boolean val) {
+        HasGoal = val;
+    }
+
+    public void changeGoal(double distance, double xradians, double zradians) {
+        changeGoal(distance, xradians);
+    }
+
     /**
      * Calculates absolute field coordinates from camera relative distance and bearing.
      *
@@ -40,19 +51,19 @@ public class Turret implements SubsystemBase {
 
         double robotX = drivetrain.getX();
         double robotY = drivetrain.getY();
-        double robotHeading = drivetrain.getHeading();
+        double robotHeading = drivetrain.getHeading() - IMUHeadingOffset;
+
+        // Calculate camera position on the field accounting for body-frame offset (CameraOffsetX, CameraOffsetY)
+        double camX = robotX + CameraOffsetX * Math.cos(robotHeading) - CameraOffsetY * Math.sin(robotHeading);
+        double camY = robotY + CameraOffsetX * Math.sin(robotHeading) + CameraOffsetY * Math.cos(robotHeading);
 
         // FTC bearing: positive = right (clockwise). Field heading increases counter-clockwise.
         double fieldAngleToGoal = robotHeading - bearingRadians;
 
-        double goalX = robotX + distance * Math.cos(fieldAngleToGoal);
-        double goalY = robotY + distance * Math.sin(fieldAngleToGoal);
+        double goalX = camX + distance * Math.cos(fieldAngleToGoal);
+        double goalY = camY + distance * Math.sin(fieldAngleToGoal);
 
         CurrentGoalPosition = new Vector2D(goalX, goalY);
-    }
-
-    public void changeGoal(double distance, double xradians, double zradians) {
-        changeGoal(distance, xradians);
     }
 
     public void changeGoal(Vector2D fieldPosition) {
@@ -71,10 +82,11 @@ public class Turret implements SubsystemBase {
     public void update() {
         if (!AllowAutoRotate) return;
         if (!HasGoal) return;
-        if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null) return;
+        if (drivetrain == null || drivetrain.getFollower() == null || CurrentGoalPosition == null)
+            return;
 
-        CurrentRotation = drivetrain.getHeading();
-        panelsTelemetry.addData("Turret Rotation", CurrentRotation);
+        CurrentRotation = drivetrain.getHeading() - IMUHeadingOffset;
+        simpleTelemetry.addData("Turret Rotation", CurrentRotation);
 
         double dx = CurrentGoalPosition.x - drivetrain.getX();
         double dy = CurrentGoalPosition.y - drivetrain.getY();

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.instant;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
@@ -31,8 +31,8 @@ public class SubsystemHandler implements SubsystemBase {
     public void update() {
         Scheduler.execute();
         forEverySubsystem(SubsystemBase::update);
-        Globals.panelsTelemetry.update();
-        panelsTelemetry.update();
+        Globals.simpleTelemetry.update();
+        simpleTelemetry.update();
     }
 
     private void forEverySubsystem(Consumer<SubsystemBase> func) {

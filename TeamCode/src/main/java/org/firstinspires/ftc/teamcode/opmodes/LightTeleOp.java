@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
@@ -18,68 +19,65 @@ public class LightTeleOp extends OpMode {
     private RobotHardwareGroup robotHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
-    private OdometryLogger pinpointLogger;
 
     @Override
     public void init() {
-        // Robot Hardware Special Init
-        (robotHardware = new RobotHardwareGroup()).init(hardwareMap);
-
-        // Subsystems
-        pinpointLogger = new OdometryLogger();
-        driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1);
-        shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2);
-        drivetrain = new Drivetrain(0, 0, 0);
-        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
+        simpleTelemetry.registerFtcTelemetry(telemetry);
+        robotHardware = new RobotHardwareGroup(hardwareMap);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
-                pinpointLogger,
-                drivetrain,
-                driverGamepad,
-                shooterGamepad
+                (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
+                (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
+                (drivetrain = new Drivetrain(0, 0, 0)),
+                new OdometryLogger()
         );
 
-
+        drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
         allSubsystems.init(robotHardware);
 
-        robotHardware.intake.setDirection(DcMotorSimple.Direction.REVERSE);
         robotHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-        robotHardware.flywheel.setPower(0.65);
-
         // Key Binds
-        driverGamepad.leftTrigger
+        driverGamepad.leftTrigger /// Speed Modifier
                 .onPress(() -> drivetrain.speed(0.5))
                 .onRelease(() -> drivetrain.speed(1));
 
-        shooterGamepad.leftTrigger
+        shooterGamepad.leftTrigger /// Feeder Toggle
                 .onPress(() -> robotHardware.feeder.setPower(1))
                 .onRelease(() -> robotHardware.feeder.setPower(0));
 
-        shooterGamepad.rightTrigger
-                .onPress(() -> robotHardware.intake.setPower(-1))
+        shooterGamepad.rightTrigger /// Intake Toggle
+                .onPress(() -> robotHardware.intake.setPower(1))
                 .onRelease(() -> robotHardware.intake.setPower(0));
 
-        shooterGamepad.leftBumper
-                .whenHeld(() -> robotHardware.servo.setPosition(Math.max(robotHardware.servo.getPosition() - 0.01, 0)));
+        shooterGamepad.btnB /// Flywheel Manual Power Modifier
+                .onPress(() -> Globals.FLYWHEEL_POWER += 0.01);
+        shooterGamepad.btnX
+                .onRelease(() -> Globals.FLYWHEEL_POWER -= 0.01);
 
-        shooterGamepad.rightBumper
-                .whenHeld(() -> robotHardware.servo.setPosition(Math.min(robotHardware.servo.getPosition() + 0.01, 1)));
+        shooterGamepad.leftBumper /// Servo Position
+                .onPress(() -> robotHardware.servo.setPosition(
+                        robotHardware.servo.getPosition() == Globals.SERVO_BIG_BALL ?
+                                Globals.SERVO_SMALL_BALL : Globals.SERVO_BIG_BALL));
+
     }
 
     @Override
     public void loop() {
+        robotHardware.flywheel.setPower(Globals.FLYWHEEL_POWER);
+
         allSubsystems.update();
 
         // Telemetry
-        panelsTelemetry.addData("[drivetrain] X", drivetrain.getX());
-        panelsTelemetry.addData("[drivetrain] Y", drivetrain.getY());
+        simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
+        simpleTelemetry.addData("[drivetrain] Y", drivetrain.getY());
 
-        panelsTelemetry.addData(
-                "[drivetrain] Heading",
-                Math.toDegrees(drivetrain.getHeading())
-        );
+        simpleTelemetry.addData("[drivetrain] Heading DEGREES", Math.toDegrees(drivetrain.getHeading()));
+        simpleTelemetry.addData("FLYWHEEL_POWER", Globals.FLYWHEEL_POWER);
 
-        panelsTelemetry.update();
+        simpleTelemetry.addData("Servo Pos", robotHardware.servo.getPosition());
+
+        simpleTelemetry.update();
     }
+
 }

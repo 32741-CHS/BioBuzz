@@ -26,7 +26,7 @@ public class Intake implements SubsystemBase, MotorBasicActions {
     }
 
     public void tryRunMotorIfReady() {
-        intake.setPower(reverseMode ? 1 : 0);
+        intake.setPower(reverseMode ? -1 : 1);
     }
 
     public void stopMotor() {

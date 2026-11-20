@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.panelsTelemetry;
+import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -24,8 +24,8 @@ public class OdometryLogger implements SubsystemBase {
     public void update() {
         pinpoint.update();
         Pose2D pos = pinpoint.getPosition();
-        panelsTelemetry.addData("Odometry (CM) X", pos.getX(DistanceUnit.INCH));
-        panelsTelemetry.addData("Odometry (CM) Y", pos.getY(DistanceUnit.INCH));
-        panelsTelemetry.addData("Odometry (DEGREES) Heading", pos.getHeading(AngleUnit.DEGREES));
+        simpleTelemetry.addData("Odometry (CM) X", pos.getX(DistanceUnit.INCH));
+        simpleTelemetry.addData("Odometry (CM) Y", pos.getY(DistanceUnit.INCH));
+        simpleTelemetry.addData("Odometry (DEGREES) Heading", pos.getHeading(AngleUnit.DEGREES));
     }
 }
