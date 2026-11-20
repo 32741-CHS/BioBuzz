@@ -39,8 +39,8 @@ public class RobotHardwareGroup {
             brDrive,
             feeder,
             intake,
-            turret,
-            flywheel;
+    //            turret,
+    flywheel;
     public final @Nullable IMU imu;
     public final @Nullable WebcamName vision, insideCam;
     public final @Nullable GoBildaPinpointDriver pinpoint;
@@ -52,7 +52,7 @@ public class RobotHardwareGroup {
         frDrive = safeGet(DcMotor.class, FR_MOTOR_NAME);
         blDrive = safeGet(DcMotor.class, BL_MOTOR_NAME);
         brDrive = safeGet(DcMotor.class, BR_MOTOR_NAME);
-        turret = safeGet(DcMotor.class, TURRET_MOTOR_NAME);
+//        turret = safeGet(DcMotor.class, TURRET_MOTOR_NAME);
         flywheel = safeGet(DcMotor.class, FLYWHEEL_MOTOR_NAME);
         feeder = safeGet(DcMotor.class, FEEDER_MOTOR_NAME);
         intake = safeGet(DcMotor.class, INTAKE_MOTOR_NAME);
@@ -87,12 +87,12 @@ public class RobotHardwareGroup {
             brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            ((DcMotorEx) brDrive).setPIDFCoefficients();
         }
-        if (turret != null) {
-            turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            turret.setDirection(DcMotorSimple.Direction.FORWARD);
-            turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        if (turret != null) {
+//            turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            turret.setDirection(DcMotorSimple.Direction.FORWARD);
+//            turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            ((DcMotorEx) turret).setPIDFCoefficients();
-        }
+//        }
         if (flywheel != null) {
             flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
