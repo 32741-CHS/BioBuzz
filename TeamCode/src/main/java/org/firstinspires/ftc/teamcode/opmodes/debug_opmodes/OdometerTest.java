@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 
 @Autonomous(name = "OdometerTest", group = "Tests")
 public class OdometerTest extends OpMode {
@@ -21,7 +21,7 @@ public class OdometerTest extends OpMode {
         simpleTelemetry.registerFtcTelemetry(telemetry);
         simpleTelemetry.addData("HOW TO USE", "Move the robot and see the readings");
         simpleTelemetry.update();
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, RobotHardwareGroup.PINPOINT_NAME);
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, BotHardware.PINPOINT_NAME);
         pinpoint.recalibrateIMU();
         pinpoint.resetPosAndIMU();
     }

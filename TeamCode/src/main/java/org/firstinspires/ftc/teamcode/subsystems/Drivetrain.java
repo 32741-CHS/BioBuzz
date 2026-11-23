@@ -6,8 +6,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
@@ -44,8 +44,8 @@ public class Drivetrain implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        follower = Constants.create(robotHardware.hardwareMap);
+    public void init(BotHardware botHardware) {
+        follower = Constants.create(botHardware.hardwareMap);
         this.setPosition(startPose);
         follower.update();
     }

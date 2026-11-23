@@ -8,20 +8,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 
 
 @Autonomous(name = "IntakeFeederShooterTest", group = "Tests")
 public class IntakeFeederShooterTest extends LinearOpMode {
     double requestedRPS = 12;
-    private RobotHardwareGroup robotHardware;
+    private BotHardware botHardware;
 
     @Override
     public void runOpMode() {
-        // New robotHardware To make force fresh init and reduce risk of improper motor
+        // New botHardware To make force fresh init and reduce risk of improper motor
         // config.
         simpleTelemetry.registerFtcTelemetry(telemetry);
-        robotHardware = new RobotHardwareGroup(hardwareMap);
+        botHardware = new BotHardware(hardwareMap);
 
         simpleTelemetry.addData("HOW TO USE", "Controller/Gamepad 1 right stick changes flywheel speed/power");
         simpleTelemetry.update();
@@ -34,9 +34,9 @@ public class IntakeFeederShooterTest extends LinearOpMode {
         waitForStart();
 
         DcMotorEx feeder, intake, shooter;
-        (feeder = (DcMotorEx) robotHardware.feeder).setPower(1);
-        (intake = (DcMotorEx) robotHardware.intake).setPower(1);
-        (shooter = (DcMotorEx) robotHardware.flywheel).setPower(1);
+        (feeder = (DcMotorEx) botHardware.feeder).setPower(1);
+        (intake = (DcMotorEx) botHardware.intake).setPower(1);
+        (shooter = (DcMotorEx) botHardware.flywheel).setPower(1);
 
 
         while (opModeIsActive()) {

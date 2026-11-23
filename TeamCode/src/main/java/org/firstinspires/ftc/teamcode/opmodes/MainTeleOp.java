@@ -6,7 +6,7 @@ import com.pedropathing.api.PoseFactory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -21,7 +21,7 @@ public class MainTeleOp extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.
     GamepadWrapper driverGamepad, shooterGamepad;
-    private RobotHardwareGroup robotHardware;
+    private BotHardware botHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
     private Intake intake;
@@ -34,7 +34,7 @@ public class MainTeleOp extends OpMode {
     @Override
     public void init() {
         simpleTelemetry.registerFtcTelemetry(telemetry);
-        robotHardware = new RobotHardwareGroup(hardwareMap);
+        botHardware = new BotHardware(hardwareMap);
 
         // Subsystems
 
@@ -53,7 +53,7 @@ public class MainTeleOp extends OpMode {
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
-        allSubsystems.init(robotHardware);
+        allSubsystems.init(botHardware);
         Flywheel.canSpinFlywheel = true;
 
         // Key Binds
@@ -64,18 +64,18 @@ public class MainTeleOp extends OpMode {
 //                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
 
         shooterGamepad.leftTrigger
-                .onPress(() -> robotHardware.intake.setPower(1))
-                .onRelease(() -> robotHardware.intake.setPower(0));
+                .onPress(() -> botHardware.intake.setPower(1))
+                .onRelease(() -> botHardware.intake.setPower(0));
 
         shooterGamepad.rightTrigger
-                .onPress(() -> robotHardware.feeder.setPower(1))
-                .onRelease(() -> robotHardware.feeder.setPower(0));
+                .onPress(() -> botHardware.feeder.setPower(1))
+                .onRelease(() -> botHardware.feeder.setPower(0));
 
         shooterGamepad.btnA /// Reverse
-                .onPress(() -> robotHardware.intake.setPower(-1))
-                .onPress(() -> robotHardware.intake.setPower(-1))
-                .onRelease(() -> robotHardware.feeder.setPower(0))
-                .onRelease(() -> robotHardware.feeder.setPower(0));
+                .onPress(() -> botHardware.intake.setPower(-1))
+                .onPress(() -> botHardware.intake.setPower(-1))
+                .onRelease(() -> botHardware.feeder.setPower(0))
+                .onRelease(() -> botHardware.feeder.setPower(0));
         /*
         shooterGamepad.rightTrigger /// Feed Ball (Shoot)
                 .whenHeld(feeder::tryRunMotorIfReady)

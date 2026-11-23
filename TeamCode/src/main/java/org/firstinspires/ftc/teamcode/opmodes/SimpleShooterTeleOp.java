@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.GoalTrackerSimple;
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 @TeleOp(name = "Simple Shooter Light TeleOp")
 public class SimpleShooterTeleOp extends OpMode {
     private GamepadWrapper driverGamepad, shooterGamepad;
-    private RobotHardwareGroup robotHardware;
+    private BotHardware botHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
     private GoalTrackerSimple goalTrackerSimple;
@@ -30,7 +30,7 @@ public class SimpleShooterTeleOp extends OpMode {
     public void init() {
         // Robot Hardware Special Init
         simpleTelemetry.registerFtcTelemetry(telemetry);
-        robotHardware = new RobotHardwareGroup(hardwareMap);
+        botHardware = new BotHardware(hardwareMap);
 
         // Pass all subsystems into the handler
         allSubsystems = new SubsystemHandler(
@@ -44,10 +44,10 @@ public class SimpleShooterTeleOp extends OpMode {
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
-        allSubsystems.init(robotHardware);
+        allSubsystems.init(botHardware);
 
         /// Motor Configs
-        robotHardware.intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        botHardware.intake.setDirection(DcMotorSimple.Direction.FORWARD);
         /// Key Binds
         driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
@@ -58,12 +58,12 @@ public class SimpleShooterTeleOp extends OpMode {
                 .onRelease(simpleFeederAndFlywheel::stopFeed);
 
         shooterGamepad.rightTrigger
-                .onPress(() -> robotHardware.intake.setPower(1))
-                .onRelease(() -> robotHardware.intake.setPower(0));
+                .onPress(() -> botHardware.intake.setPower(1))
+                .onRelease(() -> botHardware.intake.setPower(0));
 
         shooterGamepad.leftBumper
-                .onPress(() -> robotHardware.servo.setPosition(SERVO_SMALL_BALL))
-                .onRelease(() -> robotHardware.servo.setPosition(SERVO_BIG_BALL));
+                .onPress(() -> botHardware.servo.setPosition(SERVO_SMALL_BALL))
+                .onRelease(() -> botHardware.servo.setPosition(SERVO_BIG_BALL));
 
     }
 

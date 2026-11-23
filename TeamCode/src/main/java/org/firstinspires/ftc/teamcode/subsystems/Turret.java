@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.utils.PID_and_KalmanFilter;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
@@ -74,7 +74,7 @@ public class Turret implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
+    public void init(BotHardware botHardware) {
 
     }
 

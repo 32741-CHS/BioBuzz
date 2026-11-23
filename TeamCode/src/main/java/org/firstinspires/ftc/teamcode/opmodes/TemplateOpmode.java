@@ -5,16 +5,16 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 
 @Autonomous(name = "TemplateOpmode", group = "Tests")
 public class TemplateOpmode extends OpMode {
-    private RobotHardwareGroup robotHardware;
+    private BotHardware botHardware;
 
     @Override
     public void init() {
         simpleTelemetry.registerFtcTelemetry(telemetry);
-        robotHardware = new RobotHardwareGroup(hardwareMap);
+        botHardware = new BotHardware(hardwareMap);
     }
 
     @Override //Optional

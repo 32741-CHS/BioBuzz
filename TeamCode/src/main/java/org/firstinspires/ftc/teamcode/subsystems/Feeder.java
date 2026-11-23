@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
@@ -32,13 +32,13 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        feeder = robotHardware.feeder;
+    public void init(BotHardware botHardware) {
+        feeder = botHardware.feeder;
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         feeder.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        servo = robotHardware.servo;
-        // insideCam = robotHardware.insideCam;
+        servo = botHardware.servo;
+        // insideCam = botHardware.insideCam;
         applyServoPosition();
     }
 

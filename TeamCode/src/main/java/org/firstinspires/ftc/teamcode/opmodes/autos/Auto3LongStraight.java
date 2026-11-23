@@ -16,7 +16,7 @@ import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.pedro.Constants;
 
 @Autonomous(name = "Auto3LongStraight", group = "Pedro")
@@ -37,9 +37,9 @@ public class Auto3LongStraight extends LinearOpMode {
 
         waitForStart();
         schedule(autoRoutine());
-        RobotHardwareGroup robotHardware = new RobotHardwareGroup(hardwareMap);
+        BotHardware botHardware = new BotHardware(hardwareMap);
         instant(() -> {
-            robotHardware.flywheel.setPower(FLYWHEEL_POWER);
+            botHardware.flywheel.setPower(FLYWHEEL_POWER);
         });
         while (opModeIsActive()) {
             follower.update();

@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
@@ -32,14 +32,14 @@ public class GoalTracker implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        if (robotHardware == null || robotHardware.vision == null) return;
+    public void init(BotHardware botHardware) {
+        if (botHardware == null || botHardware.vision == null) return;
 
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
 
         VisionPortal visionPortal = new VisionPortal.Builder()
-                .setCamera(robotHardware.vision)
+                .setCamera(botHardware.vision)
                 .addProcessor(aprilTag)
                 .enableLiveView(false)
                 .build();

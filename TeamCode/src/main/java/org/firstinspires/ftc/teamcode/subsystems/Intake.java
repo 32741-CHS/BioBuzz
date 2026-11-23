@@ -4,7 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.utils.MotorBasicActions;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
@@ -15,8 +15,8 @@ public class Intake implements SubsystemBase, MotorBasicActions {
     private DcMotor intake;
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        intake = robotHardware.intake;
+    public void init(BotHardware botHardware) {
+        intake = botHardware.intake;
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }

@@ -7,7 +7,7 @@ import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class GamepadWrapper implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
+    public void init(BotHardware botHardware) {
     }
 
     /**

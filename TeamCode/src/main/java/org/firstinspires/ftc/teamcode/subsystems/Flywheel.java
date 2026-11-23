@@ -22,8 +22,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
@@ -63,12 +63,12 @@ public class Flywheel implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        flywheel = (DcMotorEx) robotHardware.flywheel;
+    public void init(BotHardware botHardware) {
+        flywheel = (DcMotorEx) botHardware.flywheel;
         flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // this.insideCam = robotHardware.insideCam;
+        // this.insideCam = botHardware.insideCam;
     }
 
     @Override

@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 import com.bylazar.camerastream.PanelsCameraStream;
 import com.bylazar.configurables.annotations.Configurable;
 
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
@@ -23,8 +23,8 @@ public class GoalTrackerSimple implements SubsystemBase {
     private double zHeading = Double.NaN;
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        if (robotHardware == null || robotHardware.vision == null) {
+    public void init(BotHardware botHardware) {
+        if (botHardware == null || botHardware.vision == null) {
             simpleTelemetry.addData("SIMPLE SHOOTER ERROR NO VISION ", 1);
             return;
         }
@@ -33,7 +33,7 @@ public class GoalTrackerSimple implements SubsystemBase {
                 .build();
 
         visionPortal = new VisionPortal.Builder()
-                .setCamera(robotHardware.vision)
+                .setCamera(botHardware.vision)
                 .addProcessor(aprilTag)
                 .enableLiveView(false)
                 .build();

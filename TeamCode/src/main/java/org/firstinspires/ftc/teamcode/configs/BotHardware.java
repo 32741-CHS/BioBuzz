@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
-public class RobotHardwareGroup {
+public class BotHardware {
     public final static String
             FL_MOTOR_NAME = "flDrive",
             FR_MOTOR_NAME = "frDrive",
@@ -46,7 +46,7 @@ public class RobotHardwareGroup {
     public final @Nullable GoBildaPinpointDriver pinpoint;
     public final @Nullable Servo servo;
 
-    public RobotHardwareGroup(HardwareMap hardwareMap) {
+    public BotHardware(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         flDrive = safeGet(DcMotor.class, FL_MOTOR_NAME);
         frDrive = safeGet(DcMotor.class, FR_MOTOR_NAME);

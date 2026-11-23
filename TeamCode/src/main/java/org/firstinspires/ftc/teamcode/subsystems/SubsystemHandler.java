@@ -7,8 +7,8 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 import java.util.function.BooleanSupplier;
@@ -22,9 +22,9 @@ public class SubsystemHandler implements SubsystemBase {
     }
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
+    public void init(BotHardware botHardware) {
         Scheduler.reset();
-        forEverySubsystem(subsys -> subsys.init(robotHardware));
+        forEverySubsystem(subsys -> subsys.init(botHardware));
     }
 
     @Override

@@ -10,8 +10,8 @@ import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
-import org.firstinspires.ftc.teamcode.configs.RobotHardwareGroup;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -33,8 +33,8 @@ public final class ColourDetector implements SubsystemBase {
     // takes varargs (cam1, cam2, cam3) and not an array
 
     @Override
-    public void init(RobotHardwareGroup robotHardware) {
-        WebcamName[] cams = {robotHardware.insideCam};
+    public void init(BotHardware botHardware) {
+        WebcamName[] cams = {botHardware.insideCam};
 
         if (cams == null) return;
 
