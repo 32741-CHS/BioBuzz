@@ -7,9 +7,11 @@ import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -63,54 +65,27 @@ public class BotHardware {
         servo = safeGet(Servo.class, SERVO_NAME);
 
         /// ToDo: Too lazy to do this properly
-        if (flDrive != null) {
-            flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            flDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-            flDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) flDrive).setPIDFCoefficients();
-        }
-        if (frDrive != null) {
-            frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            frDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-            frDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) frDrive).setPIDFCoefficients();
-        }
-        if (blDrive != null) {
-            blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            blDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-            blDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) blDrive).setPIDFCoefficients();
-        }
-        if (brDrive != null) {
-            brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            brDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-            brDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) brDrive).setPIDFCoefficients();
-        }
-//        if (turret != null) {
-//            turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//            turret.setDirection(DcMotorSimple.Direction.FORWARD);
-//            turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) turret).setPIDFCoefficients();
-//        }
-        if (flywheel != null) {
-            flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-            flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) flywheel).setPIDFCoefficients();
-        }
-        if (feeder != null) {
-            feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            feeder.setDirection(DcMotorSimple.Direction.FORWARD);
-            feeder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) feeder).setPIDFCoefficients();
-        }
-        if (intake != null) {
-            intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            ((DcMotorEx) intake).setPIDFCoefficients();
-        }
+        DcMotor.RunMode
+                noEn = DcMotor.RunMode.RUN_WITHOUT_ENCODER,
+                yesEn = DcMotor.RunMode.RUN_USING_ENCODER,
+                yesPosEn = DcMotor.RunMode.RUN_TO_POSITION;
+
+        DcMotorSimple.Direction
+                dirF = DcMotorSimple.Direction.FORWARD,
+                dirR = DcMotorSimple.Direction.REVERSE;
+
+        DcMotor.ZeroPowerBehavior
+                brake = DcMotor.ZeroPowerBehavior.BRAKE,
+                roll = DcMotor.ZeroPowerBehavior.FLOAT;
+
+        if (flDrive != null) configMotor(flDrive, dirF, brake, noEn);
+        if (frDrive != null) configMotor(frDrive, dirF, brake, noEn);
+        if (blDrive != null) configMotor(blDrive, dirF, brake, noEn);
+        if (brDrive != null) configMotor(brDrive, dirF, brake, noEn);
+//        if (turret != null) configMotor(turret, dirF, brake, noEn);
+        if (flywheel != null) configMotor(flywheel, dirF, roll, noEn);
+        if (feeder != null) configMotor(feeder, dirF, brake, yesPosEn);
+        if (intake != null) configMotor(intake, dirF, brake, noEn);
     }
 
     private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
@@ -122,5 +97,22 @@ public class BotHardware {
                             " \n Try Checking if the wire is connected firmly, or the driver hub hardware config name matches: " + name
             );
         return obj;
+    }
+
+    /// Normal Motor Config
+    private void configMotor(DcMotor motor, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, DcMotor.RunMode runMode) {
+        motor.setDirection(direction);
+        motor.setZeroPowerBehavior(zeroPowerBehavior);
+        motor.setMode(runMode);
+    }
+
+    /// PIDF Motor Config
+    private void configMotor(DcMotor motor, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, boolean isVelPIDF, PIDFCoefficients coefficients) {
+        motor.setDirection(direction);
+        motor.setZeroPowerBehavior(zeroPowerBehavior);
+        ((DcMotorEx) motor).setPIDFCoefficients(
+                isVelPIDF ? DcMotor.RunMode.RUN_USING_ENCODER : DcMotor.RunMode.RUN_TO_POSITION,
+                coefficients
+        );
     }
 }
