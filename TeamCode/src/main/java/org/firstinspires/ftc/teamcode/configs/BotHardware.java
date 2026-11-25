@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.configs;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
-import static java.util.Objects.isNull;
-
 import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -16,7 +13,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
+import java.util.NoSuchElementException;
+
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
+
 public class BotHardware {
     public final static String
             FL_MOTOR_NAME = "flDrive",
@@ -78,9 +78,9 @@ public class BotHardware {
                 brake = DcMotor.ZeroPowerBehavior.BRAKE,
                 roll = DcMotor.ZeroPowerBehavior.FLOAT;
 
-        if (flDrive != null) configMotor(flDrive, dirF, brake, noEn);
+        if (flDrive != null) configMotor(flDrive, dirR, brake, noEn);
         if (frDrive != null) configMotor(frDrive, dirF, brake, noEn);
-        if (blDrive != null) configMotor(blDrive, dirF, brake, noEn);
+        if (blDrive != null) configMotor(blDrive, dirR, brake, noEn);
         if (brDrive != null) configMotor(brDrive, dirF, brake, noEn);
 //        if (turret != null) configMotor(turret, dirF, brake, noEn);
         if (flywheel != null) configMotor(flywheel, dirF, roll, noEn);
@@ -90,12 +90,8 @@ public class BotHardware {
 
     private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
         T obj = hardwareMap.get(classOrInterface, name);
-        if (isNull(obj))
-            simpleTelemetry.addData(
-                    "[ERROR] " + name,
-                    "FAILED TO FIND  HARDWARE (Ignoring)" +
-                            " \n Try Checking if the wire is connected firmly, or the driver hub hardware config name matches: " + name
-            );
+        if (obj == null)
+            throw new NoSuchElementException("There is no hardware with the name " + name);
         return obj;
     }
 

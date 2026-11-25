@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.AerodynamicDrag;
-import static org.firstinspires.ftc.teamcode.configs.Globals.BallGeneralMass;
-import static org.firstinspires.ftc.teamcode.configs.Globals.DecaySpin;
+import static org.firstinspires.ftc.teamcode.configs.Globals.AERODYNAMIC_DRAG;
+import static org.firstinspires.ftc.teamcode.configs.Globals.BALL_GENERAL_MASS;
+import static org.firstinspires.ftc.teamcode.configs.Globals.DECAY_SPIN;
+import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_DIAMETER;
 import static org.firstinspires.ftc.teamcode.configs.Globals.FLYWHEEL_ERROR_TOL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.FlywheelDiameter;
 import static org.firstinspires.ftc.teamcode.configs.Globals.GOBILDA_5203_6000RPM;
 import static org.firstinspires.ftc.teamcode.configs.Globals.Gravity;
-import static org.firstinspires.ftc.teamcode.configs.Globals.InitialCamHeight;
-import static org.firstinspires.ftc.teamcode.configs.Globals.RotationalDirection;
-import static org.firstinspires.ftc.teamcode.configs.Globals.ShootingAngle;
-import static org.firstinspires.ftc.teamcode.configs.Globals.SimulationTimeout;
-import static org.firstinspires.ftc.teamcode.configs.Globals.SlipagePercentage;
-import static org.firstinspires.ftc.teamcode.configs.Globals.TimeInterval;
+import static org.firstinspires.ftc.teamcode.configs.Globals.INITIAL_CAM_HEIGHT;
+import static org.firstinspires.ftc.teamcode.configs.Globals.ROTATIONAL_DIRECTION;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SHOOTING_ANGLE;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SIMULATION_TIMEOUT;
+import static org.firstinspires.ftc.teamcode.configs.Globals.SLIPAGE_PERCENTAGE;
+import static org.firstinspires.ftc.teamcode.configs.Globals.TIME_INTERVAL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
 import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
@@ -95,19 +95,19 @@ public class Flywheel implements SubsystemBase {
 
         // MATH FIX 1: standard projectile equation, ball speed needed with NO air resistance
         // v^2 = g x^2 / (2 cos^2(theta) (x tan(theta) - dy))
-        double heightDiff = verticalDistance - InitialCamHeight;
-        double angleRad = Math.toRadians(ShootingAngle);
+        double heightDiff = verticalDistance - INITIAL_CAM_HEIGHT;
+        double angleRad = Math.toRadians(SHOOTING_ANGLE);
         double denominator = 2 * Math.pow(Math.cos(angleRad), 2)
                 * (horizontalDistance * Math.tan(angleRad) - heightDiff);
         if (denominator <= 0)
             return; // target can't be hit at this launch angle (only added line that isn't maths)
         double velocityInVacuum = Math.sqrt(Gravity * horizontalDistance * horizontalDistance / denominator);
 
-        double flywheelRadius = FlywheelDiameter / 2;
+        double flywheelRadius = FLYWHEEL_DIAMETER / 2;
 
         // MATH FIX 2: ball leaves slower than the wheel surface, so DIVIDE by (1 - slip).
         // MATH FIX 3: RPS = surface speed / circumference (no *60 factors).
-        double desiredRPS = (velocityInVacuum / (1 - SlipagePercentage)) / (Math.PI * FlywheelDiameter);
+        double desiredRPS = (velocityInVacuum / (1 - SLIPAGE_PERCENTAGE)) / (Math.PI * FLYWHEEL_DIAMETER);
 
         // MATH FIX 4: simulation starts from the speed we just calculated, not the old desiredFlywheelRPS
         double initialVelocityX = Math.cos(angleRad) * velocityInVacuum;
@@ -118,9 +118,9 @@ public class Flywheel implements SubsystemBase {
         Vx = initialVelocityX;
         Vy = initialVelocityY;
         Px = 0; // MATH FIX 6: horizontalDistance is already measured from the launch point
-        Py = InitialCamHeight;
+        Py = INITIAL_CAM_HEIGHT;
 
-        double ballMass = BallGeneralMass;
+        double ballMass = BALL_GENERAL_MASS;
         /*
         if (colourDetector.getBallType(insideCam) == Globals.BallType.Big) {
             ballMass = NectarMass;
@@ -130,7 +130,7 @@ public class Flywheel implements SubsystemBase {
         */
 
         // AerodynamicDrag is now k in a = -k|v|v (units 1/m, = 0.5*rho*Cd*A/mass), scaled for ball mass
-        double dragK = AerodynamicDrag * BallGeneralMass / ballMass;
+        double dragK = AERODYNAMIC_DRAG * BALL_GENERAL_MASS / ballMass;
 
 
         if (doSimulation) {
@@ -141,14 +141,14 @@ public class Flywheel implements SubsystemBase {
                 Spin = (2 * Math.PI) / (60) * BallRPM * flywheelRadius;
                 // MATH FIX 7: Magnus lift grows WITH spin and speed (was divided by spin). Vertical-only approximation.
                 // RotationalDirection: -1 = backspin (lifts the ball), +1 = topspin.
-                Geff = Gravity + RotationalDirection * MagnusCoefficient * Spin * speed;
+                Geff = Gravity + ROTATIONAL_DIRECTION * MagnusCoefficient * Spin * speed;
                 // MATH FIX 8: exponential decay per step (was multiplying by currTime, which zeroed it)
-                BallRPM = BallRPM * Math.exp(-DecaySpin * TimeInterval);
+                BallRPM = BallRPM * Math.exp(-DECAY_SPIN * TIME_INTERVAL);
                 // MATH FIX 9: drag is proportional to speed^2, and gravity acts at full strength on Vy
-                Vx = Vx - dragK * speed * Vx * TimeInterval;
-                Vy = Vy - (Geff + dragK * speed * Vy) * TimeInterval;
-                Px = Px + Vx * TimeInterval;
-                Py = Py + Vy * TimeInterval;
+                Vx = Vx - dragK * speed * Vx * TIME_INTERVAL;
+                Vy = Vy - (Geff + dragK * speed * Vy) * TIME_INTERVAL;
+                Px = Px + Vx * TIME_INTERVAL;
+                Py = Py + Vy * TIME_INTERVAL;
 
                 if (Py <= 0.001) {
                     simpleTelemetry.addData("Flywheel Simulation", "Ball altitude cannot be less than zero.");
@@ -168,7 +168,7 @@ public class Flywheel implements SubsystemBase {
                     break;
                 }
 
-                if (currTime > SimulationTimeout) {
+                if (currTime > SIMULATION_TIMEOUT) {
                     simulationComplete = true;
                     if (!(Px >= horizontalDistance)) {
                         simpleTelemetry.addData("Flywheel Simulation", "Ball failed to reach simulated position.");
@@ -178,7 +178,7 @@ public class Flywheel implements SubsystemBase {
                     break;
                 }
 
-                currTime += TimeInterval;
+                currTime += TIME_INTERVAL;
             }
 
         }

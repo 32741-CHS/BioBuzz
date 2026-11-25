@@ -42,20 +42,20 @@ public class Globals {
     public static final TelemetryManager panelsGraph = PanelsTelemetry.INSTANCE.getTelemetry();
     /// Flywheel constants
     public static final double Gravity = 9.81,
-            DecaySpin = 0.223, // Guessed, tweak it ig
-            AerodynamicDrag = 0.00005320098663,
-            AirPressure = 1.225,
-            SlipagePercentage = 0.1,
-            MagnusEffect = 0.019,
-            TimeInterval = 0.01,
-            SimulationTimeout = 2.5,
-            RotationalDirection = -1,
-            FlywheelDiameter = 0.096,
-            BallGeneralMass = 0.03, // should change for nectar / polle,
-            PollenMass = 0.0249,
-            NectarMass = 0.0413,
-            ShootingAngle = 65,
-            InitialCamHeight = 0.37;
+            DECAY_SPIN = 0.223, // Guessed, tweak it ig
+            AERODYNAMIC_DRAG = 0.00005320098663,
+            AIR_PRESSURE = 1.225,
+            SLIPAGE_PERCENTAGE = 0.1,
+            MAGNUS_EFFECT = 0.019,
+            TIME_INTERVAL = 0.01,
+            SIMULATION_TIMEOUT = 2.5,
+            ROTATIONAL_DIRECTION = -1,
+            FLYWHEEL_DIAMETER = 0.096,
+            BALL_GENERAL_MASS = 0.03, // should change for nectar / polle,
+            POLLEN_MASS = 0.0249,
+            NECTAR_MASS = 0.0413,
+            SHOOTING_ANGLE = 65,
+            INITIAL_CAM_HEIGHT = 0.37;
     // 22mm inward = pollen
     // 0mm inward = nectar
     // Feeder
