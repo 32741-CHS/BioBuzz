@@ -24,6 +24,7 @@ public class SimpleShooterTeleOp extends OpMode {
     private Drivetrain drivetrain;
     private GoalTrackerSimple goalTrackerSimple;
     private SimpleFeederAndFlywheel simpleFeederAndFlywheel;
+    private double heading;
 
 
     @Override
@@ -65,11 +66,17 @@ public class SimpleShooterTeleOp extends OpMode {
                 .onPress(() -> botHardware.servo.setPosition(SERVO_SMALL_BALL))
                 .onRelease(() -> botHardware.servo.setPosition(SERVO_BIG_BALL));
 
+        driverGamepad.rightBumper
+                .whenHeld(
+                        () -> drivetrain.turnInput(heading)
+                );
+
     }
 
     @Override
     public void loop() {
         allSubsystems.update();
+        heading = goalTrackerSimple.getXHeading();
 
         // Telemetry
         simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
@@ -79,6 +86,7 @@ public class SimpleShooterTeleOp extends OpMode {
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
+        simpleTelemetry.addData("G TRACK", goalTrackerSimple.getXHeading());
 
     }
 }
