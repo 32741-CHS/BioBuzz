@@ -43,7 +43,7 @@ import java.util.List;
  * built-in velocity controller -- note the SDK's internal units may need
  * scaling depending on firmware version.
  */
-@TeleOp(name = "PIDF Auto Tuner (Velocity)")
+@TeleOp(name = "(FTC AutoTune) Get Velocity PIDF", group = "FTC AutoTune")
 public class VelocityPIDFTunerOpMode extends LinearOpMode {
 
     @Override

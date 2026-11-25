@@ -36,7 +36,7 @@ import java.util.List;
  * ({@code kF * cos(angle)} or similar) on top of these gains in your final
  * code.
  */
-@TeleOp(name = "PID Auto Tuner (Position)")
+@TeleOp(name = "(FTC AutoTune) Get Position PIDF", group = "FTC AutoTune")
 public class PositionPIDTunerOpMode extends LinearOpMode {
 
     @Override
