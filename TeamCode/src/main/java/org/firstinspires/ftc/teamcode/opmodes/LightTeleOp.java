@@ -37,6 +37,7 @@ public class LightTeleOp extends OpMode {
         allSubsystems.init(botHardware);
 
         botHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
+
         // Key Binds
         driverGamepad.leftTrigger /// Speed Modifier
                 .onPress(() -> drivetrain.speed(0.5))
