@@ -41,8 +41,9 @@ public class BotHardware {
             brDrive,
             feeder,
             intake,
+            flywheel;
     //            turret,
-    flywheel;
+
     public final @Nullable IMU imu;
     public final @Nullable WebcamName vision, insideCam;
     public final @Nullable GoBildaPinpointDriver pinpoint;
@@ -64,7 +65,6 @@ public class BotHardware {
         pinpoint = safeGet(GoBildaPinpointDriver.class, PINPOINT_NAME);
         servo = safeGet(Servo.class, SERVO_NAME);
 
-        /// ToDo: Too lazy to do this properly
         DcMotor.RunMode
                 noEn = DcMotor.RunMode.RUN_WITHOUT_ENCODER,
                 yesEn = DcMotor.RunMode.RUN_USING_ENCODER,
@@ -83,7 +83,8 @@ public class BotHardware {
         if (blDrive != null) configMotor(blDrive, dirR, brake, noEn);
         if (brDrive != null) configMotor(brDrive, dirF, brake, noEn);
 //        if (turret != null) configMotor(turret, dirF, brake, noEn);
-        if (flywheel != null) configMotor(flywheel, dirF, roll, noEn);
+        if (flywheel != null)
+            configMotor(flywheel, dirF, roll, true, new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
         if (feeder != null) configMotor(feeder, dirF, brake, yesPosEn);
         if (intake != null) configMotor(intake, dirF, brake, noEn);
     }
