@@ -53,7 +53,6 @@ public class MainTeleOp extends OpMode {
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
 
         allSubsystems.init(botHardware);
-        Flywheel.canSpinFlywheel = true;
 
         /// Key Binds
         new StandardKeyBinds(botHardware, drivetrain, driverGamepad, shooterGamepad);
