@@ -12,9 +12,9 @@ public class PID_and_KalmanFilter {
     private final ElapsedTime timerY = new ElapsedTime();
     private final ElapsedTime timerA = new ElapsedTime();
     // Tuning stuff
-    private final double Kp = 1.0;
-    private final double Ki = 0;
-    private final double Kd = 0;
+    public final double Kp = 1.0;
+    public final double Ki = 0;
+    public final double Kd = 0;
     // Kalman Filter
     private double Uhatx = 0.00; // real believed x position
     private double Px = 1.00; // x error covariance

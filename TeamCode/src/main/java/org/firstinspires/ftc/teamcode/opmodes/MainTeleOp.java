@@ -40,14 +40,14 @@ public class MainTeleOp extends OpMode {
         Feeder feeder;
         allSubsystems = new SubsystemHandler(
                 // (colourDetector = new ColourDetector()),
+                (goaltracker = new GoalTracker()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
                 (drivetrain = new Drivetrain(0, 0, 0)),
 
                 (turret = new Turret(drivetrain)),
                 (flywheel = new Flywheel(/*, colourDetector*/)),
-                (feeder = new Feeder(flywheel/*, colourDetector*/)),
-                (goaltracker = new GoalTracker())
+                (feeder = new Feeder(flywheel/*, colourDetector*/))
         );
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...

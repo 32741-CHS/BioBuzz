@@ -102,6 +102,9 @@ public class Turret implements SubsystemBase {
                 Math.sin(target - CurrentRotation),
                 Math.cos(target - CurrentRotation)
         );
+
+        double angleRange = Math.toRadians(0.25);
+        if (Math.abs(angleError) <= ANGLE_TOLERANCE) return 0;
         return pid.PIDangle(0, (float) angleError);
     }
 
