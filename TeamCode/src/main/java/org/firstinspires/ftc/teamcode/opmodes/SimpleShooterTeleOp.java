@@ -40,7 +40,7 @@ public class SimpleShooterTeleOp extends OpMode {
                 (drivetrain = new Drivetrain(0, 0, 0)),
                 (goalTrackerSimple = new GoalTrackerSimple()),
                 // (simpleFeederAndFlywheel = new SimpleFeederAndFlywheel(goalTrackerSimple)),
-                (fancyFlywheel = new Flywheel(drivetrain))
+                (fancyFlywheel = new Flywheel())
         );
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...

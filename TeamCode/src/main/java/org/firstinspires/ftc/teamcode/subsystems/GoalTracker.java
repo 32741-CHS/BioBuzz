@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.configs.Globals.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
+import androidx.annotation.Nullable;
+
 import com.bylazar.camerastream.PanelsCameraStream;
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -19,18 +21,12 @@ public class GoalTracker implements SubsystemBase {
     // config
     public static long GoalMemoryTimeoutMillisecs = 1500;
 
-    private final Turret turret;
-    private final Flywheel flywheel;
     private AprilTagProcessor aprilTag;
     private double distanceToGoal = Double.NaN;
     private double xRadians = Double.NaN;
     private double zRadians = Double.NaN;
+    private @Nullable AprilTagDetection currBest = null;
     private long lastSeenGoalTimestampMillisecs = 0;
-
-    public GoalTracker(Turret turret, Flywheel flywheel) {
-        this.turret = turret;
-        this.flywheel = flywheel;
-    }
 
     @Override
     public void init(BotHardware botHardware) {
@@ -88,16 +84,13 @@ public class GoalTracker implements SubsystemBase {
             }
         }
 
+        currBest = best;
         if (best == null) {
             simpleTelemetry.addData("GoalTracker Best", "Not found");
             xRadians = 0;
-            if (System.currentTimeMillis() - lastSeenGoalTimestampMillisecs > GoalMemoryTimeoutMillisecs) {
-                turret.setHasGoal(false);
-            }
             return;
         } else {
             simpleTelemetry.addData("GoalTracker Best", "Found");
-            turret.setHasGoal(true);
         }
 
         simpleTelemetry.addData("GoalTracker Best", best);
@@ -110,13 +103,6 @@ public class GoalTracker implements SubsystemBase {
         simpleTelemetry.addData("GoalTracker Distance", distanceToGoal);
         simpleTelemetry.addData("GoalTracker xRadians", xRadians);
         simpleTelemetry.addData("GoalTracker zRadians", zRadians);
-
-        if (turret != null) {
-            turret.changeGoal(distanceToGoal, xRadians, zRadians);
-        }
-        if (flywheel != null) {
-            flywheel.changeGoal(distanceToGoal, zRadians);
-        }
     }
 
     private String getTagName(AprilTagDetection detection) {
@@ -144,5 +130,9 @@ public class GoalTracker implements SubsystemBase {
 
     public double getZRadians() {
         return zRadians;
+    }
+
+    public AprilTagDetection getBest() {
+        return currBest;
     }
 }

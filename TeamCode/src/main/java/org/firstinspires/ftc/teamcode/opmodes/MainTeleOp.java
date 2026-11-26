@@ -44,9 +44,9 @@ public class MainTeleOp extends OpMode {
                 (drivetrain = new Drivetrain(0, 0, 0)),
 
                 (turret = new Turret(drivetrain)),
-                (flywheel = new Flywheel(drivetrain/*, colourDetector*/)),
+                (flywheel = new Flywheel(/*, colourDetector*/)),
                 (feeder = new Feeder(flywheel/*, colourDetector*/)),
-                (goaltracker = new GoalTracker(turret, flywheel))
+                (goaltracker = new GoalTracker())
         );
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
@@ -95,5 +95,18 @@ public class MainTeleOp extends OpMode {
         );
 
         simpleTelemetry.update();
+
+        // Flywheel & Turret
+        if (goaltracker.getBest() != null) {
+            double distanceToGoal = goaltracker.getDistance();
+            double xRadians = goaltracker.getXRadians();
+            double zRadians = goaltracker.getZRadians();
+            if (turret != null) {
+                turret.changeGoal(distanceToGoal, xRadians, zRadians);
+            }
+            if (flywheel != null) {
+                flywheel.changeGoal(distanceToGoal, zRadians);
+            }
+        }
     }
 }

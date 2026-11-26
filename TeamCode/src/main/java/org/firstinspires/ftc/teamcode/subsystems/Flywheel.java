@@ -37,15 +37,13 @@ public class Flywheel implements SubsystemBase {
     public static boolean canSpinFlywheel = true;
     public static boolean doSimulation = true; // set to false if lag
     // private final ColourDetector colourDetector;
-    private final Drivetrain drivetrain;
     private DcMotorEx flywheel;
     // private WebcamName insideCam;
     // goal stuff
     private double distance = Double.NaN;
     private double zRadians = Double.NaN;
 
-    public Flywheel(Drivetrain dt/*, ColourDetector cam*/) {
-        this.drivetrain = dt;
+    public Flywheel(/*, ColourDetector cam*/) {
         // this.colourDetector = cam;
     }
 
