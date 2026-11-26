@@ -85,14 +85,14 @@ public class BotHardware {
 //        if (turret != null) configMotor(turret, dirF, brake, noEn);
         if (flywheel != null)
             configMotor(flywheel, dirF, roll, true, new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
-        if (feeder != null) configMotor(feeder, dirF, brake, noEn);
-        if (intake != null) configMotor(intake, dirR, brake, noEn);
+        if (feeder != null) configMotor(feeder, dirR, brake, noEn);
+        if (intake != null) configMotor(intake, dirF, brake, noEn);
     }
 
     private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {
-        T obj = hardwareMap.get(classOrInterface, name);
+        T obj = hardwareMap.tryGet(classOrInterface, name);
         if (obj == null)
-            throw new NoSuchElementException("There is no hardware with the name " + name);
+            throw new NoSuchElementException("(BotHardware failed to init) There is no hardware with the name " + name);
         return obj;
     }
 

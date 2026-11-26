@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -18,13 +17,11 @@ import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
 @TeleOp(name = "Simple Shooter Light TeleOp")
 public class SimpleShooterTeleOp extends OpMode {
-    private GamepadWrapper driverGamepad, shooterGamepad;
     private BotHardware botHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
     private GoalTrackerSimple goalTrackerSimple;
     private SimpleFeederAndFlywheel simpleFeederAndFlywheel;
-    private double heading;
     private Flywheel fancyFlywheel;
 
 
@@ -35,6 +32,8 @@ public class SimpleShooterTeleOp extends OpMode {
         botHardware = new BotHardware(hardwareMap);
 
         // Pass all subsystems into the handler
+        GamepadWrapper driverGamepad, shooterGamepad;
+
         allSubsystems = new SubsystemHandler(
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
@@ -48,8 +47,6 @@ public class SimpleShooterTeleOp extends OpMode {
 
         allSubsystems.init(botHardware);
 
-        /// Motor Configs
-        botHardware.intake.setDirection(DcMotorSimple.Direction.FORWARD);
         /// Key Binds
         driverGamepad.leftTrigger
                 .onPress(() -> drivetrain.speed(0.5))
@@ -73,23 +70,22 @@ public class SimpleShooterTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        botHardware.intake.setPower(-1);
+        botHardware.intake.setPower(1);
         botHardware.feeder.setPower(1);
 
         allSubsystems.update();
-        fancyFlywheel.changeGoal(goalTrackerSimple.getDistance() / 100 * 2.54, goalTrackerSimple.getZHeading());
-        heading = goalTrackerSimple.getXHeading();
+        fancyFlywheel.changeGoal(goalTrackerSimple.getDistance(), goalTrackerSimple.getZHeading());
+        double heading = goalTrackerSimple.getXHeading();
         drivetrain.turnInput(heading);
 
         // Telemetry
         simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
         simpleTelemetry.addData("[drivetrain] Y", drivetrain.getY());
-
         simpleTelemetry.addData(
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
-        simpleTelemetry.addData("G TRACK", goalTrackerSimple.getDistance() / 100 * 2.54);
+        simpleTelemetry.addData("[GoalTrackerSimple] Heading", goalTrackerSimple.getDistance());
 
     }
 }

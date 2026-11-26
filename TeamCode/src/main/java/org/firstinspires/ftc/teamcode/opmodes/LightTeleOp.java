@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
@@ -34,8 +33,6 @@ public class LightTeleOp extends OpMode {
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
         allSubsystems.init(botHardware);
-
-        botHardware.feeder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Key Binds
         driverGamepad.leftTrigger /// Speed Modifier

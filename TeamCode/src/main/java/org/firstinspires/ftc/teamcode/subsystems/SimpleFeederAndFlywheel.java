@@ -9,7 +9,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
@@ -30,14 +29,7 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
     @Override
     public void init(BotHardware botHardware) {
         flywheel = (DcMotorEx) botHardware.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         feeder = botHardware.feeder;
-        feeder.setDirection(DcMotorSimple.Direction.FORWARD);
-        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         servo = botHardware.servo;
     }
 
@@ -45,7 +37,6 @@ public class SimpleFeederAndFlywheel implements SubsystemBase {
     @Override
     public void update() {
         flywheel.setVelocity((!isFlywheelIdled) ? desiredRPS() * GOBILDA_5203_6000RPM : 0);
-
         simpleTelemetry.addData("Flywheel RPS", getFlywheelRPS());
         simpleTelemetry.addData("Flywheel Error", getFlywheelErrorRPS());
     }

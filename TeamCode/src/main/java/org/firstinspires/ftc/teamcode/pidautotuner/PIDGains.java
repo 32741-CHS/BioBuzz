@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.pidautotuner;
 
+import android.annotation.SuppressLint;
+
 /**
  * A single set of PIDF gains, tagged with the tuning rule that produced it
  * so the user can pick between several candidate gain sets after a tune.
@@ -20,6 +22,7 @@ public class PIDGains {
         this.kF = kF;
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
         return String.format(

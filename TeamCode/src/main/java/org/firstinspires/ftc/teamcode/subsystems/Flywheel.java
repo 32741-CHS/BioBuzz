@@ -17,13 +17,9 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.panelsGraph;
 import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
-import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.utils.SubsystemBase;
 
 @Configurable
@@ -65,20 +61,13 @@ public class Flywheel implements SubsystemBase {
     @Override
     public void init(BotHardware botHardware) {
         flywheel = (DcMotorEx) botHardware.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         // this.insideCam = botHardware.insideCam;
     }
 
     @Override
     public void update() {
         if (useDynamicSpeed) UpdateDynamicRPS();
-
-        // apply PIDF every frame so @Configurable changes work
-        flywheel.setPIDFCoefficients(
-                DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 

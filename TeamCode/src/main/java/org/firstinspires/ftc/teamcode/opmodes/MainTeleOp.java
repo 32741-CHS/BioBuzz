@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.GoalTracker;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
@@ -24,7 +23,6 @@ public class MainTeleOp extends OpMode {
     private BotHardware botHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
-    private Intake intake;
     private Feeder feeder;
     private Flywheel flywheel;
     // private ColourDetector colourDetector;

@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
@@ -34,9 +33,6 @@ public class Feeder implements SubsystemBase, MotorBasicActions {
     @Override
     public void init(BotHardware botHardware) {
         feeder = botHardware.feeder;
-        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        feeder.setDirection(DcMotorSimple.Direction.REVERSE);
-
         servo = botHardware.servo;
         // insideCam = botHardware.insideCam;
         applyServoPosition();

@@ -97,7 +97,7 @@ public class GoalTrackerSimple implements SubsystemBase {
     }
 
     public double getDistance() {
-        return distanceToGoal;
+        return distanceToGoal / 100 * 2.54;
     }
 
     public double getXHeading() {
