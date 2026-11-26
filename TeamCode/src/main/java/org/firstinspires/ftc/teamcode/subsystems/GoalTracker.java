@@ -44,7 +44,7 @@ public class GoalTracker implements SubsystemBase {
                 .addProcessor(aprilTag)
                 .enableLiveView(false)
                 .build();
-        PanelsCameraStream.INSTANCE.startStream(visionPortal, 15);
+        PanelsCameraStream.INSTANCE.startStream(visionPortal, 30);
     }
 
     @Override
@@ -90,12 +90,14 @@ public class GoalTracker implements SubsystemBase {
 
         if (best == null) {
             simpleTelemetry.addData("GoalTracker Best", "Not found");
-
+            xRadians = 0;
             if (System.currentTimeMillis() - lastSeenGoalTimestampMillisecs > GoalMemoryTimeoutMillisecs) {
                 turret.setHasGoal(false);
             }
-
             return;
+        } else {
+            simpleTelemetry.addData("GoalTracker Best", "Found");
+            turret.setHasGoal(true);
         }
 
         simpleTelemetry.addData("GoalTracker Best", best);

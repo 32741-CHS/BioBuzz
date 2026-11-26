@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
-@TeleOp(name = "BioBuzz TeleOp")
+@TeleOp(name = "(Main) BioBuzz TeleOp")
 public class MainTeleOp extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // EXAMPLE starting position. Replace with your actual position.

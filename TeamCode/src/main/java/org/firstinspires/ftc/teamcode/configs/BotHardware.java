@@ -85,8 +85,8 @@ public class BotHardware {
 //        if (turret != null) configMotor(turret, dirF, brake, noEn);
         if (flywheel != null)
             configMotor(flywheel, dirF, roll, true, new PIDFCoefficients(Globals.flywheelKP, 0, 0, Globals.flywheelKF));
-        if (feeder != null) configMotor(feeder, dirF, brake, yesPosEn);
-        if (intake != null) configMotor(intake, dirF, brake, noEn);
+        if (feeder != null) configMotor(feeder, dirF, brake, noEn);
+        if (intake != null) configMotor(intake, dirR, brake, noEn);
     }
 
     private @Nullable <T> T safeGet(Class<? extends T> classOrInterface, String name) {

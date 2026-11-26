@@ -51,7 +51,7 @@ public class Globals {
             SIMULATION_TIMEOUT = 2.5,
             ROTATIONAL_DIRECTION = -1,
             FLYWHEEL_DIAMETER = 0.096,
-            BALL_GENERAL_MASS = 0.03, // should change for nectar / polle,
+            BALL_GENERAL_MASS = 0.0413, // should change for nectar / polle,
             POLLEN_MASS = 0.0249,
             NECTAR_MASS = 0.0413,
             SHOOTING_ANGLE = 65,

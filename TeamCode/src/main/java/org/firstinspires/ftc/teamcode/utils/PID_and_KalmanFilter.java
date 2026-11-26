@@ -1,184 +1,182 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 public class PID_and_KalmanFilter {
-	// in this code we still need to PID tuning with the constants, we also need to
-	// find the measured noise covariance
+    // in this code we still need to PID tuning with the constants, we also need to
+    // find the measured noise covariance
 
-	// Kalman Filter
-	private double Uhatx = 0.00; // real believed x position
-	private double Px = 1.00; // x error covariance
-	private double Uhaty = 0.00; // real believed y position
-	private double Py = 1.00; // Y Error covariance
-	private double Uhata = 0.00; // real believed y position
-	private double Pa = 1.00; // Y Error covariance
+    // PID_system
+    private final ElapsedTime timerX = new ElapsedTime();
+    private final ElapsedTime timerY = new ElapsedTime();
+    private final ElapsedTime timerA = new ElapsedTime();
+    // Tuning stuff
+    private final double Kp = 1.0;
+    private final double Ki = 0;
+    private final double Kd = 0;
+    // Kalman Filter
+    private double Uhatx = 0.00; // real believed x position
+    private double Px = 1.00; // x error covariance
+    private double Uhaty = 0.00; // real believed y position
+    private double Py = 1.00; // Y Error covariance
+    private double Uhata = 0.00; // real believed y position
+    private double Pa = 1.00; // Y Error covariance
+    // x
+    private double preTimeX = 0;
+    private double prevErrorX = 0;
+    private double cumErrorX = 0;
+    // y
+    private double preTimeY = 0;
+    private double prevErrorY = 0;
+    private double cumErrorY = 0;
+    // Angle
+    private double preTimeA = 0;
+    private double prevErrorA = 0;
+    private double cumErrorA = 0;
 
-	// PID_system
-	private final ElapsedTime timerX = new ElapsedTime();
-	private final ElapsedTime timerY = new ElapsedTime();
-	private final ElapsedTime timerA = new ElapsedTime();
-	// x
-	private double preTimeX = 0;
-	private double prevErrorX = 0;
-	private double cumErrorX = 0;
-	// y
-	private double preTimeY = 0;
-	private double prevErrorY = 0;
-	private double cumErrorY = 0;
-	// Angle
-	private double preTimeA = 0;
-	private double prevErrorA = 0;
-	private double cumErrorA = 0;
+    public double kalmanFilterX(float measurement_x_Odometry, float measurement_x_Camera) {
+        double RxO = 0.03; // Measurement noise Covariance for odometry wheels
+        double RxC = 0.03; // Measurement noise Covariance for camera
+        double Qx = 0.001; // Process noise covariance
 
-	// Tuning stuff
-	private final double Kp = 2.0;
-	private final double Ki = 0.5;
-	private final double Kd = 0.1;
+        // Prediction
+        Px = Px + Qx;
 
-	public double kalmanFilterX(float measurement_x_Odometry, float measurement_x_Camera) {
-		double RxO = 0.03; // Measurement noise Covariance for odometry wheels
-		double RxC = 0.03; // Measurement noise Covariance for camera
-		double Qx = 0.001; // Process noise covariance
+        // Update odometry wheels
+        double KL = Px / (Px + RxO);
+        Uhatx = Uhatx + KL * (measurement_x_Odometry - Uhatx);
+        Px = (1 - KL) * Px;
 
-		// Prediction
-		Px = Px + Qx;
+        // Update Camera
+        double KM = Px / (Px + RxC);
+        Uhatx = Uhatx + KM * (measurement_x_Camera - Uhatx);
+        Px = (1 - KM) * Px; // Added missing covariance update step for camera
 
-		// Update odometry wheels
-		double KL = Px / (Px + RxO);
-		Uhatx = Uhatx + KL * (measurement_x_Odometry - Uhatx);
-		Px = (1 - KL) * Px;
+        return Uhatx;
+    }
 
-		// Update Camera
-		double KM = Px / (Px + RxC);
-		Uhatx = Uhatx + KM * (measurement_x_Camera - Uhatx);
-		Px = (1 - KM) * Px; // Added missing covariance update step for camera
+    public double kalmanFilterY(float measurement_y_Odometry, float measurement_y_Camera) {
+        double RyO = 0.03;
+        double RyC = 0.03;
+        double Qy = 0.001;
 
-		return Uhatx;
-	}
+        // Prediction
+        Py = Py + Qy;
 
-	public double kalmanFilterY(float measurement_y_Odometry, float measurement_y_Camera) {
-		double RyO = 0.03;
-		double RyC = 0.03;
-		double Qy = 0.001;
+        // Update odometry wheels
+        double KL = Py / (Py + RyO);
+        Uhaty = Uhaty + KL * (measurement_y_Odometry - Uhaty);
+        Py = (1 - KL) * Py;
 
-		// Prediction
-		Py = Py + Qy;
+        // Update camera
+        double KM = Py / (Py + RyC);
+        Uhaty = Uhaty + KM * (measurement_y_Camera - Uhaty);
+        Py = (1 - KM) * Py;
 
-		// Update odometry wheels
-		double KL = Py / (Py + RyO);
-		Uhaty = Uhaty + KL * (measurement_y_Odometry - Uhaty);
-		Py = (1 - KL) * Py;
+        return Uhaty;
+    }
 
-		// Update camera
-		double KM = Py / (Py + RyC);
-		Uhaty = Uhaty + KM * (measurement_y_Camera - Uhaty);
-		Py = (1 - KM) * Py;
+    public double kalmanFilterAngle(float measurement_a_Odometry, float measurement_a_Camera) {
+        double RAO = 0.03;
+        double RAC = 0.03;
+        double QAy = 0.001;
 
-		return Uhaty;
-	}
+        // Prediction
+        Pa = Pa + QAy;
 
-	public double kalmanFilterAngle(float measurement_a_Odometry, float measurement_a_Camera) {
-		double RAO = 0.03;
-		double RAC = 0.03;
-		double QAy = 0.001;
+        // Update odometry wheels
+        double KL = Pa / (Pa + RAO);
+        Uhata = Uhata + KL * (measurement_a_Odometry - Uhata);
+        Pa = (1 - KL) * Pa;
 
-		// Prediction
-		Pa = Pa + QAy;
+        // Update camera
+        double KM = Pa / (Pa + RAC);
+        Uhata = Uhata + KM * (measurement_a_Camera - Uhata);
+        Pa = (1 - KM) * Pa;
 
-		// Update odometry wheels
-		double KL = Pa / (Pa + RAO);
-		Uhata = Uhata + KL * (measurement_a_Odometry - Uhata);
-		Pa = (1 - KL) * Pa;
+        return Uhata;
+    }
 
-		// Update camera
-		double KM = Pa / (Pa + RAC);
-		Uhata = Uhata + KM * (measurement_a_Camera - Uhata);
-		Pa = (1 - KM) * Pa;
+    public float PIDX(float realVal, float setpoint) {
+        double currentTime = timerX.seconds();
+        double elapsedTime = currentTime - preTimeX;
 
-		return Uhata;
-	}
+        // Run calculation only if enough time has passed to prevent divide by zero or
+        // jitter this just makes it smoother
+        if (elapsedTime >= 0.01) {
+            double error = setpoint - realVal;
+            cumErrorX += error * elapsedTime;
+            double rateError = (error - prevErrorX) / elapsedTime;
 
-	public float PIDX(float realVal, float setpoint) {
-		double currentTime = timerX.seconds();
-		double elapsedTime = currentTime - preTimeX;
+            cumErrorX = Range.clip(cumErrorX, -1000, 1000);
+            double output = (Kp * error) + (Ki * cumErrorX) + (Kd * rateError);
 
-		// Run calculation only if enough time has passed to prevent divide by zero or
-		// jitter this just makes it smoother
-		if (elapsedTime >= 0.01) {
-			double error = setpoint - realVal;
-			cumErrorX += error * elapsedTime;
-			double rateError = (error - prevErrorX) / elapsedTime;
+            // Clip to motor powers (-1.0 to 1.0) can change the range if you want
+            output = Range.clip(output, -1.0, 1.0);
 
-			cumErrorX = Range.clip(cumErrorX, -1000, 1000);
-			double output = (Kp * error) + (Ki * cumErrorX) + (Kd * rateError);
+            // Save states for next loop cycle of these values
+            prevErrorX = error;
+            preTimeX = currentTime;
 
-			// Clip to motor powers (-1.0 to 1.0) can change the range if you want
-			output = Range.clip(output, -1.0, 1.0);
+            return (float) output;
+        }
 
-			// Save states for next loop cycle of these values
-			prevErrorX = error;
-			preTimeX = currentTime;
+        // Return previous cached calculation if called too quickly to avoid dead zones
+        // of no value
+        return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorX), -1.0, 1.0);
+    }
 
-			return (float) output;
-		}
+    public float PIDY(float realVal, float setpoint) {
+        double currentTime = timerY.seconds();
+        double elapsedTime = currentTime - preTimeY;
 
-		// Return previous cached calculation if called too quickly to avoid dead zones
-		// of no value
-		return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorX), -1.0, 1.0);
-	}
+        if (elapsedTime >= 0.01) {
+            double error = setpoint - realVal;
+            cumErrorY += error * elapsedTime;
+            double rateError = (error - prevErrorY) / elapsedTime;
 
-	public float PIDY(float realVal, float setpoint) {
-		double currentTime = timerY.seconds();
-		double elapsedTime = currentTime - preTimeY;
+            cumErrorY = Range.clip(cumErrorY, -1000, 1000);
+            double output = (Kp * error) + (Ki * cumErrorY) + (Kd * rateError);
 
-		if (elapsedTime >= 0.01) {
-			double error = setpoint - realVal;
-			cumErrorY += error * elapsedTime;
-			double rateError = (error - prevErrorY) / elapsedTime;
+            output = Range.clip(output, -1.0, 1.0);
 
-			cumErrorY = Range.clip(cumErrorY, -1000, 1000);
-			double output = (Kp * error) + (Ki * cumErrorY) + (Kd * rateError);
+            prevErrorY = error;
+            preTimeY = currentTime;
 
-			output = Range.clip(output, -1.0, 1.0);
+            return (float) output;
+        }
 
-			prevErrorY = error;
-			preTimeY = currentTime;
+        return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorY), -1.0, 1.0);
+    }
 
-			return (float) output;
-		}
+    public float PIDangle(float realVal, float setpoint) {
+        double currentTime = timerA.seconds();
+        double elapsedTime = currentTime - preTimeA;
 
-		return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorY), -1.0, 1.0);
-	}
+        // Run calculation only if enough time has passed to prevent divide by zero or
+        // jitter this just makes it smoother
+        if (elapsedTime >= 0.01) {
+            double error = setpoint - realVal;
+            cumErrorA += error * elapsedTime;
+            double rateError = (error - prevErrorA) / elapsedTime;
 
-	public float PIDangle(float realVal, float setpoint) {
-		double currentTime = timerA.seconds();
-		double elapsedTime = currentTime - preTimeA;
+            cumErrorA = Range.clip(cumErrorA, -1000, 1000);
+            double output = (Kp * error) + (Ki * cumErrorA) + (Kd * rateError);
 
-		// Run calculation only if enough time has passed to prevent divide by zero or
-		// jitter this just makes it smoother
-		if (elapsedTime >= 0.01) {
-			double error = setpoint - realVal;
-			cumErrorA += error * elapsedTime;
-			double rateError = (error - prevErrorA) / elapsedTime;
+            // Clip to motor powers (-1.0 to 1.0) can change the range if you want
+            output = Range.clip(output, -1.0, 1.0);
 
-			cumErrorA = Range.clip(cumErrorA, -1000, 1000);
-			double output = (Kp * error) + (Ki * cumErrorA) + (Kd * rateError);
+            // Save states for next loop cycle of these values
+            prevErrorA = error;
+            preTimeA = currentTime;
 
-			// Clip to motor powers (-1.0 to 1.0) can change the range if you want
-			output = Range.clip(output, -1.0, 1.0);
+            return (float) output;
+        }
 
-			// Save states for next loop cycle of these values
-			prevErrorA = error;
-			preTimeA = currentTime;
-
-			return (float) output;
-		}
-
-		// Return previous cached calculation if called too quickly to avoid dead zones
-		// of no value
-		return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorX), -1.0, 1.0);
-	}
+        // Return previous cached calculation if called too quickly to avoid dead zones
+        // of no value
+        return (float) Range.clip((Kp * (setpoint - realVal)) + (Ki * cumErrorX), -1.0, 1.0);
+    }
 
 }

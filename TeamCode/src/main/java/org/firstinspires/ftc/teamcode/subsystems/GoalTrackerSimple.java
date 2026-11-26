@@ -44,6 +44,8 @@ public class GoalTrackerSimple implements SubsystemBase {
     @Override
     public void update() {
         if (aprilTag == null) return;
+        xHeading = 0;
+        zHeading = 0;
 
         AprilTagDetection best = null;
 

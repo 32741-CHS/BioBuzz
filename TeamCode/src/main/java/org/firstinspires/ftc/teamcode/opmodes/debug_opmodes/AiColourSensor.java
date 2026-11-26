@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.debug_opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.bylazar.camerastream.PanelsCameraStream;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,14 +9,13 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
-@Disabled
-@TeleOp(name = "CamColourSensor Example")
+@TeleOp(name = "CamColourSensor Example", group = "Tests")
 public class AiColourSensor extends LinearOpMode {
     @Override
     public void runOpMode() {
         // 1. Set up the processor with a small ROI over the intake
         PredominantColorProcessor colorSensor = new PredominantColorProcessor.Builder()
-                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.15, 0.15, 0.15, -0.15))
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
                 .setSwatches(
                         PredominantColorProcessor.Swatch.RED,
                         PredominantColorProcessor.Swatch.BLUE,
@@ -31,13 +30,15 @@ public class AiColourSensor extends LinearOpMode {
                 .addProcessor(colorSensor)
                 .build();
 
+        PanelsCameraStream.INSTANCE.startStream(visionPortal, 15);
+
         waitForStart();
 
         while (opModeIsActive()) {
             PredominantColorProcessor.Result result = colorSensor.getAnalysis();
 
             // 3. Act on the detected colour
-            telemetry.addData("CamColourSensor", "Colour Classified: " + result.closestSwatch.name());
+            telemetry.addData("CamColourSensor", "Colour Classified: " + result.closestSwatch.toString());
         }
         visionPortal.close();
     }

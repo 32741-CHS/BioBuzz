@@ -10,9 +10,9 @@ import org.firstinspires.ftc.teamcode.configs.BotHardware;
 import org.firstinspires.ftc.teamcode.configs.Globals;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
-import org.firstinspires.ftc.teamcode.subsystems.OdometryLogger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemHandler;
 
+/// Light TeleOp is an almost entirely self-contained script designed for basic operations.
 @TeleOp(name = "Light TeleOp")
 public class LightTeleOp extends OpMode {
     GamepadWrapper driverGamepad, shooterGamepad;
@@ -29,8 +29,7 @@ public class LightTeleOp extends OpMode {
         allSubsystems = new SubsystemHandler(
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
                 (shooterGamepad = GamepadWrapper.newOperatorGamepad(gamepad2)),
-                (drivetrain = new Drivetrain(0, 0, 0)),
-                new OdometryLogger()
+                (drivetrain = new Drivetrain(0, 0, 0))
         );
 
         drivetrain.bindToGamepad(driverGamepad); // Passing gamepad should be avoided as much as possible...
