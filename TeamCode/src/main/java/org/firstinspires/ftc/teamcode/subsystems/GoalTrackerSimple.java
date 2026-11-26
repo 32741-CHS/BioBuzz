@@ -92,10 +92,6 @@ public class GoalTrackerSimple implements SubsystemBase {
         return null;
     }
 
-    public void setIsTeamRed(boolean isRed) {
-        isRedAlliance = isRed;
-    }
-
     public double getDistance() {
         return distanceToGoal / 100 * 2.54;
     }

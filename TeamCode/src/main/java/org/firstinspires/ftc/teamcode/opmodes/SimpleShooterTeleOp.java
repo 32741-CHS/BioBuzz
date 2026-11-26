@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_BIG_BALL;
-import static org.firstinspires.ftc.teamcode.configs.Globals.SERVO_SMALL_BALL;
 import static org.firstinspires.ftc.teamcode.configs.Globals.simpleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
+import org.firstinspires.ftc.teamcode.configs.StandardKeyBinds;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.GamepadWrapper;
@@ -48,44 +47,20 @@ public class SimpleShooterTeleOp extends OpMode {
         allSubsystems.init(botHardware);
 
         /// Key Binds
-        driverGamepad.leftTrigger
-                .onPress(() -> drivetrain.speed(0.5))
-                .onRelease(() -> drivetrain.speed(1));
-
-//        shooterGamepad.leftTrigger
-//                .whenHeld(simpleFeederAndFlywheel::requestFeed)
-//                .onRelease(simpleFeederAndFlywheel::stopFeed);
-
-        shooterGamepad.rightTrigger
-                .onPress(() -> {
-                    botHardware.intake.setPower(1);
-                    botHardware.feeder.setPower(1);
-                })
-                .onRelease(() -> botHardware.intake.setPower(0));
-
-        shooterGamepad.leftBumper
-                .onPress(() -> botHardware.servo.setPosition(SERVO_SMALL_BALL))
-                .onRelease(() -> botHardware.servo.setPosition(SERVO_BIG_BALL));
+        new StandardKeyBinds(botHardware, drivetrain, driverGamepad, shooterGamepad);
     }
 
     @Override
     public void loop() {
-        botHardware.intake.setPower(1);
-        botHardware.feeder.setPower(1);
-
         allSubsystems.update();
-        fancyFlywheel.changeGoal(goalTrackerSimple.getDistance(), goalTrackerSimple.getZHeading());
-        double heading = goalTrackerSimple.getXHeading();
-        drivetrain.turnInput(heading);
 
-        // Telemetry
-        simpleTelemetry.addData("[drivetrain] X", drivetrain.getX());
-        simpleTelemetry.addData("[drivetrain] Y", drivetrain.getY());
-        simpleTelemetry.addData(
-                "[drivetrain] Heading",
-                Math.toDegrees(drivetrain.getHeading())
-        );
-        simpleTelemetry.addData("[GoalTrackerSimple] Heading", goalTrackerSimple.getDistance());
+        fancyFlywheel.changeGoal(goalTrackerSimple.getDistance(), goalTrackerSimple.getZHeading());
+
+        drivetrain.turnInput(goalTrackerSimple.getXHeading());
+
+        /// Telemetry
+        simpleTelemetry.addData("[GoalTrackerSimple] getDistance", goalTrackerSimple.getDistance());
+        simpleTelemetry.addData("[GoalTrackerSimple] getXHeading", goalTrackerSimple.getXHeading());
 
     }
 }

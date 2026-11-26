@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.BotHardware;
+import org.firstinspires.ftc.teamcode.configs.StandardKeyBinds;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -23,7 +24,6 @@ public class MainTeleOp extends OpMode {
     private BotHardware botHardware;
     private SubsystemHandler allSubsystems;
     private Drivetrain drivetrain;
-    private Feeder feeder;
     private Flywheel flywheel;
     // private ColourDetector colourDetector;
     private Turret turret;
@@ -37,6 +37,7 @@ public class MainTeleOp extends OpMode {
         // Subsystems
 
         // Pass all subsystems into the handler
+        Feeder feeder;
         allSubsystems = new SubsystemHandler(
                 // (colourDetector = new ColourDetector()),
                 (driverGamepad = GamepadWrapper.newDriverGamepad(gamepad1)),
@@ -54,31 +55,8 @@ public class MainTeleOp extends OpMode {
         allSubsystems.init(botHardware);
         Flywheel.canSpinFlywheel = true;
 
-        // Key Binds
-        driverGamepad.leftTrigger /// Robot Speed
-                .onPress(() -> drivetrain.speed(0.5))
-                .onRelease(() -> drivetrain.speed(1));
-//        driverGamepad.btnY
-//                .onPress(() -> fieldCentricDriving = !fieldCentricDriving);
-
-        shooterGamepad.leftTrigger
-                .onPress(() -> botHardware.intake.setPower(1))
-                .onRelease(() -> botHardware.intake.setPower(0));
-
-        shooterGamepad.rightTrigger
-                .onPress(() -> botHardware.feeder.setPower(1))
-                .onRelease(() -> botHardware.feeder.setPower(0));
-
-        shooterGamepad.btnA /// Reverse
-                .onPress(() -> botHardware.intake.setPower(-1))
-                .onPress(() -> botHardware.intake.setPower(-1))
-                .onRelease(() -> botHardware.feeder.setPower(0))
-                .onRelease(() -> botHardware.feeder.setPower(0));
-        /*
-        shooterGamepad.rightTrigger /// Feed Ball (Shoot)
-                .whenHeld(feeder::tryRunMotorIfReady)
-                .onRelease(feeder::stopMotor);
-         */
+        /// Key Binds
+        new StandardKeyBinds(botHardware, drivetrain, driverGamepad, shooterGamepad);
     }
 
     @Override
@@ -93,8 +71,6 @@ public class MainTeleOp extends OpMode {
                 "[drivetrain] Heading",
                 Math.toDegrees(drivetrain.getHeading())
         );
-
-        simpleTelemetry.update();
 
         // Flywheel & Turret
         if (goaltracker.getBest() != null) {
