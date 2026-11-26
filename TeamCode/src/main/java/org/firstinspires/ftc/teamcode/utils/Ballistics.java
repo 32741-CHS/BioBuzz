@@ -14,10 +14,6 @@ public class Ballistics {
                             {3.45, 73.5}
                     });
 
-    public static double calculateTurretAngle(double tagBearingDeg, double currentAngleDeg) {
-        return currentAngleDeg + tagBearingDeg;
-    }
-
     public static double calculateFlywheelRPS(double distance) {
         if (Double.isNaN(distance) || Double.isInfinite(distance)) {
             return 0.0;

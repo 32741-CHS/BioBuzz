@@ -27,7 +27,8 @@ public class SimpleColourSensor implements SubsystemBase {
                         PredominantColorProcessor.Swatch.BLUE,
                         PredominantColorProcessor.Swatch.YELLOW,
                         PredominantColorProcessor.Swatch.BLACK,
-                        PredominantColorProcessor.Swatch.WHITE) // Empty intake background
+                        PredominantColorProcessor.Swatch.WHITE
+                )
                 .build();
 
         // 2. Attach the processor to VisionPortal
